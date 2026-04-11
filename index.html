@@ -429,6 +429,74 @@
         .enter-btn:hover i {
             transform: translateX(10px);
         }
+        
+        /* ============================================
+           返回开始界面按钮 - 赛博朋克版
+           ============================================ */
+        .back-to-welcome-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 4px;
+            color: #00d4ff;
+            font-size: 0.9em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            font-family: 'Courier New', monospace;
+        }
+        .back-to-welcome-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            animation: tacticalPulse 2s ease-in-out infinite;
+        }
+        .back-to-welcome-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 44, 191, 0.2));
+            border-color: #00d4ff;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+        }
+        .back-to-welcome-btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+        .back-to-welcome-btn .btn-icon {
+            font-size: 1.2em;
+            transition: transform 0.3s;
+        }
+        .back-to-welcome-btn:hover .btn-icon {
+            transform: translateX(-5px);
+            animation: slideInLeft 0.3s ease-out;
+        }
+        .back-to-welcome-btn .btn-text {
+            position: relative;
+        }
+        .back-to-welcome-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .back-to-welcome-btn:hover::before {
+            left: 100%;
+        }
         .bg-layer {
             position: fixed;
             top: 0;
@@ -3850,6 +3918,12 @@
         <!-- 右下角简介按钮 -->
         <div class="welcome-info-btn" onclick="toggleInfoModal(true)">i</div>
     </div>
+
+    <!-- 返回开始界面按钮 (固定在主页面右下角) -->
+    <button id="backToWelcomeBtn" class="back-to-welcome-btn" onclick="backToWelcome()" title="返回开始界面">
+        <span class="btn-icon">↩</span>
+        <span class="btn-text">返回</span>
+    </button>
 
     <!-- Windows 11 弹窗 -->
     <div id="windows11Modal" class="windows11-modal" onclick="hideWindows11Modal()">
@@ -7361,7 +7435,9 @@
                     // 动画彻底结束后标记完成
                     setTimeout(() => {
                         isTransitioning = false;
-                        // 移除 DOM 避免影响性能（可选，但目前为了保留状态先不删）
+                        // 显示返回开始界面按钮
+                        const backBtn = document.getElementById('backToWelcomeBtn');
+                        if (backBtn) backBtn.classList.add('visible');
                     }, 500);
                 }, 400); // 在 1s 动画进行到 0.4s 时开始渲染
             } catch (err) {
@@ -7369,6 +7445,46 @@
                 isTransitioning = false;
                 const welcome = document.getElementById('welcomePage');
                 if (welcome) welcome.style.display = 'none';
+            }
+        }
+
+        // 返回开始界面
+        function backToWelcome() {
+            if (isTransitioning) return;
+            
+            try {
+                const welcome = document.getElementById('welcomePage');
+                const backBtn = document.getElementById('backToWelcomeBtn');
+                
+                if (!welcome) return;
+                
+                isTransitioning = true;
+                
+                // 隐藏返回按钮
+                if (backBtn) backBtn.classList.remove('visible');
+                
+                // 显示欢迎页
+                welcome.classList.remove('hidden');
+                
+                // 重新启动蜂窝动画
+                if (!honeycombAnimId) {
+                    animateHoneycomb();
+                }
+                
+                // 重新启动开场动画
+                initWelcomeAnimation();
+                
+                // 滚动到顶部
+                window.scrollTo(0, 0);
+                
+                // 动画结束后重置状态
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 1000);
+                
+            } catch (err) {
+                console.error('返回开始界面失败:', err);
+                isTransitioning = false;
             }
         }
 
