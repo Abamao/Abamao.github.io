@@ -4153,11 +4153,18 @@
                         <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9em;">由 MCJS 提供技术支持 Eargecraft 1.8</p>
                         
                         <div style="background: rgba(139,195,74,0.1); border: 1px solid rgba(139,195,74,0.3); border-radius: 10px; padding: 10px 15px; margin-bottom: 15px; font-size: 0.85em; color: var(--text-secondary);">
-                            💡 提示：点击全屏按钮可获得最佳游戏体验
+                            💡 提示：点击游戏画面后按 ESC 释放鼠标，WASD 移动，空格跳跃
                         </div>
                         
-                        <div style="position: relative; width: 100%; height: 400px; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px;">
-                            <iframe id="mcIframe" src="about:blank" data-src="https://play.mcjs.cc/1.8.8/" style="width: 100%; height: 100%; border: none;" allow="fullscreen; gamepad; autoplay; clipboard-write;" loading="lazy"></iframe>
+                        <div id="mcContainer" style="position: relative; width: 100%; height: 400px; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 15px; cursor: pointer;">
+                            <iframe id="mcIframe" src="about:blank" data-src="https://play.mcjs.cc/1.8.8/" style="width: 100%; height: 100%; border: none;" allow="fullscreen; gamepad; autoplay; clipboard-write;" loading="lazy" tabindex="0"></iframe>
+                            <div id="mcClickOverlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 10; transition: opacity 0.3s;">
+                                <div style="text-align: center; color: #fff;">
+                                    <div style="font-size: 3em; margin-bottom: 10px;">🖱️</div>
+                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">点击此处进入游戏</div>
+                                    <div style="font-size: 0.9em; opacity: 0.8;">点击后 WASD 移动，鼠标控制视角</div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div style="display: flex; gap: 10px; justify-content: center;">
@@ -4780,12 +4787,46 @@
                 if (mcIframe) {
                     mcIframe.src = mcIframe.getAttribute('data-src');
                 }
+                // 显示点击提示层
+                const overlay = document.getElementById('mcClickOverlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    overlay.style.opacity = '1';
+                }
             } else {
                 errorDiv.textContent = '密码错误！';
                 document.getElementById('onlinemcPasswordInput').value = '';
                 document.getElementById('onlinemcPasswordInput').focus();
             }
         }
+
+        // 在线 MC 点击聚焦功能
+        function initMCClickHandler() {
+            const container = document.getElementById('mcContainer');
+            const overlay = document.getElementById('mcClickOverlay');
+            const iframe = document.getElementById('mcIframe');
+            
+            if (container && overlay && iframe) {
+                container.addEventListener('click', function() {
+                    // 隐藏提示层
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 300);
+                    
+                    // 聚焦 iframe
+                    iframe.focus();
+                    
+                    // 尝试请求指针锁定（游戏需要）
+                    if (iframe.requestPointerLock) {
+                        iframe.requestPointerLock();
+                    }
+                });
+            }
+        }
+
+        // 初始化点击处理
+        document.addEventListener('DOMContentLoaded', initMCClickHandler);
 
         // 在线 MC 全屏功能
         function toggleMCFullscreen() {
