@@ -5629,11 +5629,11 @@
             }
         });
 
+        // 强制所有分类默认折叠
         Object.keys(siteData.categories).forEach(key => {
-            if (typeof siteData.categories[key].collapsed !== 'boolean') {
-                siteData.categories[key].collapsed = true;
-            }
+            siteData.categories[key].collapsed = true;
         });
+        saveData();
 
         let isAdmin = false;
 
