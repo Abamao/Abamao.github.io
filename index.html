@@ -530,49 +530,63 @@
             position: fixed;
             top: 20px;
             left: 20px;
-            width: 50px;
+            width: auto;
             height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 28px;
+            padding: 0 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #ffd700, #ffed4a, #9d4edd);
+            background-size: 200% 200%;
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            color: #1a1a1a;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4), 0 0 30px rgba(157, 78, 221, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.3);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
             user-select: none;
-            animation: tacticalPulse 2s ease-in-out infinite, float 3s ease-in-out infinite;
+            animation: vip3Gradient 3s ease infinite, vip3Pulse 2s ease-in-out infinite;
+        }
+        @keyframes vip3Gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes vip3Pulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4), 0 0 30px rgba(157, 78, 221, 0.3); }
+            50% { box-shadow: 0 6px 30px rgba(255, 215, 0, 0.6), 0 0 50px rgba(157, 78, 221, 0.5); }
         }
         .fish-icon:hover { 
-            transform: scale(1.15) rotate(-5deg); 
-            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.6), inset 0 2px 15px rgba(255, 255, 255, 0.3);
-            animation: glitch 0.3s ease-in-out, tacticalPulse 0.5s ease-in-out infinite;
+            transform: scale(1.05) translateY(-3px); 
+            box-shadow: 0 8px 35px rgba(255, 215, 0, 0.6), 0 0 60px rgba(157, 78, 221, 0.5);
         }
         .fish-icon::after {
-            content: '🔒';
+            content: 'VIP';
             position: absolute;
-            bottom: -5px;
+            top: -8px;
             right: -5px;
-            font-size: 16px;
-            background: var(--bg-card);
-            border-radius: 50%;
-            padding: 2px;
-            border: 1px solid var(--border-color);
+            font-size: 10px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ff4757, #ff6b6b);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             animation: breathe 2s ease-in-out infinite;
         }
         .fish-icon::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 50%;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 28px;
             animation: energyWave 2s ease-in-out infinite;
         }
         .admin-btn {
@@ -2653,6 +2667,71 @@
         }
         .code-block.tactical {
             margin: 0;
+        }
+
+        /* ============================================
+           VIP3 专属金色/紫色主题
+           ============================================ */
+        body.vip3-mode {
+            --vip3-gold: #ffd700;
+            --vip3-purple: #9d4edd;
+            --vip3-gold-light: #ffed4a;
+        }
+        
+        body.vip3-mode .fish-content-panel {
+            background: linear-gradient(135deg, rgba(40, 30, 60, 0.98), rgba(60, 40, 90, 0.95));
+            border: 2px solid var(--vip3-gold);
+            box-shadow: 
+                0 0 60px rgba(255, 215, 0, 0.3),
+                0 0 100px rgba(157, 78, 221, 0.2),
+                inset 0 0 60px rgba(255, 215, 0, 0.05);
+        }
+        
+        body.vip3-mode .fish-content-panel::before {
+            background: linear-gradient(90deg, transparent, var(--vip3-gold), transparent);
+            animation: vip3Scanline 1.5s linear infinite;
+        }
+        
+        @keyframes vip3Scanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        body.vip3-mode .fish-tactical-header h3 {
+            color: var(--vip3-gold);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        body.vip3-mode .fish-tab.active {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(157, 78, 221, 0.3));
+            border-color: var(--vip3-gold);
+            color: var(--vip3-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        
+        body.vip3-mode .fish-tab:hover {
+            border-color: var(--vip3-gold);
+            color: var(--vip3-gold-light);
+        }
+        
+        body.vip3-mode .btn-primary {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(157, 78, 221, 0.15));
+            color: var(--vip3-gold);
+            border-color: var(--vip3-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+        }
+        
+        body.vip3-mode .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(157, 78, 221, 0.3));
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+        }
+        
+        @keyframes vip3IconPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .code-block.tactical code {
             padding: 12px;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3201,8 +3280,6 @@
             .game-options {
                 grid-template-columns: 1fr;
             }
-        }
-            animation: diamondSparkle 1.5s infinite;
         }
         @keyframes diamondSparkle {
             0%, 100% { transform: scale(1); filter: brightness(1); }
@@ -3896,7 +3973,23 @@
     <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">🌙</button>
     <button class="theme-toggle bg-toggle" onclick="changeBackground()" title="更换背景图">🖼️</button>
     <button class="theme-toggle cookie-toggle" onclick="clearAllData()" title="清除所有数据">🍪</button>
-    <div class="fish-icon" title="🐟 点击访问" onclick="showFishPasswordModal()">🐟</div>
+    <div class="fish-icon" title="💎 VIP 权益专区" onclick="showFishPasswordModal()">💎 VIP 权益专区</div>
+
+    <!-- VIP3 密码保护弹窗 -->
+    <div id="vip3PasswordModal" class="fish-password-modal">
+        <div class="fish-password-content" style="border-color: #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);">
+            <h3 style="color: #ffd700;">👑 VIP3 专属区域</h3>
+            <p>请输入 VIP3 访问密码</p>
+            <div class="password-input-container">
+                <input type="password" id="vip3PasswordInput" placeholder="输入密码..." maxlength="20" style="border-color: rgba(255, 215, 0, 0.5);">
+            </div>
+            <div class="fish-password-error" id="vip3PasswordError"></div>
+            <div class="fish-password-buttons">
+                <button class="btn btn-secondary" onclick="closeVIP3PasswordModal()">取消</button>
+                <button class="btn btn-primary" onclick="checkVIP3Password()" style="background: linear-gradient(135deg, #ffd700, #9d4edd); color: #1a1a1a;">确认</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 鱼图标密码保护弹窗 -->
     <div id="fishPasswordModal" class="fish-password-modal">
@@ -3960,7 +4053,7 @@
     <div id="fishContentPanel" class="fish-content-panel">
         <div class="fish-content-content">
             <div class="fish-tactical-header">
-                <h3>🐟 战术指挥中心 // FISH_MODE</h3>
+                <h3>💎 VIP 权益专区</h3>
                 <div class="fish-tactical-status">
                     <span><span class="status-dot"></span>SYSTEM ONLINE</span>
                     <span id="tacticalTime">00:00:00</span>
@@ -3976,6 +4069,7 @@
                 <div class="fish-tab onlinemc-tab" onclick="showOnlineMCPassword()" data-tab="onlinemc">🌐 在线 MC</div>
                 <div class="fish-tab cps-tab" onclick="switchFishTab('cps')" data-tab="cps">🖱️ CPS测试</div>
                 <div class="fish-tab fakeupdate-tab" onclick="switchFishTab('fakeupdate')" data-tab="fakeupdate">🔄 假装更新</div>
+                <div class="fish-tab vip3-tab" onclick="switchFishTab('vip3')" data-tab="vip3">💎 VIP3 主题</div>
             </div>
             <div class="fish-tactical-body">
             <div class="fish-tab-content" id="moyuContent">
@@ -3989,6 +4083,39 @@
                     </div>
                 </div>
             </div>
+            <div class="fish-tab-content hidden" id="vip3Content">
+                <div class="vip3-mode">
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 3em; margin-bottom: 15px;">💎 ✨ 💎</div>
+                        <h3 style="color: #ffd700; margin-bottom: 10px;">VIP3 专属主题</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 20px;">金色/紫色专属配色，尊贵体验</p>
+                        
+                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
+                            <span style="background: rgba(255,215,0,0.1); padding: 8px 15px; border-radius: 20px; color: #ffd700;">✨ 金色主题</span>
+                            <span style="background: rgba(157,78,221,0.1); padding: 8px 15px; border-radius: 20px; color: #9d4edd;">💜 紫色渐变</span>
+                            <span style="background: rgba(255,237,74,0.1); padding: 8px 15px; border-radius: 20px; color: #ffed4a;">🎨 动态效果</span>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(157,78,221,0.1)); border: 2px solid #ffd700; border-radius: 20px; padding: 30px; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
+                            <div style="font-size: 2.5em; margin-bottom: 15px;">👑</div>
+                            <div style="font-size: 1.2em; font-weight: bold; color: #ffd700; margin-bottom: 10px;">VIP3 尊贵身份</div>
+                            <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">
+                                启用专属金色/紫色主题<br>
+                                享受独特的视觉体验
+                            </div>
+                            <button onclick="toggleVIP3Theme()" id="vip3ThemeBtn" style="display: inline-block; background: linear-gradient(135deg, #ffd700, #9d4edd); color: #1a1a1a; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1em;">
+                                ✨ 启用 VIP3 主题
+                            </button>
+                        </div>
+                        
+                        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 10px; padding: 12px 20px; font-size: 0.85em; color: #ffc107; margin-bottom: 20px;">
+                            💡 提示：VIP3 主题会在整个网站生效
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
+                    </div>
+                </div>
+
             <div class="fish-tab-content hidden" id="tuokongContent">
                 <div class="tuokong-mode">
                     <h4>🔓 快速脱控</h4>
@@ -4025,276 +4152,74 @@
                             <div class="tactic-name">强制终止</div>
                             <div class="tactic-desc">立即结束进程</div>
                             <div class="code-block tactical">
-                                <code><span style="color:#ff6b6b">taskkill</span> <span style="color:#feca57">/f</span> <span style="color:#48dbfb">/im</span> <span style="color:#ff9ff3">StudentMain.exe</span></code>
+                                <code>taskkill /f /im StudentMain.exe</code>
                                 <button class="copy-btn tactical-btn" onclick="copyShantiCode('kill')">复制</button>
                             </div>
                         </div>
-                        <div class="tactic-card suspend-card">
-                            <div class="tactic-icon">⏸️</div>
-                            <div class="tactic-name">进程挂起</div>
-                            <div class="tactic-desc">暂停进程执行</div>
-                            <div class="code-block tactical">
-                                <code><span style="color:#feca57">pssuspend</span> <span style="color:#ff9ff3">StudentMain.exe</span></code>
-                                <button class="copy-btn tactical-btn" onclick="copyShantiCode('suspend')">复制</button>
-                            </div>
-                        </div>
-                        <div class="tactic-card resume-card">
-                            <div class="tactic-icon">▶️</div>
-                            <div class="tactic-name">恢复进程</div>
-                            <div class="tactic-desc">继续进程执行</div>
-                            <div class="code-block tactical">
-                                <code><span style="color:#48dbfb">pssuspend</span> <span style="color:#ff6b6b">-r</span> <span style="color:#ff9ff3">StudentMain.exe</span></code>
-                                <button class="copy-btn tactical-btn" onclick="copyShantiCode('resume')">复制</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="tactical-footer">
-                        <span class="warning-icon">⚠️</span>
-                        <span>需要 Sysinternals PsTools | 以管理员身份运行 CMD</span>
                     </div>
                     <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 20px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="mcContent">
                 <div class="mc-mode">
-                    <div class="mc-header">
-                        <div class="mc-grass"></div>
-                        <h4>⛏️ MINECRAFT ZONE</h4>
-                        <div class="mc-grass"></div>
-                    </div>
-                    <div class="mc-intro">
-                        <span class="mc-block dirt">🟫</span>
-                        <span class="mc-text">探索无限世界</span>
-                        <span class="mc-block grass">🟩</span>
-                    </div>
-                    <div class="mc-options">
-                        <a href="https://www.mcjs.cc" target="_blank" class="mc-card mcjs-card">
-                            <div class="mc-card-glow"></div>
-                            <div class="mc-icon">📜</div>
-                            <div class="mc-card-title">MCJS 资源站</div>
-                            <div class="mc-card-desc">MC 脚本与插件资源</div>
-                            <div class="mc-card-url">mcjs.cc</div>
-                            <div class="mc-launch-btn">🚀 立即访问</div>
-                        </a>
-                        <a href="https://pcl.ruanmao.net" target="_blank" class="mc-card pcl-card">
-                            <div class="mc-card-glow"></div>
-                            <div class="mc-icon">🚀</div>
-                            <div class="mc-card-title">PCL2 启动器</div>
-                            <div class="mc-card-desc">最好的 MC 启动器</div>
-                            <div class="mc-card-url">pcl.ruanmao.net</div>
-                            <div class="mc-launch-btn pcl-launch">⚡ 前往下载</div>
-                        </a>
-                    </div>
-                    
-                    <!-- MC 速查栏目 -->
-                    <div class="mc-quick-lookup" style="margin-top: 30px; padding: 20px; background: linear-gradient(135deg, rgba(0, 100, 0, 0.1), rgba(0, 150, 0, 0.05)); border: 2px solid rgba(0, 200, 0, 0.3); border-radius: 15px;">
-                        <div class="mc-quick-header" style="text-align: center; margin-bottom: 20px;">
-                            <h5 style="color: #00c853; font-size: 1.2em; margin: 0; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                                <span>📚</span>
-                                <span>MC 速查</span>
-                                <span>🔍</span>
-                            </h5>
-                            <p style="color: var(--text-secondary); font-size: 0.85em; margin: 8px 0 0 0;">快速查询 MC 资料与种子地图</p>
-                        </div>
-                        <div class="mc-quick-options" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                            <a href="https://www.mcmod.cn" target="_blank" class="mc-card mcwiki-card" style="background: linear-gradient(135deg, rgba(139, 195, 74, 0.15), rgba(104, 159, 56, 0.1)); border-color: rgba(139, 195, 74, 0.4);">
-                                <div class="mc-card-glow" style="background: radial-gradient(circle, rgba(139, 195, 74, 0.3) 0%, transparent 70%);"></div>
-                                <div class="mc-icon" style="font-size: 2.5em;">📖</div>
-                                <div class="mc-card-title" style="color: #8bc34a;">MC 百科</div>
-                                <div class="mc-card-desc">模组、物品、合成表查询</div>
-                                <div class="mc-card-url" style="color: #8bc34a;">mcmod.cn</div>
-                                <div class="mc-launch-btn" style="background: linear-gradient(135deg, #8bc34a, #689f38);">🔍 立即查询</div>
-                            </a>
-                            <a href="https://www.chunkbase.com" target="_blank" class="mc-card chunkbase-card" style="background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(245, 124, 0, 0.1)); border-color: rgba(255, 152, 0, 0.4);">
-                                <div class="mc-card-glow" style="background: radial-gradient(circle, rgba(255, 152, 0, 0.3) 0%, transparent 70%);"></div>
-                                <div class="mc-icon" style="font-size: 2.5em;">🗺️</div>
-                                <div class="mc-card-title" style="color: #ff9800;">Chunkbase</div>
-                                <div class="mc-card-desc">种子查询、地图查看器</div>
-                                <div class="mc-card-url" style="color: #ff9800;">chunkbase.com</div>
-                                <div class="mc-launch-btn" style="background: linear-gradient(135deg, #ff9800, #f57c00);">🌱 查种子</div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="mc-footer">
-                        <span class="diamond">💎</span>
-                        <span>Happy Mining!</span>
-                        <span class="diamond">💎</span>
+                    <h4>⛏️ MC专栏</h4>
+                    <p>Minecraft 资源导航</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                        <a href="https://www.mcjs.cc" target="_blank" class="btn btn-primary">MCJS 资源站</a>
+                        <a href="https://pcl.ruanmao.net" target="_blank" class="btn btn-primary">PCL2 启动器</a>
                     </div>
                     <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 20px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="gameContent">
                 <div class="game-mode">
-                    <h4>🎮 休闲小游戏</h4>
-                    <p>工作累了？来一局放松一下吧！</p>
-                    <div class="game-options">
-                        <div class="game-card" onclick="startSnakeGame()">
-                            <div class="game-icon">🐍</div>
-                            <div class="game-title">贪吃蛇</div>
-                            <div class="game-desc">经典怀旧</div>
-                        </div>
-                        <div class="game-card" onclick="startTetrisGame()">
-                            <div class="game-icon">🧱</div>
-                            <div class="game-title">俄罗斯方块</div>
-                            <div class="game-desc">考验反应</div>
-                        </div>
-                        <div class="game-card" onclick="start2048Game()">
-                            <div class="game-icon">🔢</div>
-                            <div class="game-title">2048</div>
-                            <div class="game-desc">数字合成</div>
-                        </div>
+                    <h4>🎮 小游戏</h4>
+                    <p>选择游戏：</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                        <button class="btn btn-primary" onclick="startGame('snake')">🐍 贪吃蛇</button>
+                        <button class="btn btn-primary" onclick="startGame('tetris')">🧱 俄罗斯方块</button>
+                        <button class="btn btn-primary" onclick="startGame('breakout')">🎯 打砖块</button>
                     </div>
-                    <div id="gameContainer" class="game-container hidden">
-                        <canvas id="gameCanvas" width="400" height="400"></canvas>
-                        <div class="game-controls">
-                            <button class="btn btn-secondary" onclick="closeGame()">退出游戏</button>
-                            <button class="btn btn-primary" onclick="restartGame()">重新开始</button>
-                        </div>
-                        <div class="game-score">得分: <span id="gameScore">0</span></div>
-                    </div>
+                    <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 20px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="jiyuContent">
                 <div class="jiyu-mode">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 3em; margin-bottom: 15px;">💀 🎯 💀</div>
-                        <h3 style="color: #ff4757; margin-bottom: 10px;">极域稳杀</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">终结极域电子教室的终极武器</p>
-                        
-                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
-                            <span style="background: rgba(255,71,87,0.1); padding: 8px 15px; border-radius: 20px; color: #ff6b6b;">⚡ 一键卸载</span>
-                            <span style="background: rgba(255,71,87,0.1); padding: 8px 15px; border-radius: 20px; color: #ff6b6b;">🛡️ 彻底根除</span>
-                            <span style="background: rgba(255,71,87,0.1); padding: 8px 15px; border-radius: 20px; color: #ff6b6b;">🔒 防止恢复</span>
-                        </div>
-                        
-                        <div style="background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(44,44,84,0.9)); border: 2px solid #ff4757; border-radius: 20px; padding: 30px; margin-bottom: 20px; max-width: 350px; margin-left: auto; margin-right: auto;">
-                            <div style="font-size: 3em; margin-bottom: 10px;">📦</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #ff4757; margin-bottom: 5px;">极域稳杀工具</div>
-                            <div style="font-size: 0.85em; color: #e74c3c; margin-bottom: 15px;">v2.0 稳定版</div>
-                            <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">支持 Windows 7/8/10/11</div>
-                            <a href="https://www.onlinedown.net/soft/10017708.htm" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ff4757, #e74c3c); color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold;">🚀 立即下载</a>
-                        </div>
-                        
-                        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 10px; padding: 12px 20px; font-size: 0.85em; color: #ffc107; margin-bottom: 20px;">
-                            ⚠️ 请在老师不注意的时候使用，后果自负！
-                        </div>
-                        
-                        <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
+                    <h4>🎯 极域稳杀</h4>
+                    <p>卸载极域教室控制软件</p>
+                    <div class="code-block">
+                        <code>wmic product where name='StudentMain' call uninstall</code>
+                        <button class="copy-btn" onclick="copyJiyuCode()">📋 复制命令</button>
                     </div>
+                    <p class="hint">在 CMD 中以管理员身份运行</p>
+                    <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 15px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="onlinemcContent">
                 <div class="onlinemc-mode">
-                    <div style="text-align: center; padding: 10px;">
-                        <div style="font-size: 2.5em; margin-bottom: 10px;">⛏️ 🌐 ⛏️</div>
-                        <h3 style="color: #8bc34a; margin-bottom: 10px;">在线 MC</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9em;">由 MCJS 提供技术支持 Eargecraft 1.8</p>
-                        
-                        <div style="background: rgba(255,152,0,0.15); border: 1px solid rgba(255,152,0,0.4); border-radius: 10px; padding: 15px; margin-bottom: 15px; font-size: 0.9em; color: #ff9800; text-align: center;">
-                            <div style="font-weight: bold; margin-bottom: 5px;">⚠️ 重要提示</div>
-                            <div>由于浏览器安全限制，嵌入的 Minecraft 无法直接使用键盘控制</div>
-                            <div style="margin-top: 8px; color: var(--text-secondary);">请使用下方按钮在新标签页打开游戏</div>
-                        </div>
-                        
-                        <div style="position: relative; width: 100%; height: 300px; background: linear-gradient(135deg, #1a1a2e, #0f0f23); border-radius: 12px; overflow: hidden; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
-                            <div style="text-align: center; color: var(--text-secondary);">
-                                <div style="font-size: 4em; margin-bottom: 15px;">⛏️</div>
-                                <div style="font-size: 1.1em; margin-bottom: 5px;">Minecraft 在线版</div>
-                                <div style="font-size: 0.85em; opacity: 0.7;">play.mcjs.cc</div>
-                            </div>
-                        </div>
-                        
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openMCInNewTab()" style="background: linear-gradient(135deg, #8bc34a, #4caf50); font-size: 1.1em; padding: 15px 30px;">🎮 在新标签页打开游戏</button>
-                            <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
-                        </div>
-                    </div>
+                    <h4>🌐 在线 MC</h4>
+                    <p>浏览器中直接玩 Minecraft</p>
+                    <button class="btn btn-primary" onclick="openOnlineMC()">🚀 开始游戏</button>
+                    <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 15px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="cpsContent">
                 <div class="cps-mode">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 2.5em; margin-bottom: 10px;">🖱️ ⚡ 🖱️</div>
-                        <h3 style="color: #ff6b6b; margin-bottom: 5px;">CPS 测试</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9em;">测试你的手速！每秒点击次数</p>
-                        
-                        <!-- 点击方式选择 -->
-                        <div style="margin-bottom: 20px;">
-                            <span style="color: var(--text-secondary); font-size: 0.85em; margin-right: 10px;">点击方式:</span>
-                            <select id="cpsClickMode" style="padding: 8px 15px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-size: 0.9em;">
-                                <option value="normal">🖱️ 普通点击 (Normal)</option>
-                                <option value="jitter">⚡ Jitter Click</option>
-                                <option value="butterfly">🦋 Butterfly Click</option>
-                                <option value="drag">🔥 Drag Click (DC)</option>
-                                <option value="god">👑 神之点击 (God Bridge)</option>
-                            </select>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px;">
-                            <div style="background: rgba(255,107,107,0.1); padding: 15px 25px; border-radius: 15px;">
-                                <div style="font-size: 2em; font-weight: bold; color: #ff6b6b;" id="cpsScore">0</div>
-                                <div style="font-size: 0.8em; color: var(--text-secondary);">CPS</div>
-                            </div>
-                            <div style="background: rgba(0,212,255,0.1); padding: 15px 25px; border-radius: 15px;">
-                                <div style="font-size: 2em; font-weight: bold; color: #00d4ff;" id="cpsTotal">0</div>
-                                <div style="font-size: 0.8em; color: var(--text-secondary);">总点击</div>
-                            </div>
-                            <div style="background: rgba(139,195,74,0.1); padding: 15px 25px; border-radius: 15px;">
-                                <div style="font-size: 2em; font-weight: bold; color: #8bc34a;" id="cpsTime">5</div>
-                                <div style="font-size: 0.8em; color: var(--text-secondary);">剩余秒</div>
-                            </div>
-                        </div>
-                        
-                        <div id="cpsArea" style="background: linear-gradient(135deg, rgba(255,107,107,0.2), rgba(255,107,107,0.05)); border: 3px dashed #ff6b6b; border-radius: 20px; padding: 60px 20px; margin-bottom: 20px; cursor: pointer; user-select: none; transition: all 0.1s;">
-                            <div style="font-size: 1.5em; color: #ff6b6b; font-weight: bold;">👆 点击这里！👆</div>
-                            <div style="font-size: 0.9em; color: var(--text-secondary); margin-top: 10px;">按住鼠标疯狂点击！</div>
-                        </div>
-                        
-                        <div style="display: flex; gap: 10px; justify-content: center;">
-                            <button class="btn btn-primary" onclick="startCPSTest()" style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a);">🔄 开始测试</button>
-                            <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
-                        </div>
-                        
-                        <div id="cpsResult" style="margin-top: 20px; padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px; display: none;">
-                            <div style="font-size: 1.2em; color: #ff6b6b; font-weight: bold;" id="cpsResultText"></div>
-                            <div style="font-size: 0.9em; color: var(--text-secondary); margin-top: 8px;" id="cpsClickModeText"></div>
-                        </div>
-                    </div>
+                    <h4>🖱️ CPS测试</h4>
+                    <p>测试你的手速</p>
+                    <div style="font-size: 3em; margin: 20px 0;" id="cpsScore">0</div>
+                    <button class="btn btn-primary" onclick="startCPSTest()" id="cpsBtn">开始测试</button>
+                    <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 15px;">关闭</button>
                 </div>
             </div>
             <div class="fish-tab-content hidden" id="fakeupdateContent">
                 <div class="fakeupdate-mode">
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 3em; margin-bottom: 15px;">🔄 💻 🔄</div>
-                        <h3 style="color: #00d4ff; margin-bottom: 10px;">假装更新</h3>
-                        <p style="color: var(--text-secondary); margin-bottom: 20px;">模拟 Windows 更新界面，完美摸鱼神器</p>
-                        
-                        <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;">
-                            <span style="background: rgba(0,212,255,0.1); padding: 8px 15px; border-radius: 20px; color: #00d4ff;">🎭 逼真界面</span>
-                            <span style="background: rgba(0,212,255,0.1); padding: 8px 15px; border-radius: 20px; color: #00d4ff;">⏱️ 百分比进度</span>
-                            <span style="background: rgba(0,212,255,0.1); padding: 8px 15px; border-radius: 20px; color: #00d4ff;">🛡️ 防打扰</span>
-                        </div>
-                        
-                        <div style="background: linear-gradient(135deg, rgba(0,100,200,0.2), rgba(0,50,150,0.2)); border: 2px solid #0078d4; border-radius: 20px; padding: 30px; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">
-                            <div style="font-size: 3em; margin-bottom: 10px;">🪟</div>
-                            <div style="font-size: 1.3em; font-weight: bold; color: #0078d4; margin-bottom: 5px;">Windows 10 更新</div>
-                            <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 20px;">fakeupdate.net</div>
-                            <div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px; text-align: left; padding: 0 20px;">
-                                <div style="margin-bottom: 8px;">✓ 模拟真实更新界面</div>
-                                <div style="margin-bottom: 8px;">✓ 自动滚动百分比</div>
-                                <div style="margin-bottom: 8px;">✓ 按 F11 全屏更逼真</div>
-                                <div>✓ 按 Enter 显示蓝屏彩蛋</div>
-                            </div>
-                            <button onclick="openFakeUpdate()" style="display: inline-block; background: linear-gradient(135deg, #0078d4, #005a9e); color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; font-size: 1em;">🚀 开始假装更新</button>
-                        </div>
-                        
-                        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 10px; padding: 12px 20px; font-size: 0.85em; color: #ffc107; margin-bottom: 20px;">
-                            💡 提示：按 F11 进入全屏模式，效果更佳！
-                        </div>
-                        
-                        <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
-                    </div>
+                    <h4>🔄 假装更新</h4>
+                    <p>模拟 Windows 更新界面</p>
+                    <button class="btn btn-primary" onclick="openFakeUpdate()">🚀 开始假装更新</button>
+                    <button class="btn btn-secondary" onclick="closeFishContentPanel()" style="margin-top: 15px;">关闭</button>
                 </div>
+            </div>
             </div>
             </div>
         </div>
@@ -4631,12 +4556,14 @@
 
         // 清除所有数据（曲奇图标功能）
         function clearAllData() {
-            if (confirm('🍪 确定要清除所有数据吗？\n\n这将清除：\n- 鱼图标密码尝试记录\n- 鱼图标锁定状态\n- 鱼图标解锁状态\n- 搜索历史记录\n- 主题设置\n- 点击统计数据\n- 所有本地存储的数据\n\n此操作不可恢复！')) {
+            if (confirm('🍪 确定要清除所有数据吗？\n\n这将清除：\n- 鱼图标密码尝试记录\n- 鱼图标锁定状态\n- 鱼图标解锁状态\n- VIP3 解锁状态\n- VIP3 主题设置\n- 搜索历史记录\n- 主题设置\n- 点击统计数据\n- 所有本地存储的数据\n\n此操作不可恢复！')) {
                 // 清除所有 localStorage
                 const keysToRemove = [
                     'fishAttempts',
                     'isFishLocked',
                     'fishUnlocked',
+                    'vip3Unlocked',
+                    'vip3ThemeEnabled',
                     'debugMode',
                     'adminMode',
                     'theme',
@@ -4666,6 +4593,11 @@
                 fishAttempts = 0;
                 isFishLocked = false;
                 fishUnlocked = false;
+                vip3Unlocked = false;
+                vip3ThemeEnabled = false;
+                
+                // 移除 VIP3 主题
+                document.body.classList.remove('vip3-mode');
                 
                 // 显示成功提示
                 alert('✅ 所有数据已清除！\n\n页面将在 2 秒后刷新...');
@@ -4824,6 +4756,64 @@
             }
         }
 
+        // VIP3 密码验证
+        const VIP3_PASSWORD = 'Ha147258';
+        let vip3Unlocked = localStorage.getItem('vip3Unlocked') === 'true';
+
+        function showVIP3PasswordModal() {
+            document.getElementById('vip3PasswordModal').classList.add('active');
+            document.getElementById('vip3PasswordInput').value = '';
+            document.getElementById('vip3PasswordError').textContent = '';
+            setTimeout(() => document.getElementById('vip3PasswordInput').focus(), 100);
+        }
+
+        function closeVIP3PasswordModal() {
+            document.getElementById('vip3PasswordModal').classList.remove('active');
+        }
+
+        function checkVIP3Password() {
+            const input = document.getElementById('vip3PasswordInput').value;
+            const errorDiv = document.getElementById('vip3PasswordError');
+
+            if (input === VIP3_PASSWORD) {
+                vip3Unlocked = true;
+                localStorage.setItem('vip3Unlocked', 'true');
+                closeVIP3PasswordModal();
+                // 切换到 VIP3 选项卡
+                switchFishTab('vip3');
+                showVIP3Notification('👑 VIP3 身份验证成功！');
+            } else {
+                errorDiv.textContent = '密码错误！';
+                document.getElementById('vip3PasswordInput').value = '';
+                document.getElementById('vip3PasswordInput').focus();
+            }
+        }
+
+        // 修改切换标签函数，添加 VIP3 密码检查
+        const originalSwitchFishTab = switchFishTab;
+        switchFishTab = function(tabName) {
+            if (tabName === 'vip3' && !vip3Unlocked) {
+                showVIP3PasswordModal();
+                return;
+            }
+            // 调用原来的函数
+            document.querySelectorAll('.fish-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            document.querySelectorAll('.fish-tab-content').forEach(content => {
+                content.classList.toggle('hidden', content.id !== tabName + 'Content');
+            });
+            if (tabName !== 'game') {
+                closeGame();
+            }
+            if (tabName !== 'onlinemc') {
+                const mcIframe = document.getElementById('mcIframe');
+                if (mcIframe && mcIframe.src !== 'about:blank') {
+                    mcIframe.src = 'about:blank';
+                }
+            }
+        };
+
         // 在线 MC 密码验证
         const ONLINEMC_PASSWORD = '20141028';
 
@@ -4923,6 +4913,74 @@
         // 打开假装更新
         function openFakeUpdate() {
             window.open('https://fakeupdate.net/win10ue/', '_blank');
+        }
+
+        // VIP3 主题切换功能
+        let vip3ThemeEnabled = localStorage.getItem('vip3ThemeEnabled') === 'true';
+
+        // 页面加载时恢复 VIP3 主题状态
+        window.addEventListener('load', function() {
+            if (vip3ThemeEnabled) {
+                document.body.classList.add('vip3-mode');
+                updateVIP3ButtonState();
+            }
+        });
+
+        function toggleVIP3Theme() {
+            vip3ThemeEnabled = !vip3ThemeEnabled;
+            localStorage.setItem('vip3ThemeEnabled', vip3ThemeEnabled.toString());
+            
+            if (vip3ThemeEnabled) {
+                document.body.classList.add('vip3-mode');
+                showVIP3Notification('✨ VIP3 金色主题已启用');
+            } else {
+                document.body.classList.remove('vip3-mode');
+                showVIP3Notification('❌ VIP3 主题已关闭');
+            }
+            updateVIP3ButtonState();
+        }
+
+        function updateVIP3ButtonState() {
+            const btn = document.getElementById('vip3ThemeBtn');
+            if (btn) {
+                if (vip3ThemeEnabled) {
+                    btn.textContent = '❌ 关闭 VIP3 主题';
+                    btn.style.background = 'linear-gradient(135deg, #666, #999)';
+                } else {
+                    btn.textContent = '✨ 启用 VIP3 主题';
+                    btn.style.background = 'linear-gradient(135deg, #ffd700, #9d4edd)';
+                }
+            }
+        }
+
+        function showVIP3Notification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: -400px;
+                background: linear-gradient(135deg, rgba(30, 20, 50, 0.98), rgba(50, 30, 80, 0.95));
+                border: 2px solid #ffd700;
+                border-radius: 12px;
+                padding: 15px 25px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.3);
+                z-index: 10000;
+                transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            `;
+            notification.innerHTML = `
+                <span style="font-size: 28px; animation: vip3IconPulse 1s ease-in-out infinite;">👑</span>
+                <span style="color: #ffd700; font-weight: 600; font-size: 0.95em;">${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.right = '30px', 10);
+            setTimeout(() => {
+                notification.style.right = '-400px';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
         }
 
         // CPS 测试功能
