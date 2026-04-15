@@ -597,6 +597,747 @@
         }
         .admin-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px var(--shadow-color); }
 
+        /* 成就按钮 */
+        .achievement-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2001;
+            animation: trophyFloat 3s ease-in-out infinite;
+        }
+        .achievement-btn:hover {
+            transform: scale(1.15) rotate(-10deg);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
+        }
+        .achievement-btn.has-new::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 16px;
+            height: 16px;
+            background: #ff4757;
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes trophyFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* 成就面板 */
+        .achievement-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .achievement-panel.active {
+            display: flex;
+        }
+        .achievement-content {
+            background: linear-gradient(135deg, rgba(30, 30, 50, 0.95), rgba(20, 20, 40, 0.98));
+            border-radius: 24px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+        }
+        .achievement-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .achievement-header h2 {
+            font-size: 2em;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .achievement-header p {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+        .achievement-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .achievement-item.unlocked {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 170, 0, 0.05));
+        }
+        .achievement-item.locked {
+            opacity: 0.5;
+        }
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        .achievement-item.unlocked .achievement-icon {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+        .achievement-item.locked .achievement-icon {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .achievement-info {
+            flex: 1;
+        }
+        .achievement-info h4 {
+            color: white;
+            margin-bottom: 4px;
+            font-size: 1.1em;
+        }
+        .achievement-info p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9em;
+        }
+        .achievement-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .achievement-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        /* 成就解锁提示 */
+        .achievement-toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 170, 0, 0.95));
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+            z-index: 4000;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .achievement-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .achievement-toast .icon {
+            font-size: 32px;
+        }
+        .achievement-toast .text h4 {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .achievement-toast .text p {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* 成就分类样式 */
+        .achievement-category {
+            margin-bottom: 30px;
+        }
+        .achievement-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+            border-left: 4px solid;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 15px;
+        }
+        .achievement-category-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .achievement-category-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .achievement-category-header h3 {
+            color: white;
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .achievement-category-header p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85em;
+            margin: 0;
+        }
+        .achievement-category-progress {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        .achievement-category-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .achievement-check {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .achievement-roadmap {
+            margin-bottom: 24px;
+            padding: 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.14), rgba(123, 44, 191, 0.14));
+            border: 1px solid rgba(255, 215, 0, 0.22);
+        }
+        .achievement-roadmap-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.92);
+            font-weight: 600;
+        }
+        .achievement-roadmap-track {
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .achievement-roadmap-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ffd700, #ff8c42);
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.35);
+            transition: width 0.4s ease;
+        }
+        .achievement-next {
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 0.92em;
+        }
+        .achievement-timeline {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .achievement-timeline-item {
+            position: relative;
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        .achievement-step {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85em;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.75);
+            z-index: 2;
+        }
+        .achievement-timeline-item.unlocked .achievement-step {
+            border-color: rgba(255, 215, 0, 0.6);
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #1e1e1e;
+            box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+        }
+        .achievement-timeline-item.current .achievement-step {
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+        }
+        .achievement-line {
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: rgba(255, 255, 255, 0.14);
+            z-index: 1;
+        }
+        .achievement-timeline-item.unlocked .achievement-line {
+            background: linear-gradient(180deg, rgba(255, 215, 0, 0.95), rgba(255, 170, 0, 0.25));
+        }
+        .achievement-item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .achievement-category-tag {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 0.75em;
+            color: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
+        }
+        .achievement-book-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .achievement-book-tab {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.88);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.86em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .achievement-book-tab:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .achievement-book-tab.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.32), rgba(123, 44, 191, 0.35));
+            border-color: rgba(0, 212, 255, 0.5);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0, 212, 255, 0.2);
+        }
+        .achievement-prereq {
+            margin-top: 5px;
+            font-size: 0.82em;
+            color: rgba(255, 255, 255, 0.55);
+        }
+        
+        /* 简单模式下的成就分类样式 */
+        body.easy-mode .achievement-category-header {
+            background: #f5f5f7;
+        }
+        body.easy-mode .achievement-category-header h3 {
+            color: #333;
+        }
+        body.easy-mode .achievement-category-header p {
+            color: #666;
+        }
+
+        /* 简单模式下的成就样式 */
+        body.easy-mode .achievement-btn {
+            background: #ffd700;
+            animation: none;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+        }
+        body.easy-mode .achievement-content {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        body.easy-mode .achievement-header h2 {
+            background: none;
+            -webkit-text-fill-color: #ffd700;
+            color: #ffd700;
+        }
+        body.easy-mode .achievement-item {
+            background: #f5f5f7;
+        }
+        body.easy-mode .achievement-item.unlocked {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 170, 0, 0.08));
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+        body.easy-mode .achievement-info h4 {
+            color: #333;
+        }
+        body.easy-mode .achievement-info p {
+            color: #666;
+        }
+        body.easy-mode .achievement-toast {
+            background: #ffd700;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+        body.easy-mode .achievement-roadmap {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(0, 113, 227, 0.15));
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+        body.easy-mode .achievement-roadmap-title,
+        body.easy-mode .achievement-next {
+            color: #444;
+        }
+        body.easy-mode .achievement-step {
+            color: #666;
+            border-color: rgba(0, 0, 0, 0.2);
+            background: #fff;
+        }
+        body.easy-mode .achievement-line {
+            background: rgba(0, 0, 0, 0.15);
+        }
+        body.easy-mode .achievement-category-tag {
+            color: #555;
+            border-color: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.04);
+        }
+        body.easy-mode .achievement-book-tab {
+            color: #444;
+            border-color: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.03);
+        }
+        body.easy-mode .achievement-book-tab.active {
+            color: #fff;
+            border-color: rgba(0, 113, 227, 0.4);
+        }
+        body.easy-mode .achievement-prereq {
+            color: #666;
+        }
+        body.normal-mode .resource-card {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        body.normal-mode .resource-card:hover {
+            transform: translateY(-4px);
+        }
+        body.normal-mode .normalmode-toggle {
+            background: linear-gradient(135deg, #34c759, #30d158);
+            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.4);
+        }
+
+        /* 模式切换按钮 */
+        .normalmode-toggle,
+        .easymode-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 80px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #0071e3, #00d4ff);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 15px rgba(0, 113, 227, 0.4);
+            z-index: 2001;
+        }
+        .normalmode-toggle {
+            bottom: 76px;
+            background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+            box-shadow: 0 4px 15px rgba(123, 44, 191, 0.4);
+        }
+        .normalmode-toggle:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(123, 44, 191, 0.5);
+        }
+        .normalmode-toggle:active {
+            transform: scale(0.98);
+        }
+        .normalmode-toggle .icon {
+            font-size: 1.2em;
+        }
+        .normalmode-toggle.active {
+            background: linear-gradient(135deg, #34c759, #30d158);
+            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.4);
+        }
+        .easymode-toggle:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 113, 227, 0.5);
+        }
+        .easymode-toggle:active {
+            transform: scale(0.98);
+        }
+        .easymode-toggle .icon {
+            font-size: 1.2em;
+        }
+        .easymode-toggle.active {
+            background: linear-gradient(135deg, #34c759, #30d158);
+            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.4);
+        }
+        @media (max-width: 768px) {
+            .normalmode-toggle,
+            .easymode-toggle {
+                left: 74px;
+                bottom: 12px;
+                padding: 10px 14px;
+                border-radius: 12px;
+            }
+            .normalmode-toggle {
+                bottom: 64px;
+            }
+        }
+
+        /* ========== 简单模式样式 ========== */
+        body.easy-mode {
+            --accent-color: #0071e3;
+            --accent-gradient: linear-gradient(90deg, #0071e3, #00a8e8);
+            --accent-gradient-btn: linear-gradient(135deg, #0071e3, #00a8e8);
+        }
+        
+        /* 简单模式 - 移除所有动画 */
+        body.easy-mode *,
+        body.easy-mode *::before,
+        body.easy-mode *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+        
+        /* 简单模式 - 简化滚动条 */
+        body.easy-mode ::-webkit-scrollbar {
+            width: 8px;
+        }
+        body.easy-mode ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border: none;
+        }
+        body.easy-mode ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+            border: none;
+            box-shadow: none;
+        }
+        body.easy-mode ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+            box-shadow: none;
+        }
+        
+        /* 简单模式 - 简化按钮 */
+        body.easy-mode .btn,
+        body.easy-mode .btn-primary,
+        body.easy-mode .btn-secondary {
+            background: #0071e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-transform: none;
+            letter-spacing: normal;
+            font-family: inherit;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.2);
+        }
+        body.easy-mode .btn:hover,
+        body.easy-mode .btn-primary:hover {
+            background: #0077ed;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+        body.easy-mode .btn-secondary {
+            background: #f5f5f7;
+            color: #333;
+        }
+        body.easy-mode .btn-secondary:hover {
+            background: #e8e8ed;
+        }
+        
+        /* 简单模式 - 简化资源卡片 */
+        body.easy-mode .resource-card {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        body.easy-mode .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 113, 227, 0.3);
+        }
+        body.easy-mode .resource-card::before,
+        body.easy-mode .resource-card::after,
+        body.easy-mode .resource-card .corner-decoration {
+            display: none;
+        }
+        
+        /* 简单模式 - 简化分类标题 */
+        body.easy-mode .category h2 {
+            background: rgba(0, 113, 227, 0.08);
+            border-left: 4px solid #0071e3;
+            border-radius: 0 8px 8px 0;
+            text-transform: none;
+            letter-spacing: normal;
+            font-family: inherit;
+            color: #0071e3;
+            box-shadow: none;
+        }
+        body.easy-mode .category h2:hover {
+            background: rgba(0, 113, 227, 0.12);
+            box-shadow: none;
+            text-shadow: none;
+        }
+        body.easy-mode .category h2::before {
+            animation: none;
+        }
+        
+        /* 简单模式 - 简化模态框 */
+        body.easy-mode .modal-content {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        body.easy-mode .modal-content::before,
+        body.easy-mode .modal-content::after {
+            display: none;
+        }
+        body.easy-mode .modal-content h2 {
+            color: #0071e3;
+            text-transform: none;
+            letter-spacing: normal;
+            font-family: inherit;
+            text-shadow: none;
+        }
+        
+        /* 简单模式 - 简化主题切换按钮 */
+        body.easy-mode .theme-toggle {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            animation: none;
+        }
+        body.easy-mode .theme-toggle:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 简单模式 - 简化工具面板 */
+        body.easy-mode .tool-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        }
+        body.easy-mode .tool-item {
+            background: rgba(0, 113, 227, 0.08);
+            border-radius: 10px;
+        }
+        body.easy-mode .tool-item:hover {
+            background: rgba(0, 113, 227, 0.15);
+        }
+        
+        /* 简单模式 - 简化搜索框 */
+        body.easy-mode .search-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        body.easy-mode .search-input:focus {
+            border-color: #0071e3;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+        }
+        
+        /* 简单模式 - 简化标签 */
+        body.easy-mode .tag {
+            background: rgba(0, 113, 227, 0.1);
+            color: #0071e3;
+            border-radius: 6px;
+        }
+        
+        /* 简单模式 - 简化返回按钮 */
+        body.easy-mode .back-to-welcome-btn {
+            background: rgba(0, 113, 227, 0.1);
+            border: 1px solid rgba(0, 113, 227, 0.2);
+            border-radius: 8px;
+            color: #0071e3;
+            font-family: inherit;
+            text-transform: none;
+            letter-spacing: normal;
+            box-shadow: none;
+            animation: none;
+        }
+        body.easy-mode .back-to-welcome-btn:hover {
+            background: rgba(0, 113, 227, 0.15);
+            box-shadow: none;
+        }
+        body.easy-mode .back-to-welcome-btn::before {
+            display: none;
+        }
+        
+        /* 简单模式 - 简化管理按钮 */
+        body.easy-mode .admin-btn {
+            background: #0071e3;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0, 113, 227, 0.3);
+        }
+        
+        /* 简单模式 - 简化鱼图标 */
+        body.easy-mode .fish-icon {
+            background: linear-gradient(135deg, #ffb300, #ff8c00);
+            border-radius: 25px;
+            animation: none;
+            box-shadow: 0 2px 8px rgba(255, 179, 0, 0.3);
+        }
+        body.easy-mode .fish-icon::before {
+            display: none;
+        }
+        
+        /* 简单模式 - 简化新发布标识 */
+        body.easy-mode .new-badge {
+            background: #ff3b30;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(255, 59, 48, 0.3);
+        }
+
         /* 欢迎页信息按钮 */
         .welcome-info-btn {
             position: absolute;
@@ -3206,8 +3947,6 @@
                 grid-template-columns: 1fr;
             }
         }
-            animation: diamondSparkle 1.5s infinite;
-        }
         @keyframes diamondSparkle {
             0%, 100% { transform: scale(1); filter: brightness(1); }
             50% { transform: scale(1.2); filter: brightness(1.3); }
@@ -3821,8 +4560,20 @@
         <button class="enter-btn" onclick="enterMainSite()">
             点击进入 ➡️
         </button>
+        <!-- 左上角成就按钮 -->
+        <button class="achievement-btn" id="achievementBtn" onclick="toggleAchievementPanel()">🏆</button>
         <!-- 右下角简介按钮 -->
         <div class="welcome-info-btn" onclick="toggleInfoModal(true)">i</div>
+        <!-- 普通模式切换按钮 -->
+        <button class="normalmode-toggle" id="normalModeToggle" onclick="toggleNormalMode()">
+            <span class="icon">✨</span>
+            <span class="text">普通模式</span>
+        </button>
+        <!-- 轻量模式切换按钮 -->
+        <button class="easymode-toggle" id="easyModeToggle" onclick="toggleEasyMode()">
+            <span class="icon">⚡</span>
+            <span class="text">轻量模式</span>
+        </button>
     </div>
 
     <!-- 返回开始界面按钮 (固定在主页面右下角) -->
@@ -3876,13 +4627,14 @@
                 <a href="https://github.com/Abamao/Abamao.github.io/commit/ca0c41688d7af5f17334007ab7c856f7278f5661" target="_blank" class="info-link">GitHub 源网址 →</a>
             </p>
             <p style="margin-top: 15px; font-weight: bold; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">开发名单:</p>
-            <p>Openclaw-3.22</p>
+            <p>Openclaw-4.1</p>
             <p>Trae:</p>
             <p style="padding-left: 15px;">-- Bulider</p>
             <p style="padding-left: 15px;">-- Chat</p>
             <p style="padding-left: 15px;">-- Code</p>
             <p style="padding-left: 15px;">-- Solo</p>
             <p>Abamao</p>
+            <p>Cursor By VSCODE</p>
             <p style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">前端由 Github 构建</p>
             <p><a href="https://abamao.github.io" target="_blank" class="info-link">Abamao.github.io</a></p>
             <p style="font-size: 0.8em; color: #ff4757; margin-top: 10px;">⚠️ 网站可能不稳定。</p>
@@ -3900,7 +4652,7 @@
     <button class="theme-toggle" onclick="toggleTheme()" title="切换主题">🌙</button>
     <button class="theme-toggle bg-toggle" onclick="changeBackground()" title="更换背景图">🖼️</button>
     <button class="theme-toggle cookie-toggle" onclick="clearAllData()" title="清除所有数据">🍪</button>
-    <div class="fish-icon" title="VIP 权益" onclick="showFishPasswordModal()"><span style="color: #ffb300; font-size: 1.2em;">👑</span> VIP 权益</div>
+    <div class="fish-icon" title="VIP 权益" onclick="showFishPasswordModal(); unlockAchievement('fishClicker');"><span style="color: #ffb300; font-size: 1.2em;">👑</span> VIP 权益</div>
 
     <!-- 鱼图标密码保护弹窗 -->
     <div id="fishPasswordModal" class="fish-password-modal">
@@ -4555,7 +5307,7 @@
             </select>
             <div class="search-bar">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="站内搜索资源..." oninput="handleSearchInput()" onkeydown="handleSearchKeydown(event)">
+                <input type="text" id="searchInput" class="search-input" placeholder="站内搜索资源..." oninput="handleSearchInput()" onkeydown="handleSearchKeydown(event)" onclick="unlockAchievement('firstSearch'); trackSearch();">
                 <div class="search-actions">
                     <button class="action-btn" onclick="pickRandom()" title="随机抽取 (手气不错)">🎲</button>
                     <button class="action-btn" id="sortBtn" onclick="toggleSort()" title="按热度排序">🔥</button>
@@ -5809,6 +6561,9 @@
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
             updateThemeIcon(newTheme);
+            
+            // 解锁主题切换成就
+            unlockAchievement('themeSwitcher');
 
             // 统计点击次数
             themeClickCount++;
@@ -5823,6 +6578,8 @@
                       `4. 按下键盘 [X] 键 - 关闭顶部公告栏\n` +
                       `5. 拖拽视频到工具箱 - 开启随身播放器`);
                 themeClickCount = 0;
+                // 解锁惊喜成就
+                unlockAchievement('surprise');
             }
         }
 
@@ -5830,6 +6587,11 @@
             siteData.categories[key].collapsed = !siteData.categories[key].collapsed;
             saveData();
             render();
+            
+            // 追踪分类展开
+            if (!siteData.categories[key].collapsed) {
+                trackCategoryExpand(key);
+            }
         }
 
         function updateThemeIcon(theme) {
@@ -5858,6 +6620,9 @@
                 document.body.classList.add('has-bg');
                 localStorage.setItem('maomaoBg', bgUrl);
             };
+            
+            // 解锁背景切换成就
+            unlockAchievement('bgSwitcher');
         }
 
         function initBackground() {
@@ -5970,13 +6735,318 @@
             }
         }
 
+        function resolveAchievementId(input) {
+            if (!input) return null;
+            const keyword = input.trim();
+            if (!keyword) return null;
+
+            const exactId = Object.keys(ACHIEVEMENTS).find(id => id.toLowerCase() === keyword.toLowerCase());
+            if (exactId) return exactId;
+
+            const byName = Object.values(ACHIEVEMENTS).find(ach => ach.name === keyword);
+            return byName ? byName.id : null;
+        }
+
+        function grantAllAchievements() {
+            unlockedAchievements = new Set(Object.keys(ACHIEVEMENTS));
+            localStorage.setItem('achievements', JSON.stringify([...unlockedAchievements]));
+            hasNewAchievement = true;
+            localStorage.setItem('hasNewAchievement', 'true');
+            renderAchievements();
+            updateAchievementButton();
+            showNotification('✅ 已添加全部成就', 'success');
+        }
+
+        function clearAllAchievements() {
+            unlockedAchievements = new Set();
+            localStorage.setItem('achievements', JSON.stringify([]));
+            hasNewAchievement = false;
+            localStorage.setItem('hasNewAchievement', 'false');
+            renderAchievements();
+            updateAchievementButton();
+            showNotification('🧹 已清空所有成就', 'success');
+        }
+
+        function clearLoginState() {
+            isAdmin = false;
+            localStorage.removeItem('adminMode');
+            document.body.classList.remove('admin-mode');
+            closeModal('loginModal');
+            closeModal('addModal');
+            render();
+            showNotification('🔓 登录状态已清除', 'success');
+        }
+
+        function executeSearchCommand(rawQuery) {
+            if (!rawQuery || !rawQuery.startsWith('/')) return false;
+
+            const parts = rawQuery.trim().split(/\s+/);
+            const command = (parts[0] || '').toLowerCase();
+            const arg = parts.slice(1).join(' ').trim();
+
+            if (command === '/help') {
+                alert(
+                    '📘 指令帮助\n\n' +
+                    '/help\n' +
+                    '  查看所有指令说明\n\n' +
+                    '/by 成就名或ID\n' +
+                    '  添加指定成就\n' +
+                    '/by all\n' +
+                    '  添加全成就\n\n' +
+                    '/unby 成就名或ID\n' +
+                    '  取消指定成就\n' +
+                    '/unby all\n' +
+                    '  取消所有成就\n\n' +
+                    '/kill -all\n' +
+                    '  清除所有本地数据\n' +
+                    '/kill -some\n' +
+                    '  清除登录状态\n\n' +
+                    '/mode full|normal|easy\n' +
+                    '  切换性能模式\n' +
+                    '/theme dark|light|toggle\n' +
+                    '  切换主题\n' +
+                    '/engine site|web|baidu|bilibili|github\n' +
+                    '  切换搜索引擎\n' +
+                    '/sort\n' +
+                    '  切换排序方式\n' +
+                    '/random\n' +
+                    '  随机跳转资源\n' +
+                    '/tag 标签名\n' +
+                    '  按标签过滤资源\n' +
+                    '/tag clear\n' +
+                    '  清除标签过滤\n' +
+                    '/top\n' +
+                    '  返回顶部\n' +
+                    '/motto\n' +
+                    '  刷新每日一言\n' +
+                    '/panel achievement|close\n' +
+                    '  打开成就面板 / 关闭全部面板\n' +
+                    '/toolbox\n' +
+                    '  折叠或展开工具箱\n' +
+                    '/history clear\n' +
+                    '  清除搜索历史\n' +
+                    '/note clear\n' +
+                    '  清空便签内容\n' +
+                    '/reload\n' +
+                    '  刷新页面'
+                );
+                return true;
+            }
+
+            if (command === '/by') {
+                if (!arg) {
+                    showNotification('用法: /by 成就名 或 /by all', 'warning');
+                    return true;
+                }
+                if (arg.toLowerCase() === 'all') {
+                    grantAllAchievements();
+                    return true;
+                }
+                const achievementId = resolveAchievementId(arg);
+                if (!achievementId) {
+                    showNotification(`未找到成就: ${arg}`, 'error');
+                    return true;
+                }
+                unlockAchievement(achievementId);
+                showNotification(`✅ 已添加成就: ${ACHIEVEMENTS[achievementId].name}`, 'success');
+                return true;
+            }
+
+            if (command === '/unby') {
+                if (!arg) {
+                    showNotification('用法: /unby 成就名 或 /unby all', 'warning');
+                    return true;
+                }
+                if (arg.toLowerCase() === 'all') {
+                    clearAllAchievements();
+                    return true;
+                }
+                const achievementId = resolveAchievementId(arg);
+                if (!achievementId) {
+                    showNotification(`未找到成就: ${arg}`, 'error');
+                    return true;
+                }
+                if (!unlockedAchievements.has(achievementId)) {
+                    showNotification(`该成就未解锁: ${ACHIEVEMENTS[achievementId].name}`, 'warning');
+                    return true;
+                }
+                unlockedAchievements.delete(achievementId);
+                localStorage.setItem('achievements', JSON.stringify([...unlockedAchievements]));
+                renderAchievements();
+                updateAchievementButton();
+                showNotification(`↩ 已取消成就: ${ACHIEVEMENTS[achievementId].name}`, 'success');
+                return true;
+            }
+
+            if (command === '/kill') {
+                const param = arg.toLowerCase();
+                if (param === '-all') {
+                    clearAllData();
+                    return true;
+                }
+                if (param === '-some') {
+                    clearLoginState();
+                    return true;
+                }
+                showNotification('用法: /kill -all 或 /kill -some', 'warning');
+                return true;
+            }
+
+            if (command === '/mode') {
+                const mode = arg.toLowerCase();
+                if (!['full', 'normal', 'easy'].includes(mode)) {
+                    showNotification('用法: /mode full|normal|easy', 'warning');
+                    return true;
+                }
+                setPerformanceMode(mode);
+                showNotification(`🎛️ 已切换到 ${mode} 模式`, 'success');
+                return true;
+            }
+
+            if (command === '/theme') {
+                const mode = arg.toLowerCase();
+                if (!mode || mode === 'toggle') {
+                    toggleTheme();
+                    return true;
+                }
+                if (!['dark', 'light'].includes(mode)) {
+                    showNotification('用法: /theme dark|light|toggle', 'warning');
+                    return true;
+                }
+                document.documentElement.setAttribute('data-theme', mode);
+                localStorage.setItem('theme', mode);
+                updateThemeIcon(mode);
+                showNotification(`🎨 已切换到${mode === 'dark' ? '深色' : '浅色'}主题`, 'success');
+                return true;
+            }
+
+            if (command === '/engine') {
+                const engine = arg.toLowerCase();
+                const select = document.getElementById('searchEngine');
+                const valid = ['site', 'web', 'baidu', 'bilibili', 'github'];
+                if (!select || !valid.includes(engine)) {
+                    showNotification('用法: /engine site|web|baidu|bilibili|github', 'warning');
+                    return true;
+                }
+                select.value = engine;
+                handleSearchEngineChange();
+                showNotification(`🔎 搜索引擎已切换为 ${engine}`, 'success');
+                return true;
+            }
+
+            if (command === '/sort') {
+                toggleSort();
+                showNotification(`📊 排序已切换为${isSortByClicks ? '点击量' : '默认'}模式`, 'success');
+                return true;
+            }
+
+            if (command === '/random') {
+                pickRandom();
+                return true;
+            }
+
+            if (command === '/tag') {
+                if (!arg || arg.toLowerCase() === 'clear') {
+                    currentTagFilter = '';
+                    render();
+                    showNotification('🏷️ 已清除标签过滤', 'success');
+                    return true;
+                }
+                const allTags = new Set();
+                Object.values(siteData.categories || {}).forEach(cat => {
+                    (cat.items || []).forEach(item => allTags.add(item.tag));
+                });
+                const matched = [...allTags].find(tag => tag && tag.toLowerCase() === arg.toLowerCase());
+                if (!matched) {
+                    showNotification(`未找到标签: ${arg}`, 'warning');
+                    return true;
+                }
+                currentTagFilter = matched;
+                const input = document.getElementById('searchInput');
+                if (input) input.value = '';
+                currentSearchQuery = '';
+                render();
+                showNotification(`🏷️ 已按标签筛选: ${matched}`, 'success');
+                return true;
+            }
+
+            if (command === '/top') {
+                scrollToTop();
+                return true;
+            }
+
+            if (command === '/motto') {
+                fetchMotto();
+                showNotification('📝 正在刷新每日一言', 'success');
+                return true;
+            }
+
+            if (command === '/panel') {
+                const target = arg.toLowerCase();
+                if (target === 'achievement') {
+                    toggleAchievementPanel(true);
+                    return true;
+                }
+                if (target === 'close') {
+                    toggleAchievementPanel(false);
+                    closeAllPanels();
+                    return true;
+                }
+                showNotification('用法: /panel achievement|close', 'warning');
+                return true;
+            }
+
+            if (command === '/toolbox') {
+                toggleToolbox();
+                return true;
+            }
+
+            if (command === '/history') {
+                if (arg.toLowerCase() === 'clear') {
+                    clearSearchHistory();
+                    return true;
+                }
+                showNotification('用法: /history clear', 'warning');
+                return true;
+            }
+
+            if (command === '/note') {
+                if (arg.toLowerCase() === 'clear') {
+                    clearNote();
+                    return true;
+                }
+                showNotification('用法: /note clear', 'warning');
+                return true;
+            }
+
+            if (command === '/reload') {
+                location.reload();
+                return true;
+            }
+
+            showNotification(`未知指令: ${command}`, 'warning');
+            return true;
+        }
+
         function handleSearchKeydown(e) {
             if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query.startsWith('/')) {
+                    e.preventDefault();
+                    const handled = executeSearchCommand(query);
+                    if (handled) {
+                        e.target.value = '';
+                        currentSearchQuery = '';
+                        currentTagFilter = '';
+                        render();
+                    }
+                    return;
+                }
+
                 const engine = getSearchEngine();
                 if (engine === 'site') return;
 
                 e.preventDefault();
-                const query = e.target.value.trim();
                 if (!query) return;
 
                 const engineUrls = {
@@ -6033,6 +7103,8 @@
             if (allItems.length > 0) {
                 const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
                 createConfetti(); // 触发纸屑特效
+                // 解锁手气不错成就
+                unlockAchievement('lucky');
                 if (confirm(`🎲 随机抽中了：【${randomItem.name}】\n\n简介：${randomItem.desc}\n\n是否现在前往？`)) {
                     window.open(randomItem.url, '_blank');
                 }
@@ -6189,6 +7261,12 @@
                 if (currentSearchQuery || currentTagFilter) {
                     const filterText = currentTagFilter ? `标签 "${currentTagFilter}"` : `关键词 "${currentSearchQuery}"`;
                     searchStats.innerHTML = `为您找到 ${totalMatchCount} 个 ${filterText} 相关的资源`;
+                    
+                    // 检查精准搜索成就
+                    if (totalMatchCount === 1) {
+                        unlockAchievement('preciseSearch');
+                    }
+                    
                     if (totalMatchCount === 0) {
                         content.innerHTML = `
                             <div class="no-results" style="display: flex; flex-direction: column; align-items: center; padding: 60px 20px;">
@@ -6227,6 +7305,8 @@
                 closeModal('loginModal');
                 render();
                 showAddModal();
+                // 解锁管理员成就
+                unlockAchievement('adminMode');
             } else {
                 document.getElementById('loginError').style.display = 'block';
             }
@@ -6288,12 +7368,34 @@
         }
 
         function trackClick(catKey, index) {
-            if (!siteData.categories[catKey].items[index].clicks) {
-                siteData.categories[catKey].items[index].clicks = 0;
+            const item = siteData.categories[catKey].items[index];
+            if (!item.clicks) {
+                item.clicks = 0;
             }
-            siteData.categories[catKey].items[index].clicks++;
+            item.clicks++;
             saveData();
             render();
+            
+            // 解锁"梦想家"成就（点击任意网址）
+            unlockAchievement('firstClick');
+            
+            // 追踪资源点击
+            trackResourceClick(item.url, catKey);
+            
+            // 检查热门猎人成就
+            if (item.clicks > 10) {
+                unlockAchievement('hotHunter');
+            }
+            
+            // 检查数字控成就
+            if (/\d/.test(item.name)) {
+                unlockAchievement('numberLover');
+            }
+            
+            // 检查尝鲜者成就
+            if (!item.clicks || item.clicks <= 2) {
+                unlockAchievement('earlyAdopter');
+            }
         }
 
         // 视频播放器拖拽逻辑
@@ -6320,6 +7422,8 @@
             if (!isActive) {
                 panel.classList.add('active');
                 overlay.classList.add('active');
+                // 解锁工具使用者成就
+                unlockAchievement('toolUser');
             }
         }
 
@@ -6618,6 +7722,9 @@
             title.textContent = `📱 扫码访问: ${name}`;
             display.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" alt="QR Code">`;
             document.getElementById('qrModal').classList.add('active');
+            
+            // 解锁扫码达人成就
+            unlockAchievement('qrMaster');
         }
 
         // AI 助手逻辑
@@ -6665,6 +7772,9 @@
             const apiUrl = localStorage.getItem('maomaoAIUrl');
 
             if (!message) return;
+            
+            // 解锁爪爪的朋友成就
+            unlockAchievement('zhuaFriend');
             if (!apiKey && !apiUrl.includes('localhost')) {
                 alert('请先在设置中填写 API Key！');
                 toggleAISettings();
@@ -6733,6 +7843,11 @@
                 `;
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 2500);
+                
+                // 解锁收藏家成就
+                unlockAchievement('collector');
+                // 解锁剪贴板成就
+                unlockAchievement('clipboard');
             });
         }
 
@@ -7123,6 +8238,8 @@
                         btn.textContent = '🗑️';
                     }, 1500);
                 }
+                // 解锁清理大师成就
+                unlockAchievement('cleaner');
             }
         }
 
@@ -7186,7 +8303,12 @@
             const modal = document.getElementById('infoModal');
             if (show) {
                 modal.classList.add('active');
-                document.getElementById('infoYearDisplay').textContent = `${new Date().getFullYear()} 年`;
+                const yearDisplay = document.getElementById('infoYearDisplay');
+                if (yearDisplay) {
+                    yearDisplay.textContent = `${new Date().getFullYear()} 年`;
+                }
+                // 解锁好奇宝宝成就
+                unlockAchievement('curious');
             } else {
                 modal.classList.remove('active');
             }
@@ -7373,6 +8495,9 @@
 
         // 全局键盘监听
         document.addEventListener('keydown', function(e) {
+            // 解锁键盘侠成就
+            unlockAchievement('keyboardMaster');
+            
             // 按 / 打开命令栏（不在输入框时）
             if (e.key === '/' && !e.target.matches('input, textarea')) {
                 e.preventDefault();
@@ -7482,9 +8607,12 @@
                     render(); 
                     
                     // 初始化粒子背景（在渲染后执行，以获取正确的页面高度）
-                    initParticles();
-                    if (!particlesAnimId) {
-                        animateParticles();
+                    // 简单模式下不启动粒子动画以节省性能
+                    if (shouldRunParticles()) {
+                        initParticles();
+                        if (!particlesAnimId) {
+                            animateParticles();
+                        }
                     }
                     
                     // 动画彻底结束后标记完成
@@ -7493,6 +8621,9 @@
                         // 显示返回开始界面按钮
                         const backBtn = document.getElementById('backToWelcomeBtn');
                         if (backBtn) backBtn.classList.add('visible');
+                        
+                        // 解锁"从未"成就（进入主站）
+                        unlockAchievement('enterMain');
                     }, 500);
                 }, 400); // 在 1s 动画进行到 0.4s 时开始渲染
             } catch (err) {
@@ -7500,6 +8631,123 @@
                 isTransitioning = false;
                 const welcome = document.getElementById('welcomePage');
                 if (welcome) welcome.style.display = 'none';
+            }
+        }
+
+        // 性能模式状态（full / normal / easy）
+        let performanceMode = localStorage.getItem('performanceMode') || (localStorage.getItem('easyMode') === 'true' ? 'easy' : 'full');
+        let isEasyMode = performanceMode === 'easy';
+        let isNormalMode = performanceMode === 'normal';
+
+        function syncPerformanceFlags() {
+            isEasyMode = performanceMode === 'easy';
+            isNormalMode = performanceMode === 'normal';
+        }
+
+        function shouldRunParticles() {
+            return !isEasyMode && !isNormalMode;
+        }
+
+        function shouldRunHoneycomb() {
+            return !isEasyMode;
+        }
+
+        function applyPerformanceModeClass() {
+            document.body.classList.toggle('easy-mode', isEasyMode);
+            document.body.classList.toggle('normal-mode', isNormalMode);
+        }
+
+        // 初始化模式
+        function initEasyMode() {
+            syncPerformanceFlags();
+            applyPerformanceModeClass();
+            applyEasyModeRuntime();
+            updateModeButtons();
+        }
+
+        function applyEasyModeRuntime() {
+            const particleCanvas = document.getElementById('particleCanvas');
+            const honeycombCanvas = document.getElementById('honeycombCanvas');
+            const welcome = document.getElementById('welcomePage');
+            const inMainPage = welcome ? welcome.classList.contains('hidden') : true;
+
+            if (isEasyMode) {
+                if (particlesAnimId) {
+                    cancelAnimationFrame(particlesAnimId);
+                    particlesAnimId = null;
+                }
+                if (honeycombAnimId) {
+                    cancelAnimationFrame(honeycombAnimId);
+                    honeycombAnimId = null;
+                }
+                if (particleCanvas) particleCanvas.style.display = 'none';
+                if (honeycombCanvas) honeycombCanvas.style.display = 'none';
+            } else if (isNormalMode) {
+                if (particlesAnimId) {
+                    cancelAnimationFrame(particlesAnimId);
+                    particlesAnimId = null;
+                }
+                if (particleCanvas) particleCanvas.style.display = 'none';
+                if (honeycombCanvas) honeycombCanvas.style.display = '';
+                if (!honeycombAnimId) {
+                    animateHoneycomb();
+                }
+            } else {
+                if (particleCanvas) particleCanvas.style.display = '';
+                if (honeycombCanvas) honeycombCanvas.style.display = '';
+
+                if (inMainPage) {
+                    initParticles();
+                    if (!particlesAnimId) animateParticles();
+                }
+                if (!honeycombAnimId) {
+                    animateHoneycomb();
+                }
+            }
+        }
+
+        function setPerformanceMode(mode) {
+            performanceMode = mode;
+            localStorage.setItem('performanceMode', performanceMode);
+            localStorage.setItem('easyMode', performanceMode === 'easy' ? 'true' : 'false');
+            syncPerformanceFlags();
+            applyPerformanceModeClass();
+            applyEasyModeRuntime();
+            updateModeButtons();
+        }
+
+        function toggleNormalMode() {
+            const nextMode = isNormalMode ? 'full' : 'normal';
+            setPerformanceMode(nextMode);
+            showNotification(nextMode === 'normal' ? '已切换到普通模式（保留部分动画）' : '已切换到完整模式', 'success');
+        }
+
+        // 切换轻量模式
+        function toggleEasyMode() {
+            const nextMode = isEasyMode ? 'full' : 'easy';
+            if (nextMode === 'easy') {
+                // 解锁简单模式成就
+                unlockAchievement('easyModeUser');
+            }
+            setPerformanceMode(nextMode);
+            showNotification(nextMode === 'easy' ? '已切换到轻量模式' : '已切换到完整模式', 'success');
+        }
+
+        // 更新模式按钮状态
+        function updateModeButtons() {
+            const normalBtn = document.getElementById('normalModeToggle');
+            const easyBtn = document.getElementById('easyModeToggle');
+
+            if (normalBtn) {
+                normalBtn.classList.toggle('active', isNormalMode);
+                normalBtn.querySelector('.text').textContent = isNormalMode ? '普通模式 ✓' : '普通模式';
+                normalBtn.title = isNormalMode ? '普通模式（已开启）' : '普通模式';
+            }
+
+            if (easyBtn) {
+                easyBtn.classList.toggle('active', isEasyMode);
+                easyBtn.querySelector('.text').textContent = isEasyMode ? '轻量模式 ✓' : '轻量模式';
+                easyBtn.title = isEasyMode ? '轻量模式（已开启）' : '轻量模式';
             }
         }
 
@@ -7521,13 +8769,16 @@
                 // 显示欢迎页
                 welcome.classList.remove('hidden');
                 
-                // 重新启动蜂窝动画
-                if (!honeycombAnimId) {
+                // 重新启动蜂窝动画（简单模式下不启动）
+                if (shouldRunHoneycomb() && !honeycombAnimId) {
                     animateHoneycomb();
                 }
                 
                 // 重新启动开场动画
                 initWelcomeAnimation();
+                
+                // 解锁回家成就
+                unlockAchievement('goHome');
                 
                 // 滚动到顶部
                 window.scrollTo(0, 0);
@@ -7543,6 +8794,978 @@
             }
         }
 
+        // ========== 成就系统 ==========
+        // 成就按时间线分类（MC风格进度）
+        const ACHIEVEMENT_CATEGORIES = {
+            tutorial: { name: '新手教程', color: '#4CAF50', desc: '初次接触' },
+            explorer: { name: '探险家', color: '#2196F3', desc: '探索世界' },
+            collector: { name: '收藏家', color: '#FF9800', desc: '收集资源' },
+            specialist: { name: '专家', color: '#9C27B0', desc: '精通功能' },
+            veteran: { name: '老兵', color: '#F44336', desc: '坚持不懈' },
+            legendary: { name: '传说', color: '#FFD700', desc: '终极挑战' }
+        };
+        
+        const ACHIEVEMENTS = {
+            // ========== 【新手教程】- 初次接触 ==========
+            // 第1步：首次访问
+            firstVisit: { 
+                id: 'firstVisit', 
+                name: '第一次', 
+                desc: '第一次访问网站', 
+                icon: '🌟',
+                category: 'tutorial',
+                order: 1
+            },
+            // 第2步：进入主站
+            enterMain: { 
+                id: 'enterMain', 
+                name: '从未', 
+                desc: '进入主站', 
+                icon: '🚀',
+                category: 'tutorial',
+                order: 2
+            },
+            // 第3步：了解信息
+            curious: { 
+                id: 'curious', 
+                name: '好奇宝宝', 
+                desc: '查看网站信息', 
+                icon: '❓',
+                category: 'tutorial',
+                order: 3
+            },
+            // 第4步：第一次交互
+            firstClick: { 
+                id: 'firstClick', 
+                name: '梦想家', 
+                desc: '点击任意网址', 
+                icon: '💫',
+                category: 'tutorial',
+                order: 4
+            },
+            // 第5步：学会搜索
+            firstSearch: { 
+                id: 'firstSearch', 
+                name: '打开世界', 
+                desc: '第一次点击搜索框', 
+                icon: '🔍',
+                category: 'tutorial',
+                order: 5
+            },
+            // 第6步：使用工具
+            toolUser: { 
+                id: 'toolUser', 
+                name: '工具使用者', 
+                desc: '使用任意工具箱工具', 
+                icon: '📊',
+                category: 'tutorial',
+                order: 6
+            },
+            // 第7步：学会返回
+            goHome: { 
+                id: 'goHome', 
+                name: '回家', 
+                desc: '返回开始界面', 
+                icon: '🏠',
+                category: 'tutorial',
+                order: 7
+            },
+            // 第8步：个性化设置
+            themeSwitcher: { 
+                id: 'themeSwitcher', 
+                name: '主题切换', 
+                desc: '切换过主题', 
+                icon: '🎨',
+                category: 'tutorial',
+                order: 8
+            },
+            
+            // ========== 【探险家】- 探索世界 ==========
+            // 初级探索
+            explorer5: { 
+                id: 'explorer5', 
+                name: '探索者', 
+                desc: '访问 5 个不同的资源', 
+                icon: '🎯',
+                category: 'explorer',
+                order: 1
+            },
+            // 中级探索
+            runner10: { 
+                id: 'runner10', 
+                name: '奔跑者', 
+                desc: '访问 10 个不同的资源', 
+                icon: '🏃',
+                category: 'explorer',
+                order: 2
+            },
+            // 高级探索
+            conqueror20: { 
+                id: 'conqueror20', 
+                name: '征服者', 
+                desc: '访问 20 个不同的资源', 
+                icon: '🏆',
+                category: 'explorer',
+                order: 3
+            },
+            // 探索全部分类
+            categoryMaster: { 
+                id: 'categoryMaster', 
+                name: '分类大师', 
+                desc: '浏览所有分类', 
+                icon: '🏷️',
+                category: 'explorer',
+                order: 4
+            },
+            // 探索所有分类资源
+            allCategories: { 
+                id: 'allCategories', 
+                name: '全分类', 
+                desc: '访问所有分类的资源', 
+                icon: '🌈',
+                category: 'explorer',
+                order: 5
+            },
+            // 探索热门
+            hotHunter: { 
+                id: 'hotHunter', 
+                name: '热门猎人', 
+                desc: '点击热门资源', 
+                icon: '🔥',
+                category: 'explorer',
+                order: 6
+            },
+            // 探索新资源
+            earlyAdopter: { 
+                id: 'earlyAdopter', 
+                name: '尝鲜者', 
+                desc: '点击 NEW 标签的资源', 
+                icon: '🆕',
+                category: 'explorer',
+                order: 7
+            },
+            // 精准定位
+            preciseSearch: { 
+                id: 'preciseSearch', 
+                name: '精准搜索', 
+                desc: '搜索后只显示 1 个结果', 
+                icon: '🎯',
+                category: 'explorer',
+                order: 8
+            },
+            // 随机探索
+            lucky: { 
+                id: 'lucky', 
+                name: '手气不错', 
+                desc: '使用随机跳转', 
+                icon: '🎲',
+                category: 'explorer',
+                order: 9
+            },
+            
+            // ========== 【收藏家】- 收集资源 ==========
+            // 复制链接
+            collector: { 
+                id: 'collector', 
+                name: '收藏家', 
+                desc: '复制过资源链接', 
+                icon: '🔗',
+                category: 'collector',
+                order: 1
+            },
+            // 查看二维码
+            qrMaster: { 
+                id: 'qrMaster', 
+                name: '扫码达人', 
+                desc: '查看过二维码', 
+                icon: '📱',
+                category: 'collector',
+                order: 2
+            },
+            // 剪贴板使用
+            clipboard: { 
+                id: 'clipboard', 
+                name: '剪贴板', 
+                desc: '复制任意文本', 
+                icon: '📋',
+                category: 'collector',
+                order: 3
+            },
+            // 数字偏好
+            numberLover: { 
+                id: 'numberLover', 
+                name: '数字控', 
+                desc: '点击带数字名称的资源', 
+                icon: '🔢',
+                category: 'collector',
+                order: 4
+            },
+            // 背景收藏
+            bgSwitcher: { 
+                id: 'bgSwitcher', 
+                name: '背景切换', 
+                desc: '切换过背景', 
+                icon: '🖼️',
+                category: 'collector',
+                order: 5
+            },
+            
+            // ========== 【专家】- 精通功能 ==========
+            // 搜索熟练
+            search5: { 
+                id: 'search5', 
+                name: '搜索专家', 
+                desc: '搜索过 5 次', 
+                icon: '🔎',
+                category: 'specialist',
+                order: 1
+            },
+            // 搜索精通
+            detective: { 
+                id: 'detective', 
+                name: '侦探', 
+                desc: '搜索过 10 次', 
+                icon: '🕵️',
+                category: 'specialist',
+                order: 2
+            },
+            // 键盘精通
+            keyboardMaster: { 
+                id: 'keyboardMaster', 
+                name: '键盘侠', 
+                desc: '使用快捷键', 
+                icon: '🎹',
+                category: 'specialist',
+                order: 3
+            },
+            // 管理模式
+            adminMode: { 
+                id: 'adminMode', 
+                name: '管理员', 
+                desc: '进入管理模式', 
+                icon: '🎭',
+                category: 'specialist',
+                order: 4
+            },
+            // 清理数据
+            cleaner: { 
+                id: 'cleaner', 
+                name: '清理大师', 
+                desc: '清除搜索历史', 
+                icon: '🧹',
+                category: 'specialist',
+                order: 5
+            },
+            // 性能优化
+            easyModeUser: { 
+                id: 'easyModeUser', 
+                name: '简单模式', 
+                desc: '开启简单模式', 
+                icon: '⚡',
+                category: 'specialist',
+                order: 6
+            },
+            // VIP权益
+            fishClicker: { 
+                id: 'fishClicker', 
+                name: '摸鱼达人', 
+                desc: '点击鱼图标', 
+                icon: '🐟',
+                category: 'specialist',
+                order: 7
+            },
+            // AI对话
+            zhuaFriend: { 
+                id: 'zhuaFriend', 
+                name: '爪爪的朋友', 
+                desc: '和爪爪对话过', 
+                icon: '🦞',
+                category: 'specialist',
+                order: 8
+            },
+            
+            // ========== 【老兵】- 坚持不懈 ==========
+            // 青铜等级
+            bronze: { 
+                id: 'bronze', 
+                name: '青铜用户', 
+                desc: '访问 3 天', 
+                icon: '🥉',
+                category: 'veteran',
+                order: 1
+            },
+            // 白银等级
+            silver: { 
+                id: 'silver', 
+                name: '白银用户', 
+                desc: '访问 7 天', 
+                icon: '🥈',
+                category: 'veteran',
+                order: 2
+            },
+            // 黄金等级
+            gold: { 
+                id: 'gold', 
+                name: '黄金用户', 
+                desc: '访问 30 天', 
+                icon: '🥇',
+                category: 'veteran',
+                order: 3
+            },
+            // 钻石等级
+            diamond: { 
+                id: 'diamond', 
+                name: '钻石用户', 
+                desc: '访问 100 天', 
+                icon: '💎',
+                category: 'veteran',
+                order: 4
+            },
+            // 连续访问
+            gameLife: { 
+                id: 'gameLife', 
+                name: '游戏人生', 
+                desc: '连续 7 天访问', 
+                icon: '🎮',
+                category: 'veteran',
+                order: 5
+            },
+            // 高频使用
+            return3: { 
+                id: 'return3', 
+                name: '回头客', 
+                desc: '同一天访问 3 次', 
+                icon: '🔄',
+                category: 'veteran',
+                order: 6
+            },
+            // 长时间停留
+            stayer: { 
+                id: 'stayer', 
+                name: '停留者', 
+                desc: '停留超过 5 分钟', 
+                icon: '⏱️',
+                category: 'veteran',
+                order: 7
+            },
+            // 高频点击
+            click100: { 
+                id: 'click100', 
+                name: '点击狂魔', 
+                desc: '点击 100 次', 
+                icon: '👆',
+                category: 'veteran',
+                order: 8
+            },
+            // 高频使用
+            graduate: { 
+                id: 'graduate', 
+                name: '毕业生', 
+                desc: '使用网站超过 100 次', 
+                icon: '🎓',
+                category: 'veteran',
+                order: 9
+            },
+            // 特殊时段
+            nightOwl: { 
+                id: 'nightOwl', 
+                name: '夜猫子', 
+                desc: '凌晨 0-6 点访问', 
+                icon: '🌙',
+                category: 'veteran',
+                order: 10
+            },
+            // 特殊时段
+            earlyBird: { 
+                id: 'earlyBird', 
+                name: '早起的鸟', 
+                desc: '早上 6-9 点访问', 
+                icon: '☀️',
+                category: 'veteran',
+                order: 11
+            },
+            
+            // ========== 【传说】- 终极挑战 ==========
+            // 探索巅峰
+            king50: { 
+                id: 'king50', 
+                name: '王者', 
+                desc: '访问 50 个不同的资源', 
+                icon: '👑',
+                category: 'legendary',
+                order: 1
+            },
+            // 完美主义
+            perfectionist: { 
+                id: 'perfectionist', 
+                name: '完美主义', 
+                desc: '所有分类都访问过', 
+                icon: '⭐',
+                category: 'legendary',
+                order: 2
+            },
+            // 资源之王
+            resourceKing: { 
+                id: 'resourceKing', 
+                name: '资源王', 
+                desc: '访问所有资源', 
+                icon: '🌟',
+                category: 'legendary',
+                order: 3
+            },
+            // 完美收集
+            hundred: { 
+                id: 'hundred', 
+                name: '百分百', 
+                desc: '所有资源都点过', 
+                icon: '💯',
+                category: 'legendary',
+                order: 4
+            },
+            // 发现彩蛋
+            surprise: { 
+                id: 'surprise', 
+                name: '惊喜', 
+                desc: '发现隐藏彩蛋', 
+                icon: '🎁',
+                category: 'legendary',
+                order: 5
+            },
+            // 长期陪伴
+            oldFriend: { 
+                id: 'oldFriend', 
+                name: '老朋友', 
+                desc: '使用网站超过一年', 
+                icon: '👋',
+                category: 'legendary',
+                order: 6
+            },
+            // 成就收集
+            hunter10: { 
+                id: 'hunter10', 
+                name: '成就猎人', 
+                desc: '解锁 10 个成就', 
+                icon: '🎊',
+                category: 'legendary',
+                order: 7
+            },
+            // 成就精通
+            master25: { 
+                id: 'master25', 
+                name: '成就大师', 
+                desc: '解锁 25 个成就', 
+                icon: '🎉',
+                category: 'legendary',
+                order: 8
+            },
+            // 终极成就
+            allAchievements: { 
+                id: 'allAchievements', 
+                name: '全成就', 
+                desc: '解锁所有成就', 
+                icon: '🏆',
+                category: 'legendary',
+                order: 9
+            }
+        };
+
+        let unlockedAchievements = new Set();
+        let hasNewAchievement = false;
+        let achievementToastQueue = [];
+        let isAchievementToastShowing = false;
+        let achievementBookFilter = localStorage.getItem('achievementBookFilter') || 'all';
+        
+        // 成就追踪数据
+        let achievementStats = {
+            clickedUrls: new Set(),
+            searchCount: 0,
+            totalClicks: 0,
+            categoriesExpanded: new Set(),
+            categoriesVisited: new Set(),
+            visitDates: new Set(),
+            sessionStart: Date.now()
+        };
+
+        // 初始化成就系统
+        function initAchievements() {
+            // 从本地存储加载已解锁成就
+            const saved = localStorage.getItem('achievements');
+            if (saved) {
+                unlockedAchievements = new Set(JSON.parse(saved));
+            }
+            hasNewAchievement = localStorage.getItem('hasNewAchievement') === 'true';
+            
+            // 加载追踪数据
+            const savedStats = localStorage.getItem('achievementStats');
+            if (savedStats) {
+                const parsed = JSON.parse(savedStats);
+                achievementStats.clickedUrls = new Set(parsed.clickedUrls || []);
+                achievementStats.categoriesExpanded = new Set(parsed.categoriesExpanded || []);
+                achievementStats.categoriesVisited = new Set(parsed.categoriesVisited || []);
+                achievementStats.visitDates = new Set(parsed.visitDates || []);
+                achievementStats.searchCount = parsed.searchCount || 0;
+                achievementStats.totalClicks = parsed.totalClicks || 0;
+            }
+            
+            // 记录今日访问
+            const today = new Date().toDateString();
+            achievementStats.visitDates.add(today);
+            saveAchievementStats();
+            
+            // 检查首次访问成就
+            const isFirstVisit = !localStorage.getItem('hasVisitedBefore');
+            if (isFirstVisit) {
+                localStorage.setItem('hasVisitedBefore', 'true');
+                unlockAchievement('firstVisit');
+            } else if (!unlockedAchievements.has('firstVisit')) {
+                unlockAchievement('firstVisit');
+            }
+            
+            // 检查时间相关成就
+            checkTimeAchievements();
+            // 检查访问天数成就
+            checkVisitDayAchievements();
+            // 检查回头客成就
+            checkReturnAchievement();
+            // 启动时补一次全量条件校验，避免历史数据错过解锁
+            checkAchievementMilestones();
+            
+            renderAchievements();
+            updateAchievementButton();
+            
+            // 5分钟后检查停留者成就
+            setTimeout(() => {
+                unlockAchievement('stayer');
+            }, 5 * 60 * 1000);
+        }
+        
+        // 保存追踪数据
+        function saveAchievementStats() {
+            localStorage.setItem('achievementStats', JSON.stringify({
+                clickedUrls: [...achievementStats.clickedUrls],
+                categoriesExpanded: [...achievementStats.categoriesExpanded],
+                categoriesVisited: [...achievementStats.categoriesVisited],
+                visitDates: [...achievementStats.visitDates],
+                searchCount: achievementStats.searchCount,
+                totalClicks: achievementStats.totalClicks
+            }));
+        }
+        
+        // 检查时间相关成就
+        function checkTimeAchievements() {
+            const hour = new Date().getHours();
+            if (hour >= 0 && hour < 6) {
+                unlockAchievement('nightOwl');
+            }
+            if (hour >= 6 && hour < 9) {
+                unlockAchievement('earlyBird');
+            }
+        }
+        
+        // 检查访问天数成就
+        function checkVisitDayAchievements() {
+            const days = achievementStats.visitDates.size;
+            if (days >= 3) unlockAchievement('bronze');
+            if (days >= 7) unlockAchievement('silver');
+            if (days >= 30) unlockAchievement('gold');
+            if (days >= 100) unlockAchievement('diamond');
+            
+            // 检查游戏人生成就（连续7天）
+            checkConsecutiveDays();
+            
+            // 检查老朋友成就（使用超过一年）
+            checkOldFriend();
+        }
+        
+        // 检查连续访问天数
+        function checkConsecutiveDays() {
+            const dates = [...achievementStats.visitDates].sort();
+            if (dates.length < 7) return;
+            
+            let maxConsecutive = 1;
+            let currentConsecutive = 1;
+            
+            for (let i = 1; i < dates.length; i++) {
+                const prev = new Date(dates[i - 1]);
+                const curr = new Date(dates[i]);
+                const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+                
+                if (diff === 1) {
+                    currentConsecutive++;
+                    maxConsecutive = Math.max(maxConsecutive, currentConsecutive);
+                } else {
+                    currentConsecutive = 1;
+                }
+            }
+            
+            if (maxConsecutive >= 7) {
+                unlockAchievement('gameLife');
+            }
+        }
+        
+        // 检查老朋友成就
+        function checkOldFriend() {
+            const firstVisit = localStorage.getItem('firstVisitDate');
+            if (!firstVisit) {
+                localStorage.setItem('firstVisitDate', new Date().toISOString());
+                return;
+            }
+            
+            const first = new Date(firstVisit);
+            const now = new Date();
+            const diffDays = (now - first) / (1000 * 60 * 60 * 24);
+            
+            if (diffDays >= 365) {
+                unlockAchievement('oldFriend');
+            }
+        }
+        
+        // 检查回头客成就
+        function checkReturnAchievement() {
+            const today = new Date().toDateString();
+            const lastVisitDate = localStorage.getItem('lastVisitDate');
+            if (lastVisitDate !== today) {
+                localStorage.setItem('todayVisits', '0');
+            }
+            const todayVisits = parseInt(localStorage.getItem('todayVisits') || '0', 10) + 1;
+            localStorage.setItem('todayVisits', todayVisits);
+            localStorage.setItem('lastVisitDate', today);
+            
+            if (todayVisits >= 3) {
+                unlockAchievement('return3');
+            }
+        }
+        
+        // 追踪点击的资源
+        function trackResourceClick(url, category) {
+            achievementStats.clickedUrls.add(url);
+            achievementStats.categoriesVisited.add(category);
+            achievementStats.totalClicks++;
+            saveAchievementStats();
+            
+            const count = achievementStats.clickedUrls.size;
+            if (count >= 5) unlockAchievement('explorer5');
+            if (count >= 10) unlockAchievement('runner10');
+            if (count >= 20) unlockAchievement('conqueror20');
+            if (count >= 50) unlockAchievement('king50');
+            
+            if (achievementStats.totalClicks >= 100) {
+                unlockAchievement('click100');
+            }
+            
+            // 检查毕业生成就
+            if (achievementStats.totalClicks >= 100) {
+                unlockAchievement('graduate');
+            }
+            
+            // 检查资源王和百分百成就
+            checkResourceKingAchievement();
+            checkAllCategoriesAchievement();
+        }
+        
+        // 检查资源王成就
+        function checkResourceKingAchievement() {
+            if (!siteData || !siteData.categories) return;
+            
+            let totalResources = 0;
+            let clickedResources = achievementStats.clickedUrls.size;
+            
+            Object.values(siteData.categories).forEach(cat => {
+                if (cat.items) {
+                    totalResources += cat.items.length;
+                }
+            });
+            
+            // 访问所有资源
+            if (clickedResources >= totalResources && totalResources > 0) {
+                unlockAchievement('resourceKing');
+                unlockAchievement('hundred');
+            }
+        }
+        
+        // 追踪搜索
+        function trackSearch() {
+            achievementStats.searchCount++;
+            saveAchievementStats();
+            
+            if (achievementStats.searchCount >= 5) unlockAchievement('search5');
+            if (achievementStats.searchCount >= 10) unlockAchievement('detective');
+            checkAchievementCountAchievements();
+        }
+        
+        // 追踪分类展开
+        function trackCategoryExpand(category) {
+            achievementStats.categoriesExpanded.add(category);
+            saveAchievementStats();
+            
+            // 检查是否浏览了所有分类
+            if (siteData && siteData.categories) {
+                const allCategories = Object.keys(siteData.categories);
+                const expanded = achievementStats.categoriesExpanded;
+                if (allCategories.every(cat => expanded.has(cat))) {
+                    unlockAchievement('categoryMaster');
+                }
+            }
+            checkAllCategoriesAchievement();
+        }
+
+        // 统一检查里程碑类成就
+        function checkAchievementMilestones() {
+            checkVisitDayAchievements();
+            checkResourceKingAchievement();
+            checkAchievementCountAchievements();
+            checkAllCategoriesAchievement();
+        }
+
+        // 解锁成就
+        function unlockAchievement(achievementId) {
+            if (unlockedAchievements.has(achievementId)) return;
+            
+            const achievement = ACHIEVEMENTS[achievementId];
+            if (!achievement) return;
+            
+            unlockedAchievements.add(achievementId);
+            localStorage.setItem('achievements', JSON.stringify([...unlockedAchievements]));
+            
+            // 显示解锁提示
+            showAchievementToast(achievement);
+            
+            // 标记有新成就
+            hasNewAchievement = true;
+            localStorage.setItem('hasNewAchievement', 'true');
+            updateAchievementButton();
+            
+            // 重新渲染成就列表
+            renderAchievements();
+            
+            // 检查成就数量相关成就
+            checkAchievementCountAchievements();
+            
+            // 检查全分类成就
+            checkAllCategoriesAchievement();
+        }
+        
+        // 检查成就数量相关成就
+        function checkAchievementCountAchievements() {
+            const count = unlockedAchievements.size;
+            if (count >= 10) unlockAchievement('hunter10');
+            if (count >= 25) unlockAchievement('master25');
+            if (count >= Object.keys(ACHIEVEMENTS).length) {
+                unlockAchievement('allAchievements');
+            }
+        }
+        
+        // 检查全分类成就
+        function checkAllCategoriesAchievement() {
+            if (siteData && siteData.categories) {
+                const allCategories = Object.keys(siteData.categories);
+                const visited = achievementStats.categoriesVisited;
+                if (allCategories.every(cat => visited.has(cat))) {
+                    unlockAchievement('allCategories');
+                    unlockAchievement('perfectionist');
+                }
+            }
+        }
+
+        // 显示成就解锁提示
+        function showAchievementToast(achievement) {
+            const toast = document.getElementById('achievementToast');
+            const text = document.getElementById('achievementToastText');
+            if (!toast || !text) return;
+
+            achievementToastQueue.push(achievement);
+            if (isAchievementToastShowing) return;
+
+            const playNextToast = () => {
+                if (achievementToastQueue.length === 0) {
+                    isAchievementToastShowing = false;
+                    return;
+                }
+                isAchievementToastShowing = true;
+                const current = achievementToastQueue.shift();
+                text.textContent = current.name;
+                toast.classList.add('show');
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(playNextToast, 250);
+                }, 3000);
+            };
+
+            playNextToast();
+        }
+
+        // 切换成就面板
+        function toggleAchievementPanel(show) {
+            const panel = document.getElementById('achievementPanel');
+            
+            if (show === undefined) {
+                show = !panel.classList.contains('active');
+            }
+            
+            if (show) {
+                panel.classList.add('active');
+                renderAchievements();
+                // 查看后清除新成就标记
+                hasNewAchievement = false;
+                localStorage.setItem('hasNewAchievement', 'false');
+                updateAchievementButton();
+            } else {
+                panel.classList.remove('active');
+            }
+        }
+
+        function getAchievementProgressText(achievementId) {
+            const totalCategories = siteData && siteData.categories ? Object.keys(siteData.categories).length : 0;
+            const totalResources = siteData && siteData.categories
+                ? Object.values(siteData.categories).reduce((sum, cat) => sum + ((cat && cat.items) ? cat.items.length : 0), 0)
+                : 0;
+            const progressMap = {
+                explorer5: `${Math.min(achievementStats.clickedUrls.size, 5)}/5`,
+                runner10: `${Math.min(achievementStats.clickedUrls.size, 10)}/10`,
+                conqueror20: `${Math.min(achievementStats.clickedUrls.size, 20)}/20`,
+                king50: `${Math.min(achievementStats.clickedUrls.size, 50)}/50`,
+                click100: `${Math.min(achievementStats.totalClicks, 100)}/100`,
+                graduate: `${Math.min(achievementStats.totalClicks, 100)}/100`,
+                search5: `${Math.min(achievementStats.searchCount, 5)}/5`,
+                detective: `${Math.min(achievementStats.searchCount, 10)}/10`,
+                bronze: `${Math.min(achievementStats.visitDates.size, 3)}/3`,
+                silver: `${Math.min(achievementStats.visitDates.size, 7)}/7`,
+                gold: `${Math.min(achievementStats.visitDates.size, 30)}/30`,
+                diamond: `${Math.min(achievementStats.visitDates.size, 100)}/100`,
+                categoryMaster: `${Math.min(achievementStats.categoriesExpanded.size, totalCategories)}/${totalCategories || '?'}`,
+                allCategories: `${Math.min(achievementStats.categoriesVisited.size, totalCategories)}/${totalCategories || '?'}`,
+                perfectionist: `${Math.min(achievementStats.categoriesVisited.size, totalCategories)}/${totalCategories || '?'}`,
+                resourceKing: `${Math.min(achievementStats.clickedUrls.size, totalResources)}/${totalResources || '?'}`,
+                hundred: `${Math.min(achievementStats.clickedUrls.size, totalResources)}/${totalResources || '?'}`,
+                hunter10: `${Math.min(unlockedAchievements.size, 10)}/10`,
+                master25: `${Math.min(unlockedAchievements.size, 25)}/25`,
+                allAchievements: `${Math.min(unlockedAchievements.size, Object.keys(ACHIEVEMENTS).length)}/${Object.keys(ACHIEVEMENTS).length}`
+            };
+
+            return progressMap[achievementId] || '';
+        }
+
+        function getCategoryTimelineIcon(catKey) {
+            const iconMap = {
+                tutorial: '🌱',
+                explorer: '🗺️',
+                collector: '🎒',
+                specialist: '⚔️',
+                veteran: '🛡️',
+                legendary: '👑'
+            };
+            return iconMap[catKey] || '⭐';
+        }
+
+        function getMainlineTimeline() {
+            const categoryOrder = ['tutorial', 'explorer', 'collector', 'specialist', 'veteran', 'legendary'];
+            const timeline = [];
+            categoryOrder.forEach(catKey => {
+                const catAchievements = Object.values(ACHIEVEMENTS)
+                    .filter(ach => ach.category === catKey)
+                    .sort((a, b) => (a.order || 0) - (b.order || 0));
+                catAchievements.forEach(ach => timeline.push(ach));
+            });
+            return timeline;
+        }
+
+        function setAchievementBookFilter(filter) {
+            achievementBookFilter = filter;
+            localStorage.setItem('achievementBookFilter', filter);
+            renderAchievements();
+        }
+
+        // 渲染成就列表（按时间顺序时间线）
+        function renderAchievements() {
+            const list = document.getElementById('achievementList');
+            if (!list) return;
+            const categoryOrder = ['tutorial', 'explorer', 'collector', 'specialist', 'veteran', 'legendary'];
+            const mainlineTimeline = getMainlineTimeline();
+            const timeline = achievementBookFilter === 'all'
+                ? mainlineTimeline
+                : mainlineTimeline.filter(ach => ach.category === achievementBookFilter);
+
+            const unlockedCount = mainlineTimeline.filter(a => unlockedAchievements.has(a.id)).length;
+            const totalCount = mainlineTimeline.length;
+            const percent = totalCount ? ((unlockedCount / totalCount) * 100).toFixed(1) : '0.0';
+            const nextAchievement = mainlineTimeline.find(a => !unlockedAchievements.has(a.id));
+
+            const tabsHtml = [
+                `<button class="achievement-book-tab ${achievementBookFilter === 'all' ? 'active' : ''}" onclick="setAchievementBookFilter('all')">📖 全部配方</button>`,
+                ...categoryOrder.map(catKey => {
+                    const cat = ACHIEVEMENT_CATEGORIES[catKey];
+                    return `<button class="achievement-book-tab ${achievementBookFilter === catKey ? 'active' : ''}" onclick="setAchievementBookFilter('${catKey}')">${getCategoryTimelineIcon(catKey)} ${cat.name}</button>`;
+                })
+            ].join('');
+
+            const timelineHtml = timeline.map((achievement, idx) => {
+                const isUnlocked = unlockedAchievements.has(achievement.id);
+                const isCurrent = !isUnlocked && nextAchievement && nextAchievement.id === achievement.id;
+                const cat = ACHIEVEMENT_CATEGORIES[achievement.category] || { name: '其他', color: '#999' };
+                const progressText = !isUnlocked ? getAchievementProgressText(achievement.id) : '';
+                const globalIndex = mainlineTimeline.findIndex(ach => ach.id === achievement.id);
+                const prevAchievement = globalIndex > 0 ? mainlineTimeline[globalIndex - 1] : null;
+                const prereqText = (!isUnlocked && prevAchievement && !unlockedAchievements.has(prevAchievement.id))
+                    ? `前置未完成：${prevAchievement.icon} ${prevAchievement.name}`
+                    : '';
+
+                return `
+                    <div class="achievement-timeline-item ${isUnlocked ? 'unlocked' : 'locked'} ${isCurrent ? 'current' : ''}">
+                        <div class="achievement-step">${globalIndex + 1}</div>
+                        ${idx < timeline.length - 1 ? `<div class="achievement-line"></div>` : ''}
+                        <div class="achievement-item ${isUnlocked ? 'unlocked' : 'locked'}">
+                            <div class="achievement-icon" style="${isUnlocked ? `background: ${cat.color}; box-shadow: 0 4px 15px ${cat.color}80` : ''}">
+                                ${isUnlocked ? achievement.icon : '🔒'}
+                            </div>
+                            <div class="achievement-info">
+                                <div class="achievement-item-head">
+                                    <h4>${achievement.name}</h4>
+                                    <span class="achievement-category-tag" style="border-color: ${cat.color}66; color: ${cat.color};">
+                                        ${getCategoryTimelineIcon(achievement.category)} ${cat.name}
+                                    </span>
+                                </div>
+                                <p>${achievement.desc}${progressText ? `（进度 ${progressText}）` : ''}${isCurrent ? ' · 当前目标' : ''}</p>
+                                ${prereqText ? `<div class="achievement-prereq">🔗 ${prereqText}</div>` : ''}
+                            </div>
+                            ${isUnlocked ? `<div class="achievement-check" style="color: ${cat.color}">✓</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            list.innerHTML = `
+                <div class="achievement-roadmap">
+                    <div class="achievement-roadmap-title">
+                        <span>主线进度</span>
+                        <span>${unlockedCount}/${totalCount} · ${percent}%</span>
+                    </div>
+                    <div class="achievement-roadmap-track">
+                        <div class="achievement-roadmap-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="achievement-next">
+                        ${nextAchievement
+                            ? `下一成就：${nextAchievement.icon} ${nextAchievement.name}`
+                            : '你已经达成全成就，太强了！ 👑'}
+                    </div>
+                </div>
+                <div class="achievement-book-tabs">${tabsHtml}</div>
+                <div class="achievement-timeline">${timelineHtml}</div>
+            `;
+        }
+
+        // 更新成就按钮状态
+        function updateAchievementButton() {
+            const btn = document.getElementById('achievementBtn');
+            if (btn) {
+                if (hasNewAchievement) {
+                    btn.classList.add('has-new');
+                } else {
+                    btn.classList.remove('has-new');
+                }
+            }
+        }
+
         // 初始化
         initBackground();
         updateFPS();
@@ -7551,7 +9774,12 @@
         fetchMotto();
         initWelcomeAnimation(); // 启动开场动画
         initHoneycomb();
-        animateHoneycomb();
+        initEasyMode(); // 初始化简单模式（需要在蜂窝动画之前）
+        initAchievements(); // 初始化成就系统
+        // 简单模式下不启动蜂窝动画以节省性能
+        if (shouldRunHoneycomb()) {
+            animateHoneycomb();
+        }
         initSearchEngine();
         renderSearchSuggestions(); // 初始化搜索建议
         updateScroll(); // 初始化滚动状态
@@ -7582,6 +9810,27 @@
                 <button class="btn btn-secondary" onclick="closeOnlineMCPasswordModal()">取消</button>
                 <button class="btn btn-primary" onclick="checkOnlineMCPassword()">验证</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 成就面板 -->
+    <div id="achievementPanel" class="achievement-panel" onclick="toggleAchievementPanel(false)">
+        <button class="achievement-close" onclick="toggleAchievementPanel(false)">×</button>
+        <div class="achievement-content" onclick="event.stopPropagation()">
+            <div class="achievement-header">
+                <h2>🏆 成就系统</h2>
+                <p>探索网站，解锁成就！</p>
+            </div>
+            <div id="achievementList"></div>
+        </div>
+    </div>
+
+    <!-- 成就解锁提示 -->
+    <div id="achievementToast" class="achievement-toast">
+        <span class="icon">🏆</span>
+        <div class="text">
+            <h4>成就解锁！</h4>
+            <p id="achievementToastText"></p>
         </div>
     </div>
 </body>
