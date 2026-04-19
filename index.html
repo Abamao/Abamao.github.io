@@ -66,6 +66,7 @@
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
+            overflow-y: scroll;
             transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -152,23 +153,24 @@
         
         /* 自定义滚动条 - 赛博朋克风格 */
         ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: linear-gradient(180deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 30, 0.95));
-            border-left: 1px solid rgba(0, 212, 255, 0.1);
+            background: var(--bg-input);
+            border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #00d4ff, #7b2cbf);
-            border-radius: 5px;
-            border: 2px solid transparent;
-            background-clip: content-box;
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            background: var(--accent-color);
+            border-radius: 4px;
+            opacity: 0.6;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #00ffff, #9d4edd);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+            background: var(--accent-color);
+            opacity: 1;
+        }
+        ::-webkit-scrollbar-corner {
+            background: var(--bg-input);
         }
 
         /* 阅读进度条 */
@@ -2216,10 +2218,13 @@
             padding: 30px;
             width: 90%;
             max-width: 500px;
+            max-height: 85vh;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             display: none;
             z-index: 1100;
             animation: modalIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
         @keyframes modalIn {
             from { opacity: 0; transform: translate(-50%, -40%) scale(0.9); }
@@ -3572,6 +3577,14 @@
         }
         .fish-tab.fakeupdate-tab.active::before { background: #0078d4; }
 
+        /* 附魔台选项卡 - 紫色系 */
+        .fish-tab.enchant-tab { color: rgba(156, 39, 176, 0.7); }
+        .fish-tab.enchant-tab:hover, .fish-tab.enchant-tab.active { 
+            color: #9c27b0; 
+            background: rgba(156, 39, 176, 0.1);
+        }
+        .fish-tab.enchant-tab.active::before { background: #9c27b0; }
+
         .onlinemc-mode {
             width: 100%;
         }
@@ -4513,6 +4526,211 @@
             background: rgba(255, 71, 87, 0.2);
             color: #ff4757;
         }
+
+        /* ============================================
+           抽卡游戏样式
+           ============================================ */
+        .gacha-container {
+            font-family: 'Courier New', monospace;
+        }
+
+        .gacha-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 44, 191, 0.1));
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gacha-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .card {
+            aspect-ratio: 3/4;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardAppear 0.5s ease-out;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotateY(180deg);
+            }
+            50% {
+                transform: scale(1.05) rotateY(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        .card.common {
+            border-color: #9e9e9e;
+            box-shadow: 0 0 15px rgba(158, 158, 158, 0.3);
+        }
+
+        .card.rare {
+            border-color: #2196f3;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .card.epic {
+            border-color: #9c27b0;
+            box-shadow: 0 0 25px rgba(156, 39, 176, 0.5);
+        }
+
+        .card.legendary {
+            border-color: #ff9800;
+            box-shadow: 0 0 30px rgba(255, 152, 0, 0.6);
+            animation: cardAppear 0.5s ease-out, legendaryPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes legendaryPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 152, 0, 0.6); }
+            50% { box-shadow: 0 0 40px rgba(255, 152, 0, 0.8); }
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.05);
+        }
+
+        .card-icon {
+            font-size: 2em;
+            margin-bottom: 6px;
+        }
+
+        .card-name {
+            font-size: 0.8em;
+            font-weight: bold;
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .card-rarity {
+            font-size: 0.65em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .card.common .card-rarity {
+            background: rgba(158, 158, 158, 0.2);
+            color: #9e9e9e;
+        }
+
+        .card.rare .card-rarity {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+
+        .card.epic .card-rarity {
+            background: rgba(156, 39, 176, 0.2);
+            color: #9c27b0;
+        }
+
+        .card.legendary .card-rarity {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+        }
+
+        .collection-item {
+            aspect-ratio: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .collection-item.unlocked {
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .collection-item.locked {
+            opacity: 0.4;
+            filter: grayscale(1);
+        }
+
+        .collection-item .item-icon {
+            font-size: 1.5em;
+            margin-bottom: 3px;
+        }
+
+        .collection-item .item-count {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: #00d4ff;
+            color: #000;
+            font-size: 0.6em;
+            padding: 1px 4px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 44, 191, 0.2));
+            border-color: #00d4ff;
+            color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -5044,6 +5262,103 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- 附魔台内容 -->
+            <div class="fish-tab-content hidden" id="enchantContent">
+                <div class="enchant-mode" style="padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 2.5em; margin-bottom: 10px;">✨ ⛏️ ✨</div>
+                        <h3 style="color: #9c27b0; margin-bottom: 5px;">附魔台</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9em;">MC风格附魔系统 - 挑战极限！</p>
+                    </div>
+                    
+                    <!-- 难度选择 -->
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span style="font-weight: bold;">⚔️ 难度选择</span>
+                            <span id="difficultyLabel" style="color: #4caf50; font-weight: bold;">简单</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button onclick="setDifficulty('easy')" id="diffEasy" style="flex: 1; padding: 8px; border: 2px solid #4caf50; background: rgba(76,175,80,0.2); color: #4caf50; border-radius: 8px; cursor: pointer; font-weight: bold;">🌱 简单</button>
+                            <button onclick="setDifficulty('normal')" id="diffNormal" style="flex: 1; padding: 8px; border: 2px solid #ff9800; background: transparent; color: #ff9800; border-radius: 8px; cursor: pointer;">⚔️ 普通</button>
+                            <button onclick="setDifficulty('hard')" id="diffHard" style="flex: 1; padding: 8px; border: 2px solid #f44336; background: transparent; color: #f44336; border-radius: 8px; cursor: pointer;">💀 困难</button>
+                            <button onclick="setDifficulty('nightmare')" id="diffNightmare" style="flex: 1; padding: 8px; border: 2px solid #9c27b0; background: transparent; color: #9c27b0; border-radius: 8px; cursor: pointer;">🔮 噩梦</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 游戏状态 -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 0.75em; color: var(--text-muted);">金币</div>
+                            <div id="enchantCoins" style="font-size: 1.4em; font-weight: bold; color: #ffd700;">1000</div>
+                        </div>
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 0.75em; color: var(--text-muted);">附魔等级</div>
+                            <div id="enchantLevel" style="font-size: 1.4em; font-weight: bold; color: #9c27b0;">1</div>
+                        </div>
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 0.75em; color: var(--text-muted);">经验值</div>
+                            <div id="enchantExp" style="font-size: 1.4em; font-weight: bold; color: #00d4ff;">0/100</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 附魔台 -->
+                    <div id="enchantTable" style="background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(44,44,84,0.9)); border: 2px solid #9c27b0; border-radius: 16px; padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 30%, rgba(156,39,176,0.1), transparent 70%); pointer-events: none;"></div>
+                        <div style="text-align: center; position: relative; z-index: 1;">
+                            <div style="font-size: 4em; margin-bottom: 10px;" id="enchantIcon">🔮</div>
+                            <div id="enchantName" style="font-size: 1.3em; font-weight: bold; color: #fff; margin-bottom: 5px;">未附魔</div>
+                            <div id="enchantDesc" style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 15px;">点击下方按钮开始附魔</div>
+                            
+                            <!-- 附魔属性展示 -->
+                            <div id="enchantStats" style="display: none; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+                                <div style="font-size: 0.8em; color: var(--text-muted); margin-bottom: 8px;">附魔属性</div>
+                                <div id="enchantStatsText" style="color: #9c27b0; font-weight: bold; font-size: 0.9em;"></div>
+                            </div>
+                            
+                            <!-- 附魔按钮 -->
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <button onclick="doEnchant()" id="enchantBtn" style="padding: 12px 25px; background: linear-gradient(135deg, #9c27b0, #7b1fa2); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; font-size: 1em; box-shadow: 0 4px 15px rgba(156,39,176,0.4);">✨ 附魔 (-<span id="enchantCost">50</span>金币)</button>
+                                <button onclick="upgradeEnchant()" id="upgradeBtn" style="padding: 12px 25px; background: linear-gradient(135deg, #00d4ff, #0099cc); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; font-size: 1em;">⬆️ 升级附魔 (-200金币)</button>
+                            </div>
+                            
+                            <!-- 重置按钮 -->
+                            <div style="margin-top: 15px;">
+                                <button onclick="resetEnchant()" style="padding: 8px 20px; background: transparent; border: 1px solid #f44336; border-radius: 20px; color: #f44336; cursor: pointer; font-size: 0.85em;">🔄 重置附魔</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 抽卡按钮 -->
+                    <button onclick="enchantGachaPull()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #ff9800, #f57c00); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 15px;">🎴 抽卡获取金币 (+<span id="gachaReward">100</span>金币)</button>
+                    
+                    <!-- 消息显示 -->
+                    <div id="enchantMessage" style="text-align: center; padding: 10px; border-radius: 8px; display: none; margin-bottom: 10px;"></div>
+                    
+                    <!-- 进度 -->
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 8px;">
+                            <span>通关进度</span>
+                            <span id="progressText">0/10 关</span>
+                        </div>
+                        <div style="height: 8px; background: var(--bg-input); border-radius: 4px; overflow: hidden;">
+                            <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #9c27b0, #00d4ff); border-radius: 4px; transition: width 0.5s;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 破产/胜利提示 -->
+                    <div id="gameStatus" style="display: none; text-align: center; padding: 20px; border-radius: 12px; margin-top: 15px;">
+                        <div style="font-size: 2.5em; margin-bottom: 10px;" id="statusIcon">💀</div>
+                        <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;" id="statusTitle">破产！</div>
+                        <button onclick="restartEnchantGame()" style="padding: 12px 30px; background: linear-gradient(135deg, #4caf50, #388e3c); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer;">🔄 重新开始</button>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="closeFishContentPanel()">关闭</button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="fish-tab-content hidden" id="fakeupdateContent">
                 <div class="fakeupdate-mode">
                     <div style="text-align: center; padding: 20px;">
@@ -5101,6 +5416,8 @@
         <div class="tool-item" onclick="toggleToolPanel('sysPanel')" title="系统信息">💻</div>
         <div class="tool-item" onclick="toggleToolPanel('pwdPanel')" title="密码生成">🔑</div>
         <div class="tool-item" onclick="toggleToolPanel('colorPanel')" title="颜色选择">🎨</div>
+        <div class="tool-item" onclick="toggleToolPanel('gachaPanel')" title="抽卡游戏">🎴</div>
+        <div class="tool-item" onclick="toggleToolPanel('enchantPanel')" title="附魔台">✨</div>
     </div>
 
     <!-- 工具面板区域 (移出侧边栏以避免样式冲突) -->
@@ -5287,6 +5604,265 @@
                         <span style="position: absolute; right: 15px; top: 35px; font-size: 0.8em; opacity: 0.5; pointer-events: none;">点击复制</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 抽卡游戏面板 -->
+    <div id="gachaPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 800px;">
+        <div class="gacha-container">
+            <div class="gacha-header">
+                <h2 style="font-size: 1.5em; margin-bottom: 5px;">◆ 战术卡牌系统 ◆</h2>
+                <p style="font-size: 0.8em; color: var(--color-text-muted);">CYBERPUNK GACHA SYSTEM v2.0</p>
+            </div>
+
+            <div class="stats-bar" style="display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <div class="stat-item" style="flex: 1; padding: 10px; background: var(--bg-card); border-radius: 8px; text-align: center; min-width: 80px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">总抽数</div>
+                    <div id="totalPulls" style="font-size: 1.5em; font-weight: bold; color: #00d4ff;">0</div>
+                </div>
+                <div class="stat-item" style="flex: 1; padding: 10px; background: var(--bg-card); border-radius: 8px; text-align: center; min-width: 80px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">传说卡牌</div>
+                    <div id="legendaryCount" style="font-size: 1.5em; font-weight: bold; color: #ff9800;">0</div>
+                </div>
+                <div class="stat-item" style="flex: 1; padding: 10px; background: var(--bg-card); border-radius: 8px; text-align: center; min-width: 80px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">收集进度</div>
+                    <div id="collectionProgress" style="font-size: 1.5em; font-weight: bold; color: #9c27b0;">0%</div>
+                </div>
+                <div class="stat-item" style="flex: 1; padding: 10px; background: var(--bg-card); border-radius: 8px; text-align: center; min-width: 80px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">保底计数</div>
+                    <div id="pityCounter" style="font-size: 1.5em; font-weight: bold; color: #e91e63;">0/90</div>
+                </div>
+                <div class="stat-item" style="flex: 1; padding: 10px; background: var(--bg-card); border-radius: 8px; text-align: center; min-width: 80px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">金币</div>
+                    <div id="coinCount" style="font-size: 1.5em; font-weight: bold; color: #ffd700;">100</div>
+                    <button onclick="showRechargePanel()" style="margin-top: 5px; padding: 3px 10px; font-size: 0.65em; background: linear-gradient(135deg, #ffd700, #ff9800); border: none; border-radius: 4px; cursor: pointer; color: #000;">充值</button>
+                </div>
+            </div>
+
+            <div class="tab-nav" style="display: flex; gap: 8px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <button class="tab-btn active" data-tab="pull" onclick="switchGachaTab('pull')" style="padding: 6px 15px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 0.85em;">抽卡</button>
+                <button class="tab-btn" data-tab="collection" onclick="switchGachaTab('collection')" style="padding: 6px 15px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 0.85em;">图鉴</button>
+                <button class="tab-btn" data-tab="history" onclick="switchGachaTab('history')" style="padding: 6px 15px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-size: 0.85em;">记录</button>
+                <button class="tab-btn" data-tab="recharge" onclick="switchGachaTab('recharge')" style="padding: 6px 15px; background: transparent; border: 1px solid rgba(255, 215, 0, 0.3); color: #ffd700; border-radius: 6px; cursor: pointer; font-size: 0.85em;">充值</button>
+                <button class="tab-btn" data-tab="pets" onclick="switchGachaTab('pets')" style="padding: 6px 15px; background: transparent; border: 1px solid rgba(76, 175, 80, 0.3); color: #4caf50; border-radius: 6px; cursor: pointer; font-size: 0.85em;">宠物</button>
+            </div>
+
+            <div id="tab-pull" class="tab-content active">
+                <div class="pull-section" style="text-align: center; margin-bottom: 20px;">
+                    <div class="pull-buttons" style="display: flex; gap: 10px; justify-content: center;">
+                        <button class="btn btn-primary" onclick="singlePull()" id="singlePullBtn" style="padding: 10px 25px; font-size: 0.9em;">免费抽取 (3)</button>
+                        <button class="btn btn-secondary" onclick="tenPull()" style="padding: 10px 25px; font-size: 0.9em;">十连抽取 (90💰)</button>
+                    </div>
+                </div>
+
+                <div class="card-display" id="cardDisplay" style="min-height: 200px;">
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <div style="font-size: 2.5em; margin-bottom: 10px;">🎴</div>
+                        <p>点击按钮开始抽卡</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-collection" class="tab-content" style="display: none;">
+                <div class="collection-grid" id="collectionGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px;"></div>
+            </div>
+
+            <div id="tab-history" class="tab-content" style="display: none;">
+                <div id="historyList"></div>
+            </div>
+
+            <div id="tab-recharge" class="tab-content" style="display: none;">
+                <div style="text-align: center; padding: 20px;">
+                    <h3 style="margin-bottom: 20px;">💎 充值中心 💎</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">当前金币: <span id="rechargeCoinDisplay" style="color: #ffd700; font-weight: bold;">100</span></p>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 400px; margin: 0 auto;">
+                        <div onclick="doRecharge(100)" style="padding: 15px; background: var(--bg-card); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd700'" onmouseout="this.style.borderColor='rgba(255, 215, 0, 0.3)'">
+                            <div style="font-size: 2em; margin-bottom: 5px;">💰</div>
+                            <div style="font-weight: bold;">100 金币</div>
+                            <div style="font-size: 0.8em; color: var(--text-muted);">¥ 6</div>
+                        </div>
+                        <div onclick="doRecharge(500)" style="padding: 15px; background: var(--bg-card); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd700'" onmouseout="this.style.borderColor='rgba(255, 215, 0, 0.3)'">
+                            <div style="font-size: 2em; margin-bottom: 5px;">💎</div>
+                            <div style="font-weight: bold;">500 金币</div>
+                            <div style="font-size: 0.8em; color: var(--text-muted);">¥ 30</div>
+                        </div>
+                        <div onclick="doRecharge(1000)" style="padding: 15px; background: var(--bg-card); border: 2px solid rgba(255, 215, 0, 0.3); border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd700'" onmouseout="this.style.borderColor='rgba(255, 215, 0, 0.3)'">
+                            <div style="font-size: 2em; margin-bottom: 5px;">👑</div>
+                            <div style="font-weight: bold;">1000 金币</div>
+                            <div style="font-size: 0.8em; color: var(--text-muted);">¥ 60</div>
+                        </div>
+                        <div onclick="doRecharge(5000)" style="padding: 15px; background: var(--bg-card); border: 2px solid rgba(255, 215, 0, 0.5); border-radius: 8px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='#ffd700'" onmouseout="this.style.borderColor='rgba(255, 215, 0, 0.5)'">
+                            <div style="font-size: 2em; margin-bottom: 5px;">🚀</div>
+                            <div style="font-weight: bold;">5000 金币</div>
+                            <div style="font-size: 0.8em; color: var(--text-muted);">¥ 298</div>
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px; font-size: 0.8em; color: var(--text-muted);">💡 充值仅供娱乐，无实际价值</p>
+                </div>
+            </div>
+
+            <!-- 宠物系统 -->
+            <div id="tab-pets" class="tab-content" style="display: none;">
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="font-size: 2em; margin-bottom: 5px;">🐾</div>
+                    <h3 style="color: #4caf50; margin-bottom: 3px;">宠物中心</h3>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 15px;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center;">
+                        <div style="font-size: 0.7em; color: var(--text-muted);">宠物数</div>
+                        <div id="petCount" style="font-size: 1.3em; font-weight: bold; color: #4caf50;">0</div>
+                    </div>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center;">
+                        <div style="font-size: 0.7em; color: var(--text-muted);">仓库</div>
+                        <div id="petStorageCount" style="font-size: 1.3em; font-weight: bold; color: #ff9800;">0/10</div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-weight: bold;">🐕 我的宠物</span>
+                        <button onclick="switchPetTab('mypets')" style="padding: 3px 10px; font-size: 0.7em; background: #4caf50; border: none; border-radius: 4px; color: white; cursor: pointer;">管理</button>
+                    </div>
+                    <div id="petList" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; min-height: 50px; padding: 8px; background: var(--bg-input); border-radius: 6px;">
+                        <p id="noPetText" style="color: var(--text-muted); font-size: 0.8em; width: 100%;">暂无宠物</p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button onclick="petGachaPull()" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #9c27b0, #7b1fa2); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">🎰 宠物抽卡<br><span style="font-size: 0.7em; opacity: 0.8;">500金币</span></button>
+                    <button onclick="buyPetDirect(0)" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #ff9800, #f57c00); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">🏪 宠物商店<br><span style="font-size: 0.7em; opacity: 0.8;">买宠物</span></button>
+                </div>
+
+                <div id="treasureStatus" style="display: none; background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(255,152,0,0.1)); border: 2px solid #4caf50; border-radius: 10px; padding: 15px; margin-bottom: 12px; text-align: center;">
+                    <div style="font-size: 1.5em; margin-bottom: 5px;">🏃🐕</div>
+                    <div style="font-weight: bold; color: #4caf50; margin-bottom: 3px;">宠物工作中...</div>
+                    <div id="treasureTimer" style="font-size: 1.2em; font-weight: bold; color: #ff9800;">10:00</div>
+                </div>
+
+                <div id="treasureResult" style="display: none; background: linear-gradient(135deg, rgba(255,152,0,0.2), rgba(255,193,7,0.2)); border: 2px solid #ff9800; border-radius: 10px; padding: 15px; margin-bottom: 12px; text-align: center;">
+                    <div id="resultIcon" style="font-size: 2.5em; margin-bottom: 5px;">📦</div>
+                    <div id="resultTitle" style="font-weight: bold; font-size: 1.1em; margin-bottom: 3px;">寻宝归来！</div>
+                    <div id="resultItem" style="color: var(--text-secondary); font-size: 0.85em; margin-bottom: 8px;"></div>
+                    <button onclick="closeTreasureResult()" style="padding: 6px 15px; background: #4caf50; border: none; border-radius: 15px; color: white; cursor: pointer; font-size: 0.85em;">收下奖励</button>
+                </div>
+
+                <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+                    <button id="sendTreasureBtn" onclick="sendPetTreasure()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #4caf50, #388e3c); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9em;">🐕 寻宝</button>
+                    <button onclick="startPetBattle(0)" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #f44336, #d32f2f); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9em;">⚔️ 战斗</button>
+                    <button onclick="startPetAdventure(0)" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #00d4ff, #0099cc); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.9em;">🗺️ 探险</button>
+                </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 8px;">🎯 每日任务</div>
+                    <div id="dailyQuestList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 8px;">🛒 道具商店</div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button onclick="buyPetEquip(0)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.75em;">⭕项圈<br>100💰</button>
+                        <button onclick="buyPetEquip(3)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.75em;">⛓️金链<br>500💰</button>
+                        <button onclick="buyPetEquip(9)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid #ff9800; border-radius: 6px; cursor: pointer; font-size: 0.75em;">💍神器<br>2000💰</button>
+                        <button onclick="buyPetFood(0)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.75em;">🍖狗粮<br>20💰</button>
+                        <button onclick="buyPetFood(3)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid #f44336; border-radius: 6px; cursor: pointer; font-size: 0.75em;">🥩牛排<br>100💰</button>
+                        <button onclick="buyPetSkin(3)" style="padding: 6px 10px; background: var(--bg-input); border: 1px solid #ffd700; border-radius: 6px; cursor: pointer; font-size: 0.75em;">✨金皮<br>2000💰</button>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                    <button onclick="switchPetTab('breed')" style="padding: 10px; background: linear-gradient(135deg, #e91e63, #c2185b); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">💕 繁殖</button>
+                    <button onclick="switchPetTab('storage')" style="padding: 10px; background: linear-gradient(135deg, #607d8b, #455a64); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">📦 仓库</button>
+                    <button onclick="switchPetTab('adventure')" style="padding: 10px; background: linear-gradient(135deg, #3f51b5, #303f9f); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">🌍 地图</button>
+                    <button onclick="switchPetTab('rank')" style="padding: 10px; background: linear-gradient(135deg, #ff5722, #e64a19); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 0.85em;">🏆 排行</button>
+                </div>
+
+                <div id="petDetailPanel" style="display: none; margin-top: 12px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 附魔台面板 -->
+    <div id="enchantPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 800px;">
+        <div class="enchant-container" style="font-family: 'Courier New', monospace;">
+            <div class="enchant-header" style="text-align: center; margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, rgba(156,39,176,0.1), rgba(0,212,255,0.1)); border: 2px solid rgba(156,39,176,0.3); border-radius: 8px;">
+                <h2 style="font-size: 1.5em; margin-bottom: 5px; color: #9c27b0;">◆ MC 附魔台 ◆</h2>
+                <p style="font-size: 0.8em; color: var(--text-muted);">ENCHANTMENT SYSTEM v1.0</p>
+            </div>
+
+            <!-- 难度选择 -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-weight: bold;">⚔️ 难度选择</span>
+                    <span id="difficultyLabel" style="color: #4caf50; font-weight: bold;">简单</span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button onclick="setDifficulty('easy')" id="diffEasy" style="flex: 1; padding: 8px; border: 2px solid #4caf50; background: rgba(76,175,80,0.2); color: #4caf50; border-radius: 8px; cursor: pointer; font-weight: bold;">🌱 简单</button>
+                    <button onclick="setDifficulty('normal')" id="diffNormal" style="flex: 1; padding: 8px; border: 2px solid #ff9800; background: transparent; color: #ff9800; border-radius: 8px; cursor: pointer;">⚔️ 普通</button>
+                    <button onclick="setDifficulty('hard')" id="diffHard" style="flex: 1; padding: 8px; border: 2px solid #f44336; background: transparent; color: #f44336; border-radius: 8px; cursor: pointer;">💀 困难</button>
+                    <button onclick="setDifficulty('nightmare')" id="diffNightmare" style="flex: 1; padding: 8px; border: 2px solid #9c27b0; background: transparent; color: #9c27b0; border-radius: 8px; cursor: pointer;">🔮 噩梦</button>
+                </div>
+            </div>
+
+            <!-- 游戏状态 -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">金币</div>
+                    <div id="enchantCoins" style="font-size: 1.4em; font-weight: bold; color: #ffd700;">1000</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">附魔等级</div>
+                    <div id="enchantLevel" style="font-size: 1.4em; font-weight: bold; color: #9c27b0;">1</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 0.75em; color: var(--text-muted);">经验值</div>
+                    <div id="enchantExp" style="font-size: 1.4em; font-weight: bold; color: #00d4ff;">0/100</div>
+                </div>
+            </div>
+
+            <!-- 附魔台 -->
+            <div id="enchantTable" style="background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(44,44,84,0.9)); border: 2px solid #9c27b0; border-radius: 16px; padding: 20px; margin-bottom: 15px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(circle at 50% 30%, rgba(156,39,176,0.1), transparent 70%); pointer-events: none;"></div>
+                <div style="text-align: center; position: relative; z-index: 1;">
+                    <div style="font-size: 4em; margin-bottom: 10px;" id="enchantIcon">🔮</div>
+                    <div id="enchantName" style="font-size: 1.3em; font-weight: bold; color: #fff; margin-bottom: 5px;">未附魔</div>
+                    <div id="enchantDesc" style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 15px;">点击下方按钮开始附魔</div>
+
+                    <div id="enchantStats" style="display: none; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 15px;">
+                        <div style="font-size: 0.8em; color: var(--text-muted); margin-bottom: 8px;">附魔属性</div>
+                        <div id="enchantStatsText" style="color: #9c27b0; font-weight: bold; font-size: 0.9em;"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="doEnchant()" id="enchantBtn" style="padding: 12px 25px; background: linear-gradient(135deg, #9c27b0, #7b1fa2); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; font-size: 1em; box-shadow: 0 4px 15px rgba(156,39,176,0.4);">✨ 附魔 (-<span id="enchantCost">50</span>金币)</button>
+                        <button onclick="upgradeEnchant()" id="upgradeBtn" style="padding: 12px 25px; background: linear-gradient(135deg, #00d4ff, #0099cc); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer; font-size: 1em;">⬆️ 升级附魔 (-200金币)</button>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <button onclick="resetEnchant()" style="padding: 8px 20px; background: transparent; border: 1px solid #f44336; border-radius: 20px; color: #f44336; cursor: pointer; font-size: 0.85em;">🔄 重置附魔</button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="enchantGachaPull()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #ff9800, #f57c00); border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; font-size: 1.1em; margin-bottom: 15px;">🎴 抽卡获取金币 (+<span id="gachaReward">100</span>金币)</button>
+
+            <div id="enchantMessage" style="text-align: center; padding: 10px; border-radius: 8px; display: none; margin-bottom: 10px;"></div>
+
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 8px;">
+                    <span>通关进度</span>
+                    <span id="progressText">0/10 关</span>
+                </div>
+                <div style="height: 8px; background: var(--bg-input); border-radius: 4px; overflow: hidden;">
+                    <div id="progressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #9c27b0, #00d4ff); border-radius: 4px; transition: width 0.5s;"></div>
+                </div>
+            </div>
+
+            <div id="gameStatus" style="display: none; text-align: center; padding: 20px; border-radius: 12px; margin-top: 15px;">
+                <div style="font-size: 2.5em; margin-bottom: 10px;" id="statusIcon">💀</div>
+                <div style="font-size: 1.3em; font-weight: bold; margin-bottom: 10px;" id="statusTitle">破产！</div>
+                <button onclick="restartEnchantGame()" style="padding: 12px 30px; background: linear-gradient(135deg, #4caf50, #388e3c); border: none; border-radius: 25px; color: white; font-weight: bold; cursor: pointer;">🔄 重新开始</button>
             </div>
         </div>
     </div>
@@ -5548,11 +6124,13 @@
             const hasSeenIntro = localStorage.getItem('fishIntroSeen');
             if (hasSeenIntro === 'true') {
                 document.getElementById('fishContentPanel').classList.add('active');
+                document.body.style.overflow = 'hidden';
                 switchFishTab('moyu');
                 return;
             }
             // 显示鱼模式简介页面
             document.getElementById('fishIntro').classList.add('active');
+            document.body.style.overflow = 'hidden';
             document.getElementById('check1').checked = false;
             document.getElementById('check2').checked = false;
             document.getElementById('enterBtn').disabled = true;
@@ -5560,6 +6138,10 @@
 
         function closeFishIntro() {
             document.getElementById('fishIntro').classList.remove('active');
+            const fishContentActive = document.getElementById('fishContentPanel').classList.contains('active');
+            if (!fishContentActive) {
+                document.body.style.overflow = '';
+            }
         }
 
         function enterFish() {
@@ -5567,6 +6149,7 @@
             localStorage.setItem('fishIntroSeen', 'true');
             document.getElementById('fishIntro').classList.remove('active');
             document.getElementById('fishContentPanel').classList.add('active');
+            document.body.style.overflow = 'hidden';
             switchFishTab('moyu');
         }
 
@@ -5587,6 +6170,7 @@
 
         function closeFishContentPanel() {
             document.getElementById('fishContentPanel').classList.remove('active');
+            document.body.style.overflow = '';
             // 停止在线 MC iframe，释放资源
             const mcIframe = document.getElementById('mcIframe');
             if (mcIframe) {
@@ -5613,6 +6197,287 @@
                     mcIframe.src = 'about:blank';
                 }
             }
+        }
+
+        // ============================================
+        // 附魔台游戏系统
+        // ============================================
+        const enchantGame = {
+            coins: 1000,
+            level: 1,
+            exp: 0,
+            expNeeded: 100,
+            currentEnchant: null,
+            difficulty: 'easy',
+            stage: 0,
+            totalStages: 10,
+            isGameOver: false,
+            
+            difficulties: {
+                easy: { name: '简单', costMult: 0.8, rewardMult: 1.2, expMult: 0.8 },
+                normal: { name: '普通', costMult: 1, rewardMult: 1, expMult: 1 },
+                hard: { name: '困难', costMult: 1.5, rewardMult: 1.5, expMult: 1.5 },
+                nightmare: { name: '噩梦', costMult: 2.5, rewardMult: 2.5, expMult: 2.5 }
+            },
+            
+            enchantNames: [
+                '锋利', '亡灵杀手', '节肢杀手', '火焰附加', '击退', 'Expier',
+                '耐久', '精准采集', '时运', '力量', '冲击', '火矢',
+                '无限', '冰霜行者', '深海探索者', '速度', '跳跃', '保护',
+                '爆炸保护', '弹射保护', '荆棘', '水下呼吸', '水下速游'
+            ],
+            
+            enchantIcons: ['⚔️', '💀', '🕷️', '🔥', '💨', '✨', '🛡️', '💎', '🍀', '💪', '🏹', '🔥', '♾️', '❄️', '🌊', '⚡', '🦘', '🛡️', '💥', '🏹', '🌵', '🫧', '🐟'],
+            
+            itemNames: ['钻石剑', '钻石镐', '钻石斧', '钻石铲', '弓', '三叉戟', '钻石胸甲', '钻石头盔', '钻石护腿', '钻石靴子'],
+            itemIcons: ['🗡️', '⛏️', '🪓', '🪣', '🏹', '🔱', '👕', '⛑️', '👖', '👢']
+        };
+        
+        function setDifficulty(diff) {
+            enchantGame.difficulty = diff;
+            const diffs = enchantGame.difficulties[diff];
+            document.getElementById('difficultyLabel').textContent = diffs.name;
+            document.getElementById('difficultyLabel').style.color = diff === 'easy' ? '#4caf50' : diff === 'normal' ? '#ff9800' : diff === 'hard' ? '#f44336' : '#9c27b0';
+            
+            ['easy', 'normal', 'hard', 'nightmare'].forEach(d => {
+                const btn = document.getElementById('diff' + d.charAt(0).toUpperCase() + d.slice(1));
+                if (d === diff) {
+                    btn.style.background = 'rgba(76,175,80,0.2)';
+                    btn.style.fontWeight = 'bold';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.fontWeight = 'normal';
+                }
+            });
+            
+            updateEnchantUI();
+        }
+        
+        function updateEnchantUI() {
+            const diff = enchantGame.difficulties[enchantGame.difficulty];
+            const cost = Math.floor(50 * diff.costMult);
+            const reward = Math.floor(100 * diff.rewardMult);
+            
+            document.getElementById('enchantCoins').textContent = enchantGame.coins;
+            document.getElementById('enchantLevel').textContent = enchantGame.level;
+            document.getElementById('enchantExp').textContent = enchantGame.exp + '/' + enchantGame.expNeeded;
+            document.getElementById('enchantCost').textContent = cost;
+            document.getElementById('gachaReward').textContent = reward;
+            
+            const progress = (enchantGame.stage / enchantGame.totalStages) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = enchantGame.stage + '/' + enchantGame.totalStages + ' 关';
+        }
+        
+        function showEnchantMessage(msg, type) {
+            const msgDiv = document.getElementById('enchantMessage');
+            msgDiv.style.display = 'block';
+            msgDiv.textContent = msg;
+            msgDiv.style.background = type === 'success' ? 'rgba(76,175,80,0.2)' : type === 'error' ? 'rgba(244,67,54,0.2)' : 'rgba(255,152,0,0.2)';
+            msgDiv.style.color = type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#ff9800';
+            msgDiv.style.border = '1px solid ' + (type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#ff9800');
+            
+            setTimeout(() => {
+                msgDiv.style.display = 'none';
+            }, 2000);
+        }
+        
+        function doEnchant() {
+            if (enchantGame.isGameOver) return;
+            
+            const diff = enchantGame.difficulties[enchantGame.difficulty];
+            const cost = Math.floor(50 * diff.costMult);
+            
+            if (enchantGame.coins < cost) {
+                checkBankruptcy();
+                return;
+            }
+            
+            enchantGame.coins -= cost;
+            
+            // 随机生成附魔
+            const enchantIndex = Math.floor(Math.random() * enchantGame.enchantNames.length);
+            const itemIndex = Math.floor(Math.random() * enchantGame.itemNames.length);
+            const level = enchantGame.level;
+            
+            enchantGame.currentEnchant = {
+                name: enchantGame.enchantNames[enchantIndex],
+                icon: enchantGame.enchantIcons[enchantIndex],
+                item: enchantGame.itemNames[itemIndex],
+                itemIcon: enchantGame.itemIcons[itemIndex],
+                level: level,
+                stats: generateEnchantStats(enchantIndex, level)
+            };
+            
+            // 更新UI
+            document.getElementById('enchantIcon').textContent = enchantGame.currentEnchant.itemIcon;
+            document.getElementById('enchantName').textContent = enchantGame.currentEnchant.item + ' +' + level;
+            document.getElementById('enchantDesc').textContent = enchantGame.currentEnchant.icon + ' ' + enchantGame.currentEnchant.name + ' I';
+            
+            document.getElementById('enchantStats').style.display = 'block';
+            document.getElementById('enchantStatsText').textContent = enchantGame.currentEnchant.stats;
+            
+            // 获得经验
+            const expGain = Math.floor(20 * diff.expMult);
+            enchantGame.exp += expGain;
+            
+            // 升级检查
+            if (enchantGame.exp >= enchantGame.expNeeded) {
+                enchantGame.level++;
+                enchantGame.exp = enchantGame.expNeeded + enchantGame.exp - enchantGame.expNeeded;
+                enchantGame.expNeeded = Math.floor(100 * Math.pow(1.2, enchantGame.level - 1));
+                showEnchantMessage('🎉 升级到 ' + enchantGame.level + ' 级！', 'success');
+            }
+            
+            // 推进关卡
+            enchantGame.stage++;
+            
+            // 检查通关
+            if (enchantGame.stage >= enchantGame.totalStages) {
+                winGame();
+            }
+            
+            updateEnchantUI();
+            checkBankruptcy();
+        }
+        
+        function generateEnchantStats(enchantIndex, level) {
+            const stats = [
+                '伤害 +' + (5 + level * 2),
+                '亡灵生物伤害 +' + (8 + level * 2.5),
+                '节肢动物伤害 +' + (8 + level * 2.5),
+                '火焰时间 +' + (level * 1) + '秒',
+                '击退等级 +' + level,
+                '经验获取 +' + (level * 10) + '%',
+                '耐久等级 +' + Math.ceil(level / 2),
+                '采集速度 +' + level,
+                '掉落物 +' + (level * 15) + '%',
+                '攻击伤害 +' + (level * 5) + '%',
+                '击退抗性 +' + level,
+                '远程伤害 +' + (level * 5),
+                '无限箭矢',
+                '冰霜行者',
+                '水下挖掘 +' + level,
+                '移动速度 +' + (level * 5) + '%',
+                '跳跃高度 +' + (level * 10) + '%',
+                '护甲 +' + (level * 2),
+                '爆炸抗性 +' + (level * 2),
+                '弹射物抗性 +' + (level * 2),
+                '荆棘反射 +' + level,
+                '水下呼吸 +' + (level * 15) + '秒',
+                '水下速度 +' + (level * 10) + '%'
+            ];
+            return stats[enchantIndex] || '未知属性';
+        }
+        
+        function upgradeEnchant() {
+            if (enchantGame.isGameOver) return;
+            
+            const diff = enchantGame.difficulties[enchantGame.difficulty];
+            const cost = Math.floor(200 * diff.costMult);
+            
+            if (enchantGame.coins < cost) {
+                showEnchantMessage('💰 金币不足！需要 ' + cost + ' 金币', 'error');
+                checkBankruptcy();
+                return;
+            }
+            
+            enchantGame.coins -= cost;
+            
+            if (enchantGame.currentEnchant) {
+                enchantGame.level++;
+                enchantGame.currentEnchant.level = enchantGame.level;
+                enchantGame.currentEnchant.stats = generateEnchantStats(
+                    enchantGame.enchantNames.indexOf(enchantGame.currentEnchant.name),
+                    enchantGame.level
+                );
+                
+                document.getElementById('enchantName').textContent = enchantGame.currentEnchant.item + ' +' + enchantGame.level;
+                document.getElementById('enchantStatsText').textContent = enchantGame.currentEnchant.stats;
+                
+                showEnchantMessage('⬆️ 附魔等级提升到 ' + enchantGame.level + ' 级！', 'success');
+            }
+            
+            updateEnchantUI();
+            checkBankruptcy();
+        }
+        
+        function resetEnchant() {
+            enchantGame.currentEnchant = null;
+            document.getElementById('enchantIcon').textContent = '🔮';
+            document.getElementById('enchantName').textContent = '未附魔';
+            document.getElementById('enchantDesc').textContent = '点击下方按钮开始附魔';
+            document.getElementById('enchantStats').style.display = 'none';
+            showEnchantMessage('🔄 附魔已重置', 'info');
+        }
+        
+        function enchantGachaPull() {
+            if (enchantGame.isGameOver) return;
+            
+            const diff = enchantGame.difficulties[enchantGame.difficulty];
+            const reward = Math.floor(100 * diff.rewardMult);
+            const bonus = Math.floor(Math.random() * 50 * diff.rewardMult);
+            
+            enchantGame.coins += reward + bonus;
+            
+            showEnchantMessage('🎴 抽卡成功！ +' + reward + ' 金币' + (bonus > 0 ? ' (幸运加成 +' + bonus + ')' : ''), 'success');
+            
+            enchantGame.stage++;
+            
+            if (enchantGame.stage >= enchantGame.totalStages) {
+                winGame();
+            }
+            
+            updateEnchantUI();
+        }
+        
+        function checkBankruptcy() {
+            if (enchantGame.coins <= 0) {
+                enchantGame.isGameOver = true;
+                const statusDiv = document.getElementById('gameStatus');
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(244,67,54,0.2)';
+                statusDiv.style.border = '2px solid #f44336';
+                document.getElementById('statusIcon').textContent = '💀';
+                document.getElementById('statusTitle').textContent = '破产！金币为0！';
+                document.getElementById('statusTitle').style.color = '#f44336';
+            }
+        }
+        
+        function winGame() {
+            enchantGame.isGameOver = true;
+            const statusDiv = document.getElementById('gameStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.style.background = 'rgba(76,175,80,0.2)';
+            statusDiv.style.border = '2px solid #4caf50';
+            document.getElementById('statusIcon').textContent = '🏆';
+            document.getElementById('statusTitle').textContent = '通关成功！';
+            document.getElementById('statusTitle').style.color = '#4caf50';
+            
+            // 通关奖励
+            const reward = 5000 * enchantGame.difficulties[enchantGame.difficulty].rewardMult;
+            enchantGame.coins += reward;
+            showEnchantMessage('🎉 通关奖励 +' + Math.floor(reward) + ' 金币！', 'success');
+            updateEnchantUI();
+        }
+        
+        function restartEnchantGame() {
+            enchantGame.coins = 1000;
+            enchantGame.level = 1;
+            enchantGame.exp = 0;
+            enchantGame.expNeeded = 100;
+            enchantGame.currentEnchant = null;
+            enchantGame.stage = 0;
+            enchantGame.isGameOver = false;
+            
+            document.getElementById('gameStatus').style.display = 'none';
+            document.getElementById('enchantIcon').textContent = '🔮';
+            document.getElementById('enchantName').textContent = '未附魔';
+            document.getElementById('enchantDesc').textContent = '点击下方按钮开始附魔';
+            document.getElementById('enchantStats').style.display = 'none';
+            
+            setDifficulty(enchantGame.difficulty);
+            showEnchantMessage('🔄 游戏已重置！', 'info');
         }
 
         // 在线 MC 密码验证
@@ -7325,6 +8190,10 @@
 
         function closeModal(id) {
             document.getElementById(id).classList.remove('active');
+            const anyModalOpen = document.querySelector('.modal.active, .tool-panel.active, #fishContentPanel.active, #fishIntro.active, #windows11Modal.active');
+            if (!anyModalOpen) {
+                document.body.style.overflow = '';
+            }
         }
 
         function checkNewCategory() {
@@ -7422,14 +8291,33 @@
             if (!isActive) {
                 panel.classList.add('active');
                 overlay.classList.add('active');
-                // 解锁工具使用者成就
+                document.body.style.overflow = 'hidden';
+                if (id === 'gachaPanel') {
+                    resetDailyPulls();
+                    updateDailyFreeDisplay();
+                    updateGachaStats();
+                    updatePetDisplay();
+                    if (gachaStats.isTreasureQuest) {
+                        document.getElementById('sendTreasureBtn').disabled = true;
+                        document.getElementById('sendTreasureBtn').style.opacity = '0.5';
+                        document.getElementById('sendTreasureBtn').textContent = '🐕 寻宝中...';
+                        document.getElementById('treasureStatus').style.display = 'block';
+                        updateTreasureTimer();
+                    }
+                }
+                if (id === 'enchantPanel') {
+                    updateEnchantUI();
+                }
                 unlockAchievement('toolUser');
+            } else {
+                document.body.style.overflow = '';
             }
         }
 
         function closeAllPanels() {
             document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
             document.getElementById('toolOverlay').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // 拖拽事件处理
@@ -7722,6 +8610,7 @@
             title.textContent = `📱 扫码访问: ${name}`;
             display.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" alt="QR Code">`;
             document.getElementById('qrModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
             
             // 解锁扫码达人成就
             unlockAchievement('qrMaster');
@@ -8380,10 +9269,12 @@
         // Windows 11 弹窗
         function showWindows11Modal() {
             document.getElementById('windows11Modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function hideWindows11Modal() {
             document.getElementById('windows11Modal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // 首次访问检测
@@ -9795,6 +10686,1471 @@
         // 初始化主题
         initTheme();
         // 注意：render() 在欢迎页消失后才调用
+
+        // ============================================
+        // 抽卡游戏系统
+        // ============================================
+        const cardPool = [
+            { name: '数据幽灵', icon: '👻', rarity: 'common', weight: 40 },
+            { name: '网络行者', icon: '🚶', rarity: 'common', weight: 40 },
+            { name: '代码碎片', icon: '💾', rarity: 'common', weight: 40 },
+            { name: '防火墙', icon: '🛡️', rarity: 'common', weight: 35 },
+            { name: '比特精灵', icon: '🔵', rarity: 'common', weight: 35 },
+            { name: '像素史莱姆', icon: '🟢', rarity: 'common', weight: 35 },
+            { name: '键盘侠', icon: '⌨️', rarity: 'common', weight: 30 },
+            { name: '鼠标战士', icon: '🖱️', rarity: 'common', weight: 30 },
+            { name: 'WiFi幽灵', icon: '📶', rarity: 'common', weight: 30 },
+            { name: '电源守护者', icon: '🔋', rarity: 'common', weight: 30 },
+            { name: '显示器精灵', icon: '🖥️', rarity: 'common', weight: 25 },
+            { name: '硬盘挖掘者', icon: '💽', rarity: 'common', weight: 25 },
+            { name: '服务器巨人', icon: '🗄️', rarity: 'rare', weight: 25 },
+            { name: '云计算师', icon: '☁️', rarity: 'rare', weight: 25 },
+            { name: '量子芯片', icon: '⚡', rarity: 'rare', weight: 25 },
+            { name: '数字猎手', icon: '🎯', rarity: 'rare', weight: 25 },
+            { name: 'AI核心', icon: '🤖', rarity: 'epic', weight: 15 },
+            { name: '虚空之刃', icon: '⚔️', rarity: 'epic', weight: 15 },
+            { name: '星界投影', icon: '✨', rarity: 'epic', weight: 15 },
+            { name: '创世代码', icon: '🌟', rarity: 'legendary', weight: 5 },
+            { name: '时间主宰', icon: '⏰', rarity: 'legendary', weight: 5 },
+            { name: '维度裂隙', icon: '🌀', rarity: 'legendary', weight: 5 },
+            { name: '赛博龙王', icon: '🐉', rarity: 'epic', weight: 12 },
+            { name: '黑洞吞噬者', icon: '⚫', rarity: 'epic', weight: 12 },
+            { name: '霓虹天使', icon: '👼', rarity: 'epic', weight: 10 },
+            { name: '机甲战神', icon: '🤖', rarity: 'epic', weight: 12 },
+            { name: '灵魂黑客', icon: '🎭', rarity: 'rare', weight: 20 },
+            { name: '暗网行者', icon: '🌑', rarity: 'rare', weight: 20 },
+            { name: '光明黑客', icon: '🌕', rarity: 'rare', weight: 20 },
+            { name: '全息少女', icon: '👩', rarity: 'rare', weight: 22 },
+            { name: '二进制先知', icon: '🔢', rarity: 'rare', weight: 18 },
+            { name: '加密诗人', icon: '📜', rarity: 'rare', weight: 18 },
+            { name: '神经漫游者', icon: '🧠', rarity: 'epic', weight: 10 },
+            { name: '梦境工程师', icon: '💭', rarity: 'epic', weight: 10 },
+            { name: '虚拟现实的织梦者', icon: '🎪', rarity: 'epic', weight: 8 },
+            { name: '星际海盗', icon: '🏴‍☠️', rarity: 'rare', weight: 18 },
+            { name: '光子骑士', icon: '🔱', rarity: 'rare', weight: 20 },
+            { name: '纳米医师', icon: '💉', rarity: 'rare', weight: 18 },
+            { name: '情感AI', icon: '❤️', rarity: 'rare', weight: 22 },
+            { name: '记忆小偷', icon: '🎭', rarity: 'rare', weight: 20 },
+            { name: '时间刺客', icon: '🗡️', rarity: 'epic', weight: 12 },
+            { name: '空间法师', icon: '📐', rarity: 'epic', weight: 12 },
+            { name: '宇宙觉醒者', icon: '🌌', rarity: 'legendary', weight: 4 },
+            { name: '多元宇宙的守护者', icon: '🛡️', rarity: 'legendary', weight: 4 },
+            { name: '无限可能的存在', icon: '♾️', rarity: 'legendary', weight: 3 },
+            { name: '零日漏洞', icon: '🔓', rarity: 'epic', weight: 10 },
+            { name: '永恒之蓝', icon: '💎', rarity: 'epic', weight: 10 },
+            { name: '幽灵协议', icon: '👁️', rarity: 'rare', weight: 18 },
+            { name: '红色警戒', icon: '🚨', rarity: 'rare', weight: 20 },
+            { name: '蓝屏天使', icon: '💙', rarity: 'common', weight: 30 },
+            { name: '管理员权限', icon: '🔑', rarity: 'epic', weight: 12 },
+            { name: '系统崩溃', icon: '💥', rarity: 'rare', weight: 20 },
+            { name: '云端漫步者', icon: '🌥️', rarity: 'common', weight: 30 },
+            { name: '数据挖掘者', icon: '⛏️', rarity: 'common', weight: 35 },
+            { name: '算法诗人', icon: '📝', rarity: 'rare', weight: 18 },
+            { name: '赛博格', icon: '🦾', rarity: 'rare', weight: 22 },
+            { name: '全息投影', icon: '🔮', rarity: 'rare', weight: 20 },
+            { name: '神经网络', icon: '🕸️', rarity: 'rare', weight: 18 },
+            { name: '区块链先驱', icon: '🔗', rarity: 'epic', weight: 10 },
+            { name: '元宇宙建筑师', icon: '🏗️', rarity: 'epic', weight: 10 },
+            { name: '量子纠缠', icon: '⛓️', rarity: 'epic', weight: 12 },
+            { name: '奇点突破者', icon: '🎯', rarity: 'legendary', weight: 4 },
+            { name: '信息洪流', icon: '🌊', rarity: 'rare', weight: 18 },
+            { name: '数字凤凰', icon: '🔥', rarity: 'epic', weight: 10 },
+            { name: '觉醒的人工智能', icon: '👁️', rarity: 'legendary', weight: 5 },
+            { name: '最后的程序员', icon: '👨‍💻', rarity: 'legendary', weight: 4 },
+            { name: '虚拟世界的创世神', icon: '🎮', rarity: 'legendary', weight: 3 },
+            { name: '时间回溯者', icon: '⏪', rarity: 'epic', weight: 10 },
+            { name: '空间跳跃者', icon: '🚀', rarity: 'epic', weight: 12 },
+            { name: '维度行者', icon: '📏', rarity: 'epic', weight: 10 },
+            { name: '和平守护者', icon: '🕊️', rarity: 'epic', weight: 10 },
+            { name: '秩序之眼', icon: '👁️', rarity: 'legendary', weight: 4 },
+            { name: '混沌之子', icon: '💀', rarity: 'legendary', weight: 4 },
+            { name: '平衡者', icon: '⚖️', rarity: 'legendary', weight: 3 }
+        ];
+
+        let gachaStats = {
+            totalPulls: 0,
+            legendary: 0,
+            collection: {},
+            history: [],
+            pityCounter: 0,
+            pityGuaranteed: false,
+            dailyFreePulls: 3,
+            lastDailyReset: null,
+            coins: 100,
+            totalCoins: 0,
+            pets: [],
+            isTreasureQuest: false,
+            treasureEndTime: null,
+            petInventory: [],
+            petLevel: {},
+            petExp: {},
+            petIntimacy: {},
+            petMood: {},
+            petEquipment: {},
+            petQuests: {},
+            petQuestsCompleted: {},
+            petStorage: [],
+            petBattleWins: 0,
+            petAdventures: 0,
+            petBreedCount: 0,
+            lastDailyQuestReset: null,
+            petSkins: {}
+        };
+
+        const petSystem = {
+            treasureDuration: 10 * 60 * 1000,
+            
+            petPool: [
+                { name: '田园犬', icon: '🐕', rarity: 'common', skill: '看家', skillDesc: '守护金币' },
+                { name: '橘猫', icon: '🐱', rarity: 'common', skill: '萌动', skillDesc: '增加亲密度' },
+                { name: '哈士奇', icon: '🐺', rarity: 'common', skill: '拆家', skillDesc: '随机获得物品' },
+                { name: '兔子', icon: '🐰', rarity: 'common', skill: '跳跃', skillDesc: '探险加成' },
+                { name: '鹦鹉', icon: '🦜', rarity: 'uncommon', skill: '模仿', skillDesc: '任务奖励' },
+                { name: '狐狸', icon: '🦊', rarity: 'uncommon', skill: '迷惑', skillDesc: '战斗加成' },
+                { name: '狼', icon: '🐺', rarity: 'uncommon', skill: '嚎叫', skillDesc: '经验加成' },
+                { name: '豹猫', icon: '🐆', rarity: 'rare', skill: '迅捷', skillDesc: '探险速度' },
+                { name: '熊猫', icon: '🐼', rarity: 'rare', skill: '卖萌', skillDesc: '亲密度UP' },
+                { name: '独角兽', icon: '🦄', rarity: 'legendary', skill: '祝福', skillDesc: '全属性UP' },
+                { name: '龙', icon: '🐉', rarity: 'legendary', skill: '龙息', skillDesc: '战斗无敌' },
+                { name: '凤凰', icon: '🦅', rarity: 'legendary', skill: '涅槃', skillDesc: '复活宠物' }
+            ],
+            
+            evolveMap: {
+                '田园犬': { name: '狼狗', icon: '🐕‍🦺', rarity: 'uncommon' },
+                '橘猫': { name: '老虎', icon: '🐅', rarity: 'rare' },
+                '哈士奇': { name: '北极狼', icon: '🐺', rarity: 'uncommon' },
+                '兔子': { name: '精灵兔', icon: '🐇', rarity: 'uncommon' },
+                '鹦鹉': { name: '大鹏鸟', icon: '🦅', rarity: 'rare' },
+                '狐狸': { name: '九尾狐', icon: '🦊', rarity: 'rare' },
+                '狼': { name: '雪狼', icon: '🐺', rarity: 'rare' },
+                '豹猫': { name: '猎豹', icon: '🐆', rarity: 'rare' },
+                '熊猫': { name: '食铁兽', icon: '🐼', rarity: 'legendary' },
+                '独角兽': { name: '天马', icon: '🦄', rarity: 'legendary' },
+                '龙': { name: '神龙', icon: '🐉', rarity: 'legendary' },
+                '凤凰': { name: '朱雀', icon: '🦅', rarity: 'legendary' }
+            },
+            
+            equipmentPool: [
+                { name: '项圈', icon: '⭕', bonus: 1.2, type: 'accessory', price: 100 },
+                { name: '铃铛', icon: '🔔', bonus: 1.15, type: 'accessory', price: 150 },
+                { name: '蝴蝶结', icon: '🎀', bonus: 1.1, type: 'accessory', price: 80 },
+                { name: '金链子', icon: '⛓️', bonus: 1.5, type: 'accessory', price: 500 },
+                { name: '小背包', icon: '🎒', bonus: 1.25, type: 'accessory', price: 200 },
+                { name: '护心镜', icon: '🛡️', bonus: 1.3, type: 'armor', price: 300 },
+                { name: '智慧帽', icon: '🎓', bonus: 1.2, type: 'armor', price: 250 },
+                { name: '速度鞋', icon: '👟', bonus: 1.35, type: 'weapon', price: 350 },
+                { name: '力量手套', icon: '🥊', bonus: 1.4, type: 'weapon', price: 400 },
+                { name: '神器戒指', icon: '💍', bonus: 2.0, type: 'accessory', price: 2000 }
+            ],
+            
+            foodPool: [
+                { name: '狗粮', icon: '🍖', moodBonus: 10, price: 20 },
+                { name: '猫罐头', icon: '🥫', moodBonus: 15, price: 30 },
+                { name: '胡萝卜', icon: '🥕', moodBonus: 8, price: 10 },
+                { name: '高级牛排', icon: '🥩', moodBonus: 30, price: 100 },
+                { name: '龙肉', icon: '🍖', moodBonus: 50, price: 500 },
+                { name: '凤凰羽毛', icon: '🪶', moodBonus: 100, price: 1000 }
+            ],
+            
+            skinPool: [
+                { name: '彩虹皮肤', icon: '🌈', price: 1000 },
+                { name: '冰雪皮肤', icon: '❄️', price: 800 },
+                { name: '火焰皮肤', icon: '🔥', price: 1200 },
+                { name: '金色皮肤', icon: '✨', price: 2000 },
+                { name: '暗影皮肤', icon: '🌑', price: 1500 }
+            ],
+            
+            dailyQuests: [
+                { id: 'feed', name: '喂食宠物', desc: '给宠物喂食1次', reward: 50, type: 'feed' },
+                { id: 'play', name: '陪宠物玩', desc: '抚摸宠物1次', reward: 30, type: 'pet' },
+                { id: 'treasure', name: '寻宝任务', desc: '派遣宠物寻宝1次', reward: 100, type: 'treasure' },
+                { id: 'battle', name: '战斗任务', desc: '进行1次宠物战斗', reward: 80, type: 'battle' },
+                { id: 'adventure', name: '探险任务', desc: '宠物探险1次', reward: 120, type: 'adventure' },
+                { id: 'breed', name: '繁殖任务', desc: '繁殖宠物1次', reward: 200, type: 'breed' }
+            ],
+            
+            adventureMaps: [
+                { name: '森林', icon: '🌲', minLevel: 1, rewardMult: 1 },
+                { name: '沙漠', icon: '🏜️', minLevel: 5, rewardMult: 1.5 },
+                { name: '雪山', icon: '🏔️', minLevel: 10, rewardMult: 2 },
+                { name: '火山', icon: '🌋', minLevel: 20, rewardMult: 3 },
+                { name: '龙穴', icon: '🐉', minLevel: 30, rewardMult: 5 },
+                { name: '神界', icon: '✨', minLevel: 50, rewardMult: 10 }
+            ],
+            
+            trashItems: [
+                { name: '破旧的鞋子', icon: '👞', value: 1 },
+                { name: '生锈的铁锭', icon: '🪨', value: 2 },
+                { name: '空的瓶子', icon: '🍾', value: 1 },
+                { name: '腐烂的树叶', icon: '🍂', value: 1 },
+                { name: '小石头', icon: '🪨', value: 2 },
+                { name: '废纸', icon: '📄', value: 1 },
+                { name: '坏掉的苹果', icon: '🍎', value: 2 },
+                { name: '破布', icon: '🧣', value: 1 }
+            ],
+            
+            rareItems: [
+                { name: '金币袋', icon: '💰', value: 50 },
+                { name: '钻石', icon: '💎', value: 100 },
+                { name: '神秘箱子', icon: '🎁', value: 80 },
+                { name: '魔法书', icon: '📕', value: 60 },
+                { name: '能量石', icon: '🔮', value: 70 }
+            ],
+            
+            legendaryItems: [
+                { name: '神器碎片', icon: '⭐', value: 500 },
+                { name: '龙蛋', icon: '🥚', value: 1000 },
+                { name: '贤者之石', icon: '💠', value: 800 },
+                { name: '王冠', icon: '👑', value: 1500 },
+                { name: '天使之羽', icon: '🪽', value: 1200 }
+            ],
+            
+            treasureRewards: {
+                trash: { min: 5, max: 20 },
+                rare: { min: 30, max: 80 },
+                legendary: { min: 200, max: 500 }
+            },
+            
+            expToLevel: [0, 100, 250, 500, 900, 1500, 2300, 3300, 4500, 6000, 8000, 10500, 13500, 17000, 21000, 25500, 30500, 36000, 42000, 50000],
+            
+            getPetMaxExp: function(level) {
+                return this.expToLevel[Math.min(level, this.expToLevel.length - 1)] || 50000;
+            }
+        };
+
+        function feedPet(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            const foods = petSystem.foodPool;
+            const food = foods[Math.floor(Math.random() * foods.length)];
+            
+            gachaStats.petMood[pet.name] = Math.min(100, (gachaStats.petMood[pet.name] || 50) + food.moodBonus);
+            
+            completeQuest('feed');
+            showGachaMessage(`给${pet.icon}${pet.name}喂了${food.icon}${food.name}，心情+${food.moodBonus}！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function petAnimal(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            gachaStats.petIntimacy[pet.name] = Math.min(100, (gachaStats.petIntimacy[pet.name] || 0) + 10);
+            gachaStats.petMood[pet.name] = Math.min(100, (gachaStats.petMood[pet.name] || 50) + 5);
+            
+            completeQuest('pet');
+            showGachaMessage(`${pet.icon}${pet.name}好开心！亲密度+10，心情+5！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function evolvePet(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            const evolveData = petSystem.evolveMap[pet.name];
+            if (!evolveData) {
+                showGachaMessage(`${pet.icon}${pet.name}无法进化！`, 'error');
+                return;
+            }
+            
+            const level = gachaStats.petLevel[pet.name] || 1;
+            if (level < 10) {
+                showGachedMessage(`宠物等级需要达到10级才能进化！`, 'error');
+                return;
+            }
+            
+            const oldIcon = pet.icon;
+            const oldName = pet.name;
+            pet.name = evolveData.name;
+            pet.icon = evolveData.icon;
+            pet.rarity = evolveData.rarity;
+            pet.skill = petSystem.petPool.find(p => p.name === evolveData.name)?.skill || pet.skill;
+            pet.skillDesc = petSystem.petPool.find(p => p.name === evolveData.name)?.skillDesc || pet.skillDesc;
+            
+            gachaStats.petLevel[pet.name] = level;
+            gachaStats.petExp[pet.name] = gachaStats.petExp[oldName] || 0;
+            gachaStats.petIntimacy[pet.name] = gachaStats.petIntimacy[oldName] || 0;
+            gachaStats.petMood[pet.name] = gachaStats.petMood[oldName] || 50;
+            delete gachaStats.petExp[oldName];
+            delete gachaStats.petIntimacy[oldName];
+            delete gachaStats.petMood[oldName];
+            delete gachaStats.petLevel[oldName];
+            
+            showGachaMessage(`🎉 ${oldIcon}${oldName}进化为${pet.icon}${pet.name}！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function upgradePet(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            const cost = 50;
+            if (gachaStats.coins < cost) {
+                showGachaMessage('金币不足！需要' + cost + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= cost;
+            const expGain = 50 + Math.floor(Math.random() * 30);
+            
+            addPetExp(pet.name, expGain);
+            showGachaMessage(`消耗${cost}金币，${pet.icon}${pet.name}获得${expGain}经验！`, 'success');
+            updatePetDisplay();
+            updateCoinDisplay();
+            saveGameData();
+        }
+        
+        function addPetExp(petName, exp) {
+            const currentExp = gachaStats.petExp[petName] || 0;
+            const currentLevel = gachaStats.petLevel[petName] || 1;
+            let newExp = currentExp + exp;
+            let newLevel = currentLevel;
+            
+            while (newLevel < 50 && newExp >= petSystem.getPetMaxExp(newLevel)) {
+                newExp -= petSystem.getPetMaxExp(newLevel);
+                newLevel++;
+            }
+            
+            gachaStats.petExp[petName] = newExp;
+            gachaStats.petLevel[petName] = newLevel;
+            
+            if (newLevel > currentLevel) {
+                showGachaMessage(`🎊 宠物${petName}升级到${newLevel}级！`, 'success');
+            }
+        }
+        
+        function equipPet(petIndex, equipIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            const equip = gachaStats.petInventory[equipIndex];
+            if (!equip) return;
+            
+            if (!gachaStats.petEquipment[pet.name]) {
+                gachaStats.petEquipment[pet.name] = null;
+            }
+            
+            const oldEquip = gachaStats.petEquipment[pet.name];
+            if (oldEquip) {
+                gachaStats.petInventory.push(oldEquip);
+            }
+            
+            gachaStats.petEquipment[pet.name] = equip;
+            gachaStats.petInventory.splice(equipIndex, 1);
+            
+            showGachaMessage(`给${pet.icon}${pet.name}装备了${equip.icon}${equip.name}！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function buyPetEquip(equipIndex) {
+            const equip = petSystem.equipmentPool[equipIndex];
+            if (!equip) return;
+            
+            if (gachaStats.coins < equip.price) {
+                showGachaMessage('金币不足！需要' + equip.price + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= equip.price;
+            gachaStats.petInventory.push(equip);
+            
+            showGachaMessage(`购买了${equip.icon}${equip.name}！`, 'success');
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function buyPetFood(foodIndex) {
+            const food = petSystem.foodPool[foodIndex];
+            if (!food) return;
+            
+            if (gachaStats.coins < food.price) {
+                showGachaMessage('金币不足！需要' + food.price + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= food.price;
+            
+            if (gachaStats.pets.length > 0) {
+                const pet = gachaStats.pets[0];
+                gachaStats.petMood[pet.name] = Math.min(100, (gachaStats.petMood[pet.name] || 50) + food.moodBonus);
+                showGachaMessage(`给${pet.icon}${pet.name}喂了${food.icon}${food.name}，心情+${food.moodBonus}！`, 'success');
+            }
+            
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function buyPetSkin(skinIndex) {
+            const skin = petSystem.skinPool[skinIndex];
+            if (!skin) return;
+            
+            if (gachaStats.coins < skin.price) {
+                showGachaMessage('金币不足！需要' + skin.price + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= skin.price;
+            gachaStats.petSkins[skin.name] = skin;
+            
+            showGachaMessage(`购买了${skin.icon}${skin.name}！可在宠物面板使用`, 'success');
+            updateCoinDisplay();
+            saveGameData();
+        }
+        
+        function startPetBattle(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            const enemyPets = petSystem.petPool.filter(p => p.rarity !== 'legendary');
+            const enemy = enemyPets[Math.floor(Math.random() * enemyPets.length)];
+            
+            const petPower = (gachaStats.petLevel[pet.name] || 1) * 10;
+            const enemyPower = Math.floor(Math.random() * 50) + 10;
+            
+            const equip = gachaStats.petEquipment[pet.name];
+            const powerMult = equip ? equip.bonus : 1;
+            const finalPower = petPower * powerMult;
+            
+            const intimacyBonus = (gachaStats.petIntimacy[pet.name] || 0) * 0.1;
+            const win = finalPower + intimacyBonus >= enemyPower;
+            
+            if (win) {
+                gachaStats.petBattleWins++;
+                const expGain = 30 + Math.floor(Math.random() * 20);
+                addPetExp(pet.name, expGain);
+                gachaStats.coins += 50;
+                completeQuest('battle');
+                showGachaMessage(`⚔️ 战斗胜利！${pet.icon}${pet.name}击败了${enemy.icon}${enemy.name}，获得${expGain}经验和50金币！`, 'success');
+            } else {
+                const expGain = 10;
+                addPetExp(pet.name, expGain);
+                showGachaMessage(`⚔️ 战斗失败...${pet.icon}${pet.name}从战斗中学到了${expGain}经验！`, 'error');
+            }
+            
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function startPetAdventure(mapIndex) {
+            const pet = gachaStats.pets[0];
+            if (!pet) return;
+            
+            const map = petSystem.adventureMaps[mapIndex];
+            const level = gachaStats.petLevel[pet.name] || 1;
+            
+            if (level < map.minLevel) {
+                showGachaMessage(`宠物等级需要达到${map.minLevel}级才能进入${map.name}！`, 'error');
+                return;
+            }
+            
+            const duration = 5000 + Math.floor(Math.random() * 5000);
+            gachaStats.isTreasureQuest = true;
+            gachaStats.treasureEndTime = Date.now() + duration;
+            
+            document.getElementById('sendTreasureBtn').disabled = true;
+            document.getElementById('sendTreasureBtn').style.opacity = '0.5';
+            document.getElementById('sendTreasureBtn').textContent = `🐕 探险${map.name}中...`;
+            document.getElementById('treasureStatus').style.display = 'block';
+            document.getElementById('treasureResult').style.display = 'none';
+            
+            setTimeout(() => {
+                completeAdventure(pet, map);
+            }, duration);
+            
+            updatePetDisplay();
+        }
+        
+        function completeAdventure(pet, map) {
+            gachaStats.isTreasureQuest = false;
+            gachaStats.petAdventures++;
+            
+            const rand = Math.random();
+            let rewardType, rewardItem, rewardValue;
+            
+            if (rand < 0.5) {
+                rewardType = 'trash';
+                rewardItem = petSystem.trashItems[Math.floor(Math.random() * petSystem.trashItems.length)];
+            } else if (rand < 0.85) {
+                rewardType = 'rare';
+                rewardItem = petSystem.rareItems[Math.floor(Math.random() * petSystem.rareItems.length)];
+            } else {
+                rewardType = 'legendary';
+                rewardItem = petSystem.legendaryItems[Math.floor(Math.random() * petSystem.legendaryItems.length)];
+            }
+            
+            const range = petSystem.treasureRewards[rewardType];
+            rewardValue = Math.floor((Math.random() * (range.max - range.min + 1) + range.min) * map.rewardMult);
+            
+            gachaStats.coins += rewardValue;
+            const expGain = Math.floor(20 * map.rewardMult);
+            addPetExp(pet.name, expGain);
+            
+            completeQuest('adventure');
+            
+            document.getElementById('treasureStatus').style.display = 'none';
+            document.getElementById('treasureResult').style.display = 'block';
+            document.getElementById('sendTreasureBtn').disabled = false;
+            document.getElementById('sendTreasureBtn').style.opacity = '1';
+            document.getElementById('sendTreasureBtn').textContent = '🐕 派出寻宝 (10分钟)';
+            
+            document.getElementById('resultIcon').textContent = rewardType === 'legendary' ? '👑' : rewardType === 'rare' ? '⭐' : '🗑️';
+            document.getElementById('resultTitle').textContent = rewardType === 'legendary' ? '稀有发现！' : rewardType === 'rare' ? '不错收获！' : '普通物品';
+            document.getElementById('resultTitle').style.color = rewardType === 'legendary' ? '#ff9800' : rewardType === 'rare' ? '#00d4ff' : 'var(--text-muted)';
+            document.getElementById('resultItem').innerHTML = `${rewardItem.icon} <strong>${rewardItem.name}</strong><br>+${rewardValue}金币, +${expGain}经验`;
+            
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function breedPets(pet1Index, pet2Index) {
+            if (pet1Index === pet2Index) {
+                showGachaMessage('需要选择两只不同的宠物！', 'error');
+                return;
+            }
+            
+            const pet1 = gachaStats.pets[pet1Index];
+            const pet2 = gachaStats.pets[pet2Index];
+            
+            if (!pet1 || !pet2) return;
+            
+            const intimacy1 = gachaStats.petIntimacy[pet1.name] || 0;
+            const intimacy2 = gachaStats.petIntimacy[pet2.name] || 0;
+            
+            if (intimacy1 < 50 || intimacy2 < 50) {
+                showGachaMessage('两只宠物亲密度都需要达到50以上才能繁殖！', 'error');
+                return;
+            }
+            
+            const cost = 200;
+            if (gachaStats.coins < cost) {
+                showGachaMessage('金币不足！需要' + cost + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= cost;
+            gachaStats.petBreedCount++;
+            
+            const parentRarity = Math.max(
+                petSystem.petPool.find(p => p.name === pet1.name)?.rarity === 'legendary' ? 4 : 
+                petSystem.petPool.find(p => p.name === pet1.name)?.rarity === 'rare' ? 3 : 2,
+                petSystem.petPool.find(p => p.name === pet2.name)?.rarity === 'legendary' ? 4 : 
+                petSystem.petPool.find(p => p.name === pet2.name)?.rarity === 'rare' ? 3 : 2
+            );
+            
+            const babyRand = Math.random();
+            let babyPet;
+            
+            if (parentRarity >= 4 && babyRand < 0.3) {
+                const legendaryPets = petSystem.petPool.filter(p => p.rarity === 'legendary');
+                babyPet = {...legendaryPets[Math.floor(Math.random() * legendaryPets.length)]};
+            } else if (parentRarity >= 3 && babyRand < 0.5) {
+                const rarePets = petSystem.petPool.filter(p => p.rarity === 'rare');
+                babyPet = {...rarePets[Math.floor(Math.random() * rarePets.length)]};
+            } else {
+                const commonPets = petSystem.petPool.filter(p => p.rarity === 'common' || p.rarity === 'uncommon');
+                babyPet = {...commonPets[Math.floor(Math.random() * commonPets.length)]};
+            }
+            
+            gachaStats.pets.push(babyPet);
+            gachaStats.petLevel[babyPet.name] = 1;
+            gachaStats.petExp[babyPet.name] = 0;
+            gachaStats.petIntimacy[babyPet.name] = 50;
+            gachaStats.petMood[babyPet.name] = 80;
+            
+            completeQuest('breed');
+            
+            showGachaMessage(`💕 ${pet1.icon}${pet1.name}和${pet2.icon}${pet2.name}的爱情结晶！\n生下了${babyPet.icon}${babyPet.name}！`, 'success');
+            
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function storePet(petIndex) {
+            const pet = gachaStats.pets[petIndex];
+            if (!pet) return;
+            
+            if (gachaStats.petStorage.length >= 10) {
+                showGachaMessage('仓库已满！最多存储10只宠物', 'error');
+                return;
+            }
+            
+            gachaStats.petStorage.push(pet);
+            gachaStats.pets.splice(petIndex, 1);
+            
+            showGachaMessage(`${pet.icon}${pet.name}已存入仓库！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function withdrawPet(storageIndex) {
+            const pet = gachaStats.petStorage[storageIndex];
+            if (!pet) return;
+            
+            if (gachaStats.pets.length >= 20) {
+                showGachaMessage('宠物数量已达上限！', 'error');
+                return;
+            }
+            
+            gachaStats.pets.push(pet);
+            gachaStats.petStorage.splice(storageIndex, 1);
+            
+            showGachaMessage(`从仓库取出了${pet.icon}${pet.name}！`, 'success');
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function buyPet(petIndex) {
+            const pet = petSystem.petPool[petIndex];
+            if (!pet) return;
+            
+            const prices = { common: 100, uncommon: 300, rare: 1000, legendary: 5000 };
+            const price = prices[pet.rarity];
+            
+            if (gachaStats.coins < price) {
+                showGachaMessage('金币不足！需要' + price + '金币', 'error');
+                return;
+            }
+            
+            if (gachaStats.pets.length >= 20) {
+                showGachaMessage('宠物数量已达上限！', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= price;
+            gachaStats.pets.push({...pet});
+            const newPet = gachaStats.pets[gachaStats.pets.length - 1];
+            gachaStats.petLevel[newPet.name] = 1;
+            gachaStats.petExp[newPet.name] = 0;
+            gachaStats.petIntimacy[newPet.name] = 30;
+            gachaStats.petMood[newPet.name] = 50;
+            
+            showGachaMessage(`购买了${pet.icon}${pet.name}！花费${price}金币`, 'success');
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function petGachaPull() {
+            const cost = 500;
+            if (gachaStats.coins < cost) {
+                showGachaMessage('金币不足！需要' + cost + '金币', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= cost;
+            
+            const rand = Math.random();
+            let pet;
+            
+            if (rand < 0.05) {
+                const legendaryPets = petSystem.petPool.filter(p => p.rarity === 'legendary');
+                pet = {...legendaryPets[Math.floor(Math.random() * legendaryPets.length)]};
+            } else if (rand < 0.2) {
+                const rarePets = petSystem.petPool.filter(p => p.rarity === 'rare');
+                pet = {...rarePets[Math.floor(Math.random() * rarePets.length)]};
+            } else if (rand < 0.5) {
+                const uncommonPets = petSystem.petPool.filter(p => p.rarity === 'uncommon');
+                pet = {...uncommonPets[Math.floor(Math.random() * uncommonPets.length)]};
+            } else {
+                const commonPets = petSystem.petPool.filter(p => p.rarity === 'common');
+                pet = {...commonPets[Math.floor(Math.random() * commonPets.length)]};
+            }
+            
+            gachaStats.pets.push(pet);
+            gachaStats.petLevel[pet.name] = 1;
+            gachaStats.petExp[pet.name] = 0;
+            gachaStats.petIntimacy[pet.name] = 30;
+            gachaStats.petMood[pet.name] = 50;
+            
+            showGachaMessage(`🎉 抽到了${pet.icon}${pet.name}（${pet.rarity}）！`, 'success');
+            updateCoinDisplay();
+            updatePetDisplay();
+            saveGameData();
+        }
+        
+        function completeQuest(questType) {
+            const today = new Date().toDateString();
+            
+            if (gachaStats.lastDailyQuestReset !== today) {
+                gachaStats.petQuestsCompleted = {};
+                gachaStats.lastDailyQuestReset = today;
+            }
+            
+            if (!gachaStats.petQuestsCompleted[questType]) {
+                gachaStats.petQuestsCompleted[questType] = true;
+                
+                const quest = petSystem.dailyQuests.find(q => q.type === questType);
+                if (quest) {
+                    gachaStats.coins += quest.reward;
+                    showGachaMessage(`✅ 完成任务：${quest.name}，奖励${quest.reward}金币！`, 'success');
+                }
+            }
+        }
+        
+        function buyPetShopItem(itemIndex) {
+            const pet = gachaStats.pets[0];
+            if (!pet) {
+                showGachaMessage('没有宠物可以使用道具！', 'error');
+                return;
+            }
+            
+            if (itemIndex < petSystem.equipmentPool.length) {
+                buyPetEquip(itemIndex);
+            } else if (itemIndex < petSystem.equipmentPool.length + petSystem.foodPool.length) {
+                buyPetFood(itemIndex - petSystem.equipmentPool.length);
+            } else {
+                buyPetSkin(itemIndex - petSystem.equipmentPool.length - petSystem.foodPool.length);
+            }
+        }
+
+        function sendPetTreasure() {
+            if (gachaStats.pets.length === 0) {
+                alert('请先抽到宠物后再派遣寻宝！');
+                return;
+            }
+            
+            if (gachaStats.isTreasureQuest) {
+                alert('宠物已经在寻宝中了，请等待归来！');
+                return;
+            }
+            
+            const now = Date.now();
+            gachaStats.isTreasureQuest = true;
+            gachaStats.treasureEndTime = now + petSystem.treasureDuration;
+            
+            document.getElementById('sendTreasureBtn').disabled = true;
+            document.getElementById('sendTreasureBtn').style.opacity = '0.5';
+            document.getElementById('sendTreasureBtn').textContent = '🐕 寻宝中...';
+            document.getElementById('treasureStatus').style.display = 'block';
+            document.getElementById('treasureResult').style.display = 'none';
+            
+            updateTreasureTimer();
+        }
+        
+        function updateTreasureTimer() {
+            if (!gachaStats.isTreasureQuest) return;
+            
+            const now = Date.now();
+            const remaining = Math.max(0, gachaStats.treasureEndTime - now);
+            
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            
+            document.getElementById('treasureTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (remaining > 0) {
+                setTimeout(updateTreasureTimer, 1000);
+            } else {
+                completeTreasureQuest();
+            }
+        }
+        
+        function completeTreasureQuest() {
+            gachaStats.isTreasureQuest = false;
+            
+            const rand = Math.random();
+            let rewardType, rewardItem, rewardValue;
+            
+            if (rand < 0.7) {
+                rewardType = 'trash';
+                rewardItem = petSystem.trashItems[Math.floor(Math.random() * petSystem.trashItems.length)];
+            } else if (rand < 0.9) {
+                rewardType = 'rare';
+                rewardItem = petSystem.rareItems[Math.floor(Math.random() * petSystem.rareItems.length)];
+            } else {
+                rewardType = 'legendary';
+                rewardItem = petSystem.legendaryItems[Math.floor(Math.random() * petSystem.legendaryItems.length)];
+            }
+            
+            const range = petSystem.treasureRewards[rewardType];
+            rewardValue = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+            
+            gachaStats.coins += rewardValue;
+            
+            document.getElementById('treasureStatus').style.display = 'none';
+            document.getElementById('treasureResult').style.display = 'block';
+            document.getElementById('sendTreasureBtn').disabled = false;
+            document.getElementById('sendTreasureBtn').style.opacity = '1';
+            document.getElementById('sendTreasureBtn').textContent = '🐕 派出寻宝 (10分钟)';
+            
+            const iconEl = document.getElementById('resultIcon');
+            const titleEl = document.getElementById('resultTitle');
+            const itemEl = document.getElementById('resultItem');
+            
+            if (rewardType === 'trash') {
+                iconEl.textContent = '🗑️';
+                titleEl.textContent = '垃圾...';
+                titleEl.style.color = 'var(--text-muted)';
+            } else if (rewardType === 'rare') {
+                iconEl.textContent = '⭐';
+                titleEl.textContent = '稀有物品！';
+                titleEl.style.color = '#00d4ff';
+            } else {
+                iconEl.textContent = '👑';
+                titleEl.textContent = '传说物品！！！';
+                titleEl.style.color = '#ff9800';
+            }
+            
+            itemEl.innerHTML = `${rewardItem.icon} <strong>${rewardItem.name}</strong><br>+${rewardValue} 金币`;
+            
+            updateCoinDisplay();
+            
+            saveGameData();
+        }
+        
+        function closeTreasureResult() {
+            document.getElementById('treasureResult').style.display = 'none';
+        }
+        
+        function updatePetDisplay() {
+            const petList = document.getElementById('petList');
+            const noPetText = document.getElementById('noPetText');
+            const petCount = document.getElementById('petCount');
+            const petStorageCount = document.getElementById('petStorageCount');
+            
+            petCount.textContent = gachaStats.pets.length;
+            petStorageCount.textContent = gachaStats.petStorage.length + '/10';
+            
+            if (gachaStats.pets.length === 0) {
+                noPetText.style.display = 'block';
+                petList.innerHTML = '<p id="noPetText" style="color: var(--text-muted); font-size: 0.8em; width: 100%;">暂无宠物</p>';
+            } else {
+                noPetText.style.display = 'none';
+                petList.innerHTML = gachaStats.pets.slice(0, 6).map((pet, index) => {
+                    const level = gachaStats.petLevel[pet.name] || 1;
+                    const mood = gachaStats.petMood[pet.name] || 50;
+                    const moodEmoji = mood > 70 ? '😊' : mood > 30 ? '😐' : '😢';
+                    return `<div onclick="showPetDetail(${index})" style="text-align: center; padding: 6px; background: var(--bg-card); border-radius: 6px; min-width: 50px; cursor: pointer;">
+                        <div style="font-size: 1.5em;">${pet.icon}</div>
+                        <div style="font-size: 0.65em; color: var(--text-secondary);">Lv.${level}</div>
+                        <div style="font-size: 0.8em;">${moodEmoji}</div>
+                    </div>`
+                }).join('');
+            }
+            
+            updateDailyQuests();
+        }
+        
+        function showPetDetail(index) {
+            const pet = gachaStats.pets[index];
+            if (!pet) return;
+            
+            const level = gachaStats.petLevel[pet.name] || 1;
+            const exp = gachaStats.petExp[pet.name] || 0;
+            const maxExp = petSystem.getPetMaxExp(level);
+            const intimacy = gachaStats.petIntimacy[pet.name] || 0;
+            const mood = gachaStats.petMood[pet.name] || 50;
+            const equip = gachaStats.petEquipment[pet.name];
+            
+            const panel = document.getElementById('petDetailPanel');
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <div style="font-size: 3em;">${pet.icon}</div>
+                        <div style="font-weight: bold;">${pet.name}</div>
+                        <div style="font-size: 0.8em; color: ${pet.rarity === 'legendary' ? '#ff9800' : pet.rarity === 'rare' ? '#00d4ff' : '#4caf50'};">${pet.rarity}</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; font-size: 0.8em; margin-bottom: 10px;">
+                        <div>等级: <strong>${level}</strong></div>
+                        <div>经验: ${exp}/${maxExp}</div>
+                        <div>亲密度: ${intimacy}</div>
+                        <div>心情: ${mood}/100</div>
+                    </div>
+                    <div style="font-size: 0.75em; color: var(--text-muted); margin-bottom: 8px;">
+                        技能: ${pet.skill} - ${pet.skillDesc}
+                    </div>
+                    <div style="font-size: 0.75em; color: var(--text-muted); margin-bottom: 8px;">
+                        装备: ${equip ? equip.icon + equip.name : '无'}
+                    </div>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <button onclick="feedPet(${index})" style="flex: 1; padding: 5px; background: #4caf50; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">🍖喂食</button>
+                        <button onclick="petAnimal(${index})" style="flex: 1; padding: 5px; background: #2196f3; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">👋抚摸</button>
+                        <button onclick="upgradePet(${index})" style="flex: 1; padding: 5px; background: #ff9800; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">⬆️升级</button>
+                        <button onclick="evolvePet(${index})" style="flex: 1; padding: 5px; background: #9c27b0; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">✨进化</button>
+                    </div>
+                    <div style="display: flex; gap: 5px; margin-top: 5px;">
+                        <button onclick="storePet(${index})" style="flex: 1; padding: 5px; background: #607d8b; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">📦存入</button>
+                        <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="flex: 1; padding: 5px; background: #9e9e9e; border: none; border-radius: 4px; color: white; cursor: pointer; font-size: 0.7em;">关闭</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateDailyQuests() {
+            const questList = document.getElementById('dailyQuestList');
+            const today = new Date().toDateString();
+            
+            if (gachaStats.lastDailyQuestReset !== today) {
+                gachaStats.petQuestsCompleted = {};
+            }
+            
+            questList.innerHTML = petSystem.dailyQuests.map(quest => {
+                const completed = gachaStats.petQuestsCompleted[quest.type];
+                return `<div style="display: flex; justify-content: space-between; align-items: center; padding: 6px; background: ${completed ? 'rgba(76,175,80,0.1)' : 'var(--bg-input)'}; border-radius: 5px;">
+                    <div>
+                        <div style="font-size: 0.8em; font-weight: bold;">${quest.name}</div>
+                        <div style="font-size: 0.65em; color: var(--text-muted);">${quest.desc}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.75em; color: #4caf50;">+${quest.reward}💰</div>
+                        <div style="font-size: 0.7em; color: ${completed ? '#4caf50' : '#9e9e9e'};">${completed ? '✅' : '⭕'}</div>
+                    </div>
+                </div>`
+            }).join('');
+        }
+        
+        function switchPetTab(tab) {
+            const panel = document.getElementById('petDetailPanel');
+            
+            if (tab === 'mypets') {
+                panel.style.display = 'none';
+                updatePetDisplay();
+            } else if (tab === 'storage') {
+                showPetStorage();
+            } else if (tab === 'breed') {
+                showBreedPanel();
+            } else if (tab === 'adventure') {
+                showAdventureMap();
+            } else if (tab === 'rank') {
+                showPetRank();
+            }
+        }
+        
+        function showPetStorage() {
+            const panel = document.getElementById('petDetailPanel');
+            panel.style.display = 'block';
+            
+            if (gachaStats.petStorage.length === 0) {
+                panel.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">📦 仓库为空</div>`;
+                return;
+            }
+            
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">📦 宠物仓库 (${gachaStats.petStorage.length}/10)</div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        ${gachaStats.petStorage.map((pet, i) => `
+                            <div onclick="withdrawPet(${i})" style="text-align: center; padding: 8px; background: var(--bg-input); border-radius: 6px; cursor: pointer;">
+                                <div style="font-size: 1.5em;">${pet.icon}</div>
+                                <div style="font-size: 0.7em;">${pet.name}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="margin-top: 10px; width: 100%; padding: 8px; background: #9e9e9e; border: none; border-radius: 6px; color: white; cursor: pointer;">关闭</button>
+                </div>
+            `;
+        }
+        
+        function showBreedPanel() {
+            const panel = document.getElementById('petDetailPanel');
+            
+            if (gachaStats.pets.length < 2) {
+                alert('需要至少2只宠物才能繁殖！');
+                return;
+            }
+            
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">💕 宠物繁殖</div>
+                    <p style="font-size: 0.8em; color: var(--text-muted); margin-bottom: 10px;">选择两只亲密度50+的宠物进行繁殖，消耗200金币</p>
+                    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                        ${gachaStats.pets.map((pet, i) => {
+                            const intimacy = gachaStats.petIntimacy[pet.name] || 0;
+                            return `<div onclick="breedPets(${i}, ${gachaStats.pets.findIndex((_, idx) => idx !== i && (gachaStats.petIntimacy[gachaStats.pets[idx].name] || 0) >= 50)})" style="text-align: center; padding: 8px; background: ${intimacy >= 50 ? 'var(--bg-input)' : 'rgba(244,67,54,0.1)'}; border-radius: 6px; min-width: 60px;">
+                                <div style="font-size: 1.5em;">${pet.icon}</div>
+                                <div style="font-size: 0.65em;">${pet.name}</div>
+                                <div style="font-size: 0.6em; color: ${intimacy >= 50 ? '#4caf50' : '#f44336'};">❤${intimacy}</div>
+                            </div>`
+                        }).join('')}
+                    </div>
+                    <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="margin-top: 10px; width: 100%; padding: 8px; background: #9e9e9e; border: none; border-radius: 6px; color: white; cursor: pointer;">关闭</button>
+                </div>
+            `;
+        }
+        
+        function showAdventureMap() {
+            const panel = document.getElementById('petDetailPanel');
+            const level = gachaStats.pets.length > 0 ? (gachaStats.petLevel[gachaStats.pets[0].name] || 1) : 0;
+            
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">🌍 探险地图</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                        ${petSystem.adventureMaps.map((map, i) => `
+                            <button onclick="startPetAdventure(${i})" style="padding: 10px; background: ${level >= map.minLevel ? 'linear-gradient(135deg, #3f51b5, #303f9f)' : 'var(--bg-input)'}; border: none; border-radius: 6px; color: ${level >= map.minLevel ? 'white' : 'var(--text-muted)'}; cursor: ${level >= map.minLevel ? 'pointer' : 'not-allowed'};">
+                                <div style="font-size: 1.5em;">${map.icon}</div>
+                                <div style="font-size: 0.8em;">${map.name}</div>
+                                <div style="font-size: 0.65em; opacity: 0.8;">Lv.${map.minLevel}+</div>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="margin-top: 10px; width: 100%; padding: 8px; background: #9e9e9e; border: none; border-radius: 6px; color: white; cursor: pointer;">关闭</button>
+                </div>
+            `;
+        }
+        
+        function showPetRank() {
+            const panel = document.getElementById('petDetailPanel');
+            
+            const sortedPets = [...gachaStats.pets].sort((a, b) => {
+                const levelA = gachaStats.petLevel[a.name] || 1;
+                const levelB = gachaStats.petLevel[b.name] || 1;
+                return levelB - levelA;
+            });
+            
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">🏆 宠物排行榜</div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        ${sortedPets.length === 0 ? '<div style="text-align: center; color: var(--text-muted);">暂无宠物</div>' : sortedPets.map((pet, i) => {
+                            const level = gachaStats.petLevel[pet.name] || 1;
+                            return `<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-input); border-radius: 6px;">
+                                <div style="font-size: 1.2em; font-weight: bold; color: ${i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'var(--text-muted)'};">${i + 1}</div>
+                                <div style="font-size: 1.5em;">${pet.icon}</div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 0.85em; font-weight: bold;">${pet.name}</div>
+                                    <div style="font-size: 0.7em; color: var(--text-muted);">Lv.${level}</div>
+                                </div>
+                            </div>`
+                        }).join('')}
+                    </div>
+                    <div style="margin-top: 10px; padding: 8px; background: var(--bg-input); border-radius: 6px; font-size: 0.75em;">
+                        <div>战斗胜利: ${gachaStats.petBattleWins}次</div>
+                        <div>探险次数: ${gachaStats.petAdventures}次</div>
+                        <div>繁殖次数: ${gachaStats.petBreedCount}次</div>
+                    </div>
+                    <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="margin-top: 10px; width: 100%; padding: 8px; background: #9e9e9e; border: none; border-radius: 6px; color: white; cursor: pointer;">关闭</button>
+                </div>
+            `;
+        }
+        
+        function buyPetDirect(index) {
+            const prices = { common: 100, uncommon: 300, rare: 1000, legendary: 5000 };
+            
+            const panel = document.getElementById('petDetailPanel');
+            panel.style.display = 'block';
+            panel.innerHTML = `
+                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">🏪 宠物商店</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto;">
+                        ${petSystem.petPool.map((pet, i) => `
+                            <button onclick="buyPet(${i})" style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; text-align: left;">
+                                <div style="font-size: 1.5em;">${pet.icon}</div>
+                                <div style="flex: 1;">
+                                    <div style="font-size: 0.85em; font-weight: bold;">${pet.name}</div>
+                                    <div style="font-size: 0.65em; color: ${pet.rarity === 'legendary' ? '#ff9800' : pet.rarity === 'rare' ? '#00d4ff' : '#4caf50'};">${pet.rarity}</div>
+                                </div>
+                                <div style="color: #ffd700; font-weight: bold;">${prices[pet.rarity]}💰</div>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <button onclick="document.getElementById('petDetailPanel').style.display='none'" style="margin-top: 10px; width: 100%; padding: 8px; background: #9e9e9e; border: none; border-radius: 6px; color: white; cursor: pointer;">关闭</button>
+                </div>
+            `;
+        }
+
+        const PITY_THRESHOLD = 90;
+
+        function getRandomCard() {
+            let card;
+            gachaStats.pityCounter++;
+            
+            if (gachaStats.pityCounter >= PITY_THRESHOLD || gachaStats.pityGuaranteed) {
+                const legendaryCards = cardPool.filter(c => c.rarity === 'legendary');
+                card = legendaryCards[Math.floor(Math.random() * legendaryCards.length)];
+                gachaStats.pityGuaranteed = true;
+                gachaStats.pityCounter = 0;
+            } else {
+                const totalWeight = cardPool.reduce((sum, c) => sum + c.weight, 0);
+                let random = Math.random() * totalWeight;
+                
+                for (const c of cardPool) {
+                    random -= c.weight;
+                    if (random <= 0) {
+                        card = c;
+                        break;
+                    }
+                }
+                if (card.rarity !== 'legendary') {
+                    gachaStats.pityGuaranteed = false;
+                }
+            }
+            
+            return { ...card };
+        }
+
+        function createCardElement(card) {
+            const div = document.createElement('div');
+            div.className = `card ${card.rarity}`;
+            div.innerHTML = `
+                <div class="card-icon">${card.icon}</div>
+                <div class="card-name">${card.name}</div>
+                <div class="card-rarity">${card.rarity}</div>
+            `;
+            return div;
+        }
+
+        function updateGachaStats() {
+            const totalEl = document.getElementById('totalPulls');
+            const legendaryEl = document.getElementById('legendaryCount');
+            const progressEl = document.getElementById('collectionProgress');
+            const pityEl = document.getElementById('pityCounter');
+            const coinEl = document.getElementById('coinCount');
+            
+            if (totalEl) totalEl.textContent = gachaStats.totalPulls;
+            if (legendaryEl) legendaryEl.textContent = gachaStats.legendary;
+            
+            const unlockedCount = Object.keys(gachaStats.collection).length;
+            const totalCount = cardPool.length;
+            const progress = Math.round((unlockedCount / totalCount) * 100);
+            if (progressEl) progressEl.textContent = progress + '%';
+            if (pityEl) pityEl.textContent = gachaStats.pityCounter + '/' + PITY_THRESHOLD;
+            if (coinEl) coinEl.textContent = gachaStats.coins;
+        }
+
+        function addToCollection(card) {
+            if (!gachaStats.collection[card.name]) {
+                gachaStats.collection[card.name] = { ...card, count: 0 };
+            }
+            gachaStats.collection[card.name].count++;
+            
+            if (card.rarity === 'legendary') {
+                gachaStats.legendary++;
+                addPetToPlayer();
+            }
+        }
+
+        function addPetToPlayer() {
+            const legendaryPets = petSystem.petPool.filter(p => p.rarity === 'legendary');
+            const rarePets = petSystem.petPool.filter(p => p.rarity === 'rare');
+            const uncommonPets = petSystem.petPool.filter(p => p.rarity === 'uncommon');
+            const commonPets = petSystem.petPool.filter(p => p.rarity === 'common');
+            
+            let newPet;
+            const rand = Math.random();
+            
+            if (rand < 0.1) {
+                newPet = legendaryPets[Math.floor(Math.random() * legendaryPets.length)];
+            } else if (rand < 0.3) {
+                newPet = rarePets[Math.floor(Math.random() * rarePets.length)];
+            } else if (rand < 0.6) {
+                newPet = uncommonPets[Math.floor(Math.random() * uncommonPets.length)];
+            } else {
+                newPet = commonPets[Math.floor(Math.random() * commonPets.length)];
+            }
+            
+            gachaStats.pets.push(newPet);
+            updatePetDisplay();
+            showGachaMessage(`获得宠物: ${newPet.icon} ${newPet.name}！`, 'success');
+            saveGameData();
+        }
+
+        function addToHistory(cards) {
+            const timestamp = new Date().toLocaleTimeString();
+            gachaStats.history.unshift({
+                time: timestamp,
+                cards: cards.map(c => c.name)
+            });
+            
+            if (gachaStats.history.length > 50) {
+                gachaStats.history = gachaStats.history.slice(0, 50);
+            }
+        }
+
+        function singlePull() {
+            const isFree = gachaStats.dailyFreePulls > 0;
+            const cost = 10;
+            
+            if (!isFree && gachaStats.coins < cost) {
+                showGachaMessage('金币不足！需要 ' + cost + ' 金币 💰', 'error');
+                return;
+            }
+            
+            if (!isFree) {
+                gachaStats.coins -= cost;
+                gachaStats.totalCoins += cost;
+            } else {
+                gachaStats.dailyFreePulls--;
+            }
+            
+            const card = getRandomCard();
+            gachaStats.totalPulls++;
+            
+            const coinReward = card.rarity === 'legendary' ? 50 : card.rarity === 'epic' ? 20 : card.rarity === 'rare' ? 10 : 5;
+            gachaStats.coins += coinReward;
+            gachaStats.totalCoins += coinReward;
+            
+            addToCollection(card);
+            addToHistory([card]);
+            updateGachaStats();
+            
+            const display = document.getElementById('cardDisplay');
+            display.innerHTML = '<div class="card-grid"></div>';
+            const grid = display.querySelector('.card-grid');
+            grid.appendChild(createCardElement(card));
+            
+            showGachaMessage(isFree ? '免费抽卡获得: ' + card.name + ' ' + card.icon + ' +' + coinReward + ' 💰' : '消耗 ' + cost + ' 金币，获得: ' + card.name + ' ' + card.icon + ' +' + coinReward + ' 💰', card.rarity);
+            
+            if (card.rarity === 'legendary') {
+                triggerConfetti();
+            }
+            
+            renderCollection();
+            renderHistory();
+            updateDailyFreeDisplay();
+        }
+
+        function tenPull() {
+            const cost = 90;
+            
+            if (gachaStats.coins < cost) {
+                showGachaMessage('金币不足！需要 ' + cost + ' 金币 💰', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= cost;
+            gachaStats.totalCoins += cost;
+            
+            const cards = [];
+            let totalReward = 0;
+            for (let i = 0; i < 10; i++) {
+                const card = getRandomCard();
+                cards.push(card);
+                gachaStats.totalPulls++;
+                
+                const coinReward = card.rarity === 'legendary' ? 50 : card.rarity === 'epic' ? 20 : card.rarity === 'rare' ? 10 : 5;
+                totalReward += coinReward;
+                gachaStats.coins += coinReward;
+                gachaStats.totalCoins += coinReward;
+                
+                addToCollection(card);
+            }
+            
+            gachaStats.coins += totalReward;
+            
+            addToHistory(cards);
+            updateGachaStats();
+            
+            const display = document.getElementById('cardDisplay');
+            display.innerHTML = '<div class="card-grid"></div>';
+            const grid = display.querySelector('.card-grid');
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    grid.appendChild(createCardElement(card));
+                }, index * 100);
+            });
+            
+            const legendaryCount = cards.filter(c => c.rarity === 'legendary').length;
+            const epicCount = cards.filter(c => c.rarity === 'epic').length;
+            let message = '十连抽卡！消耗 ' + cost + ' 金币\n';
+            if (legendaryCount > 0) message += '🎉 传说: ' + legendaryCount + ' | ';
+            if (epicCount > 0) message += '✨ 史诗: ' + epicCount + ' | ';
+            message += '+' + totalReward + ' 💰';
+            showGachaMessage(message, legendaryCount > 0 ? 'legendary' : 'success');
+            
+            const hasLegendary = cards.some(c => c.rarity === 'legendary');
+            if (hasLegendary) {
+                setTimeout(() => triggerConfetti(), 1000);
+            }
+            
+            renderCollection();
+            renderHistory();
+        }
+        
+        function showGachaMessage(text, type) {
+            const display = document.getElementById('cardDisplay');
+            let bgColor = 'var(--bg-card)';
+            let borderColor = 'var(--border-color)';
+            let textColor = 'var(--text-primary)';
+            
+            if (type === 'legendary') {
+                borderColor = '#ff9800';
+                bgColor = 'rgba(255, 152, 0, 0.2)';
+                textColor = '#ff9800';
+            } else if (type === 'epic') {
+                borderColor = '#9c27b0';
+                bgColor = 'rgba(156, 39, 176, 0.15)';
+                textColor = '#9c27b0';
+            } else if (type === 'rare') {
+                borderColor = '#2196f3';
+                textColor = '#2196f3';
+            } else if (type === 'error') {
+                borderColor = '#f44336';
+                textColor = '#f44336';
+            } else if (type === 'success') {
+                borderColor = '#4caf50';
+                textColor = '#4caf50';
+            }
+            
+            display.innerHTML = `
+                <div style="text-align: center; padding: 15px; background: ${bgColor}; border: 2px solid ${borderColor}; border-radius: 8px; animation: fadeIn 0.3s ease;">
+                    <div style="white-space: pre-line; color: ${textColor}; font-weight: bold;">${text}</div>
+                </div>
+                <div class="card-grid" style="margin-top: 15px;"></div>
+            `;
+        }
+        
+        function updateDailyFreeDisplay() {
+            const freeBtn = document.querySelector('#gachaPanel .pull-buttons button');
+            if (freeBtn) {
+                if (gachaStats.dailyFreePulls > 0) {
+                    freeBtn.innerHTML = '免费抽取 (' + gachaStats.dailyFreePulls + ')';
+                } else {
+                    freeBtn.innerHTML = '单次抽取 (10💰)';
+                }
+            }
+        }
+        
+        function resetDailyPulls() {
+            const now = new Date();
+            const lastReset = gachaStats.lastDailyReset ? new Date(gachaStats.lastDailyReset) : null;
+            
+            if (!lastReset || now.getDate() !== lastReset.getDate()) {
+                gachaStats.dailyFreePulls = 3;
+                gachaStats.lastDailyReset = now.toISOString();
+            }
+        }
+        
+        function showRechargePanel() {
+            switchGachaTab('recharge');
+            const coinDisplay = document.getElementById('rechargeCoinDisplay');
+            if (coinDisplay) {
+                coinDisplay.textContent = gachaStats.coins;
+            }
+        }
+        
+        function doRecharge(amount) {
+            const prices = { 100: 6, 500: 30, 1000: 60, 5000: 298 };
+            const price = prices[amount] || 0;
+            
+            const confirmed = confirm('确认充值 ' + amount + ' 金币？\n价格: ¥' + price + '\n\n(伪充值，仅显示效果)');
+            if (confirmed) {
+                gachaStats.coins += amount;
+                updateGachaStats();
+                showRechargePanel();
+                
+                const display = document.getElementById('cardDisplay');
+                if (display) {
+                    display.innerHTML = `
+                        <div style="text-align: center; padding: 20px; background: rgba(255, 215, 0, 0.1); border: 2px solid #ffd700; border-radius: 8px; animation: fadeIn 0.3s ease;">
+                            <div style="font-size: 3em; margin-bottom: 10px;">✅</div>
+                            <div style="color: #ffd700; font-weight: bold; font-size: 1.2em;">充值成功！</div>
+                            <div style="color: var(--text-primary); margin-top: 10px;">已扣除 ¥${price}</div>
+                            <div style="color: #ffd700; margin-top: 5px;">+${amount} 金币已到账</div>
+                        </div>
+                    `;
+                }
+                
+                if (typeof confetti !== 'undefined') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#ffd700', '#ff9800']
+                    });
+                }
+            }
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti !== 'undefined') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00d4ff', '#7b2cbf', '#ff9800']
+                });
+            }
+        }
+
+        function switchGachaTab(tabName) {
+            const btns = document.querySelectorAll('#gachaPanel .tab-btn');
+            const contents = document.querySelectorAll('#gachaPanel .tab-content');
+            
+            btns.forEach(btn => btn.classList.remove('active'));
+            contents.forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+            
+            const targetBtn = Array.from(btns).find(btn => btn.getAttribute('data-tab') === tabName);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+            
+            const tabContent = document.getElementById(`tab-${tabName}`);
+            if (tabContent) {
+                tabContent.classList.add('active');
+                tabContent.style.display = 'block';
+            }
+            
+            if (tabName === 'pets') {
+                updatePetDisplay();
+            }
+        }
+
+        function renderCollection() {
+            const grid = document.getElementById('collectionGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            
+            cardPool.forEach(card => {
+                const collected = gachaStats.collection[card.name];
+                const div = document.createElement('div');
+                div.className = `collection-item ${collected ? 'unlocked' : 'locked'}`;
+                div.innerHTML = `
+                    <div class="item-icon">${card.icon}</div>
+                    <div style="font-size: 0.65em; text-align: center;">${card.name}</div>
+                    ${collected ? `<div class="item-count">x${collected.count}</div>` : ''}
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (!list) return;
+            
+            if (gachaStats.history.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: var(--text-muted);">
+                        <div style="font-size: 2.5em; margin-bottom: 10px;">📜</div>
+                        <p>暂无抽卡记录</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = gachaStats.history.map(record => `
+                <div style="padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 8px;">
+                    <div style="font-size: 0.75em; color: var(--text-muted); margin-bottom: 5px;">${record.time}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                        ${record.cards.map(name => `<span style="padding: 2px 6px; background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 4px; font-size: 0.75em;">${name}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 初始化抽卡游戏
+        renderCollection();
+        renderHistory();
     </script>
 
     <!-- 在线 MC 密码验证弹窗 -->
