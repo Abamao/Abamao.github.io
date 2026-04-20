@@ -328,6 +328,18 @@
             transform: translateX(5px);
         }
         
+        .arcadia-btn {
+            margin-top: 80px;
+            background: linear-gradient(135deg, #9c27b0, #ff6b9d);
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .arcadia-btn:hover {
+            box-shadow: 0 15px 40px rgba(156, 39, 176, 0.5);
+        }
+        
         /* ============================================
            返回开始界面按钮 - 赛博朋克版
            ============================================ */
@@ -462,6 +474,30 @@
             filter: drop-shadow(0 0 10px var(--shadow-color));
         }
         header p { color: var(--text-secondary); font-size: 1.1em; }
+        .arcadia-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #9c27b0, #00d4ff);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .arcadia-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.5);
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         /* ============================================
            主题切换按钮 - 赛博朋克版
@@ -2179,6 +2215,98 @@
             border-color: var(--accent-color);
             border-radius: 0 12px 12px 0;
             width: 35px;
+        }
+        
+        /* 工具箱分页容器 */
+        .toolbox-page {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        .toolbox-page.hidden {
+            display: none;
+        }
+        
+        /* 工具箱翻页按钮 */
+        .toolbox-pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+        .toolbox-page-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toolbox-page-btn:hover {
+            background: var(--accent-gradient-btn);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .toolbox-page-btn.active {
+            background: var(--accent-gradient-btn);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        
+        /* 工具箱进度条 */
+        .toolbox-progress {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: var(--bg-input);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .toolbox-progress-bar {
+            height: 100%;
+            background: var(--accent-gradient);
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        /* 工具箱箭头按钮 */
+        .toolbox-nav-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toolbox-nav-btn:hover {
+            background: var(--accent-gradient-btn);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .toolbox-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .toolbox-nav-btn:disabled:hover {
+            background: var(--bg-card);
+            border-color: var(--border-color);
+            color: var(--text-secondary);
         }
         .tool-item {
             width: 50px;
@@ -4778,6 +4906,9 @@
         <button class="enter-btn" onclick="enterMainSite()">
             点击进入 ➡️
         </button>
+        <a href="https://abamao.github.io/Arcadia/" target="_self" class="enter-btn arcadia-btn">
+            🎮 前往 Arcadia
+        </a>
         <!-- 左上角成就按钮 -->
         <button class="achievement-btn" id="achievementBtn" onclick="toggleAchievementPanel()">🏆</button>
         <!-- 右下角简介按钮 -->
@@ -5143,6 +5274,16 @@
                             <div class="game-title">2048</div>
                             <div class="game-desc">数字合成</div>
                         </div>
+                        <div class="game-card" onclick="showEmbedGameIntro()">
+                            <div class="game-icon">🏃</div>
+                            <div class="game-title">地铁跑酷</div>
+                            <div class="game-desc">经典跑酷</div>
+                        </div>
+                        <div class="game-card" onclick="showChasingRhythmIntro()" style="background: linear-gradient(135deg, rgba(156,39,176,0.2), rgba(123,44,191,0.1)); border: 1px solid rgba(156,39,176,0.5);">
+                            <div class="game-icon">🎵</div>
+                            <div class="game-title">节奏跑酷</div>
+                            <div class="game-desc">音乐节奏</div>
+                        </div>
                     </div>
                     <div id="gameContainer" class="game-container hidden">
                         <canvas id="gameCanvas" width="400" height="400"></canvas>
@@ -5407,17 +5548,77 @@
         <div class="tool-search-container" id="toolSearchContainer" style="display: none; padding: 5px;">
             <input type="text" id="toolSearchInput" placeholder="搜工具..." oninput="filterTools()" style="width: 80px; padding: 4px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-primary); font-size: 12px;">
         </div>
-        <div class="tool-item" onclick="toggleToolPanel('videoPanel')" title="视频播放器">🎬</div>
-        <div class="tool-item" onclick="toggleToolPanel('musicPanel')" title="在线音乐">📻</div>
-        <div class="tool-item" onclick="toggleToolPanel('notePanel')" title="临时记事本">✍️</div>
-        <div class="tool-item" onclick="toggleToolPanel('pomoPanel')" title="番茄钟">⏳</div>
-        <div class="tool-item" onclick="toggleToolPanel('qrPanel')" title="二维码生成">📱</div>
-        <div class="tool-item" onclick="toggleToolPanel('aiPanel')" title="AI 助手">🤖</div>
-        <div class="tool-item" onclick="toggleToolPanel('sysPanel')" title="系统信息">💻</div>
-        <div class="tool-item" onclick="toggleToolPanel('pwdPanel')" title="密码生成">🔑</div>
-        <div class="tool-item" onclick="toggleToolPanel('colorPanel')" title="颜色选择">🎨</div>
-        <div class="tool-item" onclick="toggleToolPanel('gachaPanel')" title="抽卡游戏">🎴</div>
-        <div class="tool-item" onclick="toggleToolPanel('enchantPanel')" title="附魔台">✨</div>
+        
+        <!-- 第一页工具 -->
+        <div class="toolbox-page" data-page="1">
+            <div class="tool-item" onclick="toggleToolPanel('videoPanel')" title="视频播放器">🎬</div>
+            <div class="tool-item" onclick="toggleToolPanel('musicPanel')" title="在线音乐">📻</div>
+            <div class="tool-item" onclick="toggleToolPanel('notePanel')" title="临时记事本">✍️</div>
+            <div class="tool-item" onclick="toggleToolPanel('pomoPanel')" title="番茄钟">⏳</div>
+            <div class="tool-item" onclick="toggleToolPanel('qrPanel')" title="二维码生成">📱</div>
+            <div class="tool-item" onclick="toggleToolPanel('aiPanel')" title="AI 助手">🤖</div>
+        </div>
+        
+        <!-- 第二页工具 -->
+        <div class="toolbox-page hidden" data-page="2">
+            <div class="tool-item" onclick="toggleToolPanel('sysPanel')" title="系统信息">💻</div>
+            <div class="tool-item" onclick="toggleToolPanel('pwdPanel')" title="密码生成">🔑</div>
+            <div class="tool-item" onclick="toggleToolPanel('colorPanel')" title="颜色选择">🎨</div>
+            <div class="tool-item" onclick="toggleToolPanel('gachaPanel')" title="抽卡游戏">🎴</div>
+            <div class="tool-item" onclick="toggleToolPanel('enchantPanel')" title="附魔台">✨</div>
+            <div class="tool-item" onclick="toggleToolPanel('gamePanel')" title="游戏中心">🎮</div>
+        </div>
+        
+        <!-- 第三页工具 -->
+        <div class="toolbox-page hidden" data-page="3">
+            <div class="tool-item" onclick="toggleToolPanel('redeemPanel')" title="兑换码">🎁</div>
+            <div class="tool-item" onclick="toggleToolPanel('signPanel')" title="每日签到">📅</div>
+            <div class="tool-item" onclick="toggleToolPanel('minePanel')" title="矿石采集">⛏️</div>
+            <div class="tool-item" onclick="toggleToolPanel('farmPanel')" title="农场">🌾</div>
+            <div class="tool-item" onclick="toggleToolPanel('wheelPanel')" title="幸运转盘">🎡</div>
+        </div>
+        
+        <!-- 翻页控件 -->
+        <div class="toolbox-pagination">
+            <button class="toolbox-nav-btn" id="toolboxPrev" onclick="changeToolboxPage(-1)" disabled>‹</button>
+            <button class="toolbox-page-btn active" onclick="goToToolboxPage(1)">1</button>
+            <button class="toolbox-page-btn" onclick="goToToolboxPage(2)">2</button>
+            <button class="toolbox-page-btn" onclick="goToToolboxPage(3)">3</button>
+            <button class="toolbox-nav-btn" id="toolboxNext" onclick="changeToolboxPage(1)">›</button>
+        </div>
+        
+        <!-- 进度条 -->
+        <div class="toolbox-progress">
+            <div class="toolbox-progress-bar" id="toolboxProgressBar" style="width: 33.33%;"></div>
+        </div>
+    </div>
+    
+    <!-- 游戏中心面板 -->
+    <div id="gamePanel" class="tool-panel" onclick="event.stopPropagation()">
+        <h4>🎮 游戏中心</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px;">
+            <div class="game-card" onclick="startSnakeGame(); toggleToolPanel('gamePanel');" style="background: var(--bg-input); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-color);">
+                <div style="font-size: 2em;">🐍</div>
+                <div style="font-weight: bold; margin-top: 5px;">贪吃蛇</div>
+            </div>
+            <div class="game-card" onclick="startTetrisGame(); toggleToolPanel('gamePanel');" style="background: var(--bg-input); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-color);">
+                <div style="font-size: 2em;">🧱</div>
+                <div style="font-weight: bold; margin-top: 5px;">俄罗斯方块</div>
+            </div>
+            <div class="game-card" onclick="start2048Game(); toggleToolPanel('gamePanel');" style="background: var(--bg-input); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-color);">
+                <div style="font-size: 2em;">🔢</div>
+                <div style="font-weight: bold; margin-top: 5px;">2048</div>
+            </div>
+            <div class="game-card" onclick="showEmbedGameIntro(); toggleToolPanel('gamePanel');" style="background: var(--bg-input); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid var(--border-color);">
+                <div style="font-size: 2em;">🏃</div>
+                <div style="font-weight: bold; margin-top: 5px;">地铁跑酷</div>
+            </div>
+            <div class="game-card" onclick="showChasingRhythmIntro(); toggleToolPanel('gamePanel');" style="background: linear-gradient(135deg, rgba(156,39,176,0.2), rgba(123,44,191,0.1)); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 1px solid rgba(156,39,176,0.5); grid-column: span 2;">
+                <div style="font-size: 2em;">🎵</div>
+                <div style="font-weight: bold; margin-top: 5px;">节奏跑酷 (Chasing Rhythm)</div>
+                <div style="font-size: 0.8em; color: var(--text-muted); margin-top: 3px;">新增</div>
+            </div>
+        </div>
     </div>
 
     <!-- 工具面板区域 (移出侧边栏以避免样式冲突) -->
@@ -5867,6 +6068,7 @@
         </div>
     </div>
 
+    <a href="https://abamao.github.io/Arcadia/" class="arcadia-btn">🎮 前往 Arcadia</a>
     <header>
         <h1>Abamao 的资源站</h1>
         <p id="dailyMotto">正在加载每日一言...</p>
@@ -5964,6 +6166,172 @@
                 <button class="btn btn-secondary" onclick="importData()">导入</button>
                 <button class="btn btn-secondary" onclick="closeModal('addModal')">取消</button>
             </div>
+        </div>
+    </div>
+
+    <!-- 兑换码面板 -->
+    <div id="redeemPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 450px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3em; margin-bottom: 10px;">🎁</div>
+            <h2 style="color: #ff9800; margin-bottom: 5px;">兑换码中心</h2>
+            <p style="font-size: 0.8em; color: var(--text-muted);">输入兑换码领取奖励</p>
+        </div>
+        
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+            <input type="text" id="redeemCode" placeholder="请输入兑换码" style="width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-size: 1em; text-transform: uppercase; text-align: center;" onkeydown="if(event.key==='Enter')redeemCode()">
+            <button onclick="redeemCode()" style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(135deg, #ff9800, #f57c00); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 1em;">🎫 立即兑换</button>
+        </div>
+        
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px;">
+            <div style="font-weight: bold; margin-bottom: 10px;">📋 兑换记录</div>
+            <div id="redeemHistory" style="max-height: 150px; overflow-y: auto; font-size: 0.8em; color: var(--text-secondary);">
+                <p style="color: var(--text-muted); text-align: center; padding: 20px;">暂无兑换记录</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            <button onclick="closeToolPanel('redeemPanel')" style="padding: 10px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 每日签到面板 -->
+    <div id="signPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 450px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3em; margin-bottom: 10px;">📅</div>
+            <h2 style="color: #4caf50; margin-bottom: 5px;">每日签到</h2>
+            <p style="font-size: 0.8em; color: var(--text-muted);">连续签到奖励更丰富</p>
+        </div>
+        
+        <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px;">
+            <div id="signDay1" style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第1天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign1">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+20</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第2天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign2">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+40</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第3天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign3">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+60</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第4天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign4">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+80</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第5天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign5">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+100</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第6天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign6">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+120</div></div>
+            <div style="text-align: center; padding: 10px; background: var(--bg-input); border-radius: 8px; min-width: 40px;"><div style="font-size: 0.7em; color: var(--text-muted);">第7天</div><div style="font-size: 1.2em; font-weight: bold;" id="sign7">⭕</div><div style="font-size: 0.7em; color: #ffd700;">+200</div></div>
+        </div>
+        
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center;">
+            <div style="font-size: 0.85em; color: var(--text-secondary); margin-bottom: 10px;">今日签到状态</div>
+            <div id="signStatus" style="font-size: 1.2em; font-weight: bold; color: #ff9800;">未签到 ⭕</div>
+            <div style="font-size: 0.8em; color: var(--text-muted); margin-top: 5px;">连续签到: <span id="signStreakNum">0</span> 天</div>
+        </div>
+        
+        <button id="signBtn" onclick="doSign()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #4caf50, #2e7d32); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 1.1em;">签到领取奖励</button>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            <button onclick="closeToolPanel('signPanel')" style="padding: 10px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 矿石采集面板 -->
+    <div id="minePanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 450px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3em; margin-bottom: 10px;">⛏️</div>
+            <h2 style="color: #795548; margin-bottom: 5px;">矿石采集</h2>
+            <p style="font-size: 0.8em; color: var(--text-muted);">挖矿赚金币</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px;">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                <div style="font-size: 0.7em; color: var(--text-muted);">金币</div>
+                <div id="mineCoins" style="font-size: 1.3em; font-weight: bold; color: #ffd700;">0</div>
+            </div>
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                <div style="font-size: 0.7em; color: var(--text-muted);">矿石</div>
+                <div id="mineOres" style="font-size: 1.3em; font-weight: bold; color: #795548;">0</div>
+            </div>
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                <div style="font-size: 0.7em; color: var(--text-muted);">等级</div>
+                <div id="mineLevel" style="font-size: 1.3em; font-weight: bold; color: #9c27b0;">1</div>
+            </div>
+        </div>
+        
+        <div style="background: linear-gradient(180deg, #3e2723, #1b0f0a); border-radius: 12px; padding: 20px; margin-bottom: 15px; text-align: center; position: relative; overflow: hidden; min-height: 150px;">
+            <div id="miningAnim" style="font-size: 4em; cursor: pointer; position: relative; z-index: 1;" onclick="mineOre()">⛏️</div>
+            <div id="mineHint" style="color: rgba(255,255,255,0.7); font-size: 0.9em; margin-top: 10px; position: relative; z-index: 1;">点击挖掘</div>
+        </div>
+        
+        <div style="display: flex; gap: 8px;">
+            <button onclick="sellOres()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #ff9800, #f57c00); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">出售矿石</button>
+            <button onclick="upgradePickaxe()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #9c27b0, #7b1fa2); border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">升级镐子</button>
+        </div>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            <button onclick="closeToolPanel('minePanel')" style="padding: 10px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 农场面板 -->
+    <div id="farmPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 450px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3em; margin-bottom: 10px;">🌾</div>
+            <h2 style="color: #8bc34a; margin-bottom: 5px;">开心农场</h2>
+            <p style="font-size: 0.8em; color: var(--text-muted);">种植收获卖钱</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                <div style="font-size: 0.7em; color: var(--text-muted);">金币</div>
+                <div id="farmCoins" style="font-size: 1.3em; font-weight: bold; color: #ffd700;">0</div>
+            </div>
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; text-align: center;">
+                <div style="font-size: 0.7em; color: var(--text-muted);">收获</div>
+                <div id="farmHarvest" style="font-size: 1.3em; font-weight: bold; color: #8bc34a;">0</div>
+            </div>
+        </div>
+        
+        <div id="farmGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px;">
+            <div onclick="clickFarmPlot(0)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+            <div onclick="clickFarmPlot(1)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+            <div onclick="clickFarmPlot(2)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+            <div onclick="clickFarmPlot(3)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+            <div onclick="clickFarmPlot(4)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+            <div onclick="clickFarmPlot(5)" style="background: var(--bg-input); border: 2px solid var(--border-color); border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 70px;"><div style="font-size: 1.8em;">🟫</div><div style="font-size: 0.65em; color: var(--text-muted);">空地</div></div>
+        </div>
+        
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
+            <button onclick="plantCrop(0, 10)" style="flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.8em;">🌱 萝卜 (10💰)</button>
+            <button onclick="plantCrop(1, 30)" style="flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.8em;">🥕 胡萝卜 (30💰)</button>
+            <button onclick="plantCrop(2, 80)" style="flex: 1; padding: 8px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; font-size: 0.8em;">🌽 玉米 (80💰)</button>
+            <button onclick="plantCrop(3, 200)" style="flex: 1; padding: 8px; background: linear-gradient(135deg, #ffd700, #ff9800); border: none; border-radius: 6px; cursor: pointer; font-size: 0.8em; color: white; font-weight: bold;">🌟 金瓜 (200💰)</button>
+        </div>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            <button onclick="closeToolPanel('farmPanel')" style="padding: 10px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">关闭</button>
+        </div>
+    </div>
+
+    <!-- 幸运转盘面板 -->
+    <div id="wheelPanel" class="tool-panel" onclick="event.stopPropagation()" style="max-width: 450px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 3em; margin-bottom: 10px;">🎡</div>
+            <h2 style="color: #e91e63; margin-bottom: 5px;">幸运大转盘</h2>
+            <p style="font-size: 0.8em; color: var(--text-muted);">消耗 100 金币转一次</p>
+        </div>
+        
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: center;">
+            <div style="font-size: 0.8em; color: var(--text-muted);">当前金币</div>
+            <div id="wheelCoins" style="font-size: 1.8em; font-weight: bold; color: #ffd700;">0</div>
+        </div>
+        
+        <div style="position: relative; width: 280px; height: 280px; margin: 0 auto 20px;">
+            <div id="wheel" style="width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(#ff9800 0deg 60deg, #e91e63 60deg 120deg, #9c27b0 120deg 180deg, #00d4ff 180deg 240deg, #4caf50 240deg 300deg, #ffeb3b 300deg 360deg); border: 4px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.3); transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5em; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">🎯</div>
+            </div>
+            <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 25px solid #e91e63;"></div>
+        </div>
+        
+        <button id="spinBtn" onclick="spinWheel()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #e91e63, #c2185b); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; font-size: 1.1em;">开始转动 (100💰)</button>
+        
+        <div id="wheelResult" style="display: none; text-align: center; padding: 15px; background: var(--bg-card); border: 2px solid #ffd700; border-radius: 12px; margin-top: 15px;">
+            <div style="font-size: 2em; margin-bottom: 5px;" id="wheelResultIcon">🎉</div>
+            <div style="font-weight: bold; color: #ffd700;" id="wheelResultText">恭喜获得!</div>
+        </div>
+        
+        <div style="margin-top: 15px; text-align: center;">
+            <button onclick="closeToolPanel('wheelPanel')" style="padding: 10px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer;">关闭</button>
         </div>
     </div>
 
@@ -6705,8 +7073,15 @@
         let currentGame = null;
         let gameLoop = null;
         let gameScore = 0;
+        const GAME_COST = 50;
 
         function startSnakeGame() {
+            if (gachaStats.coins < GAME_COST) {
+                showGachaMessage(`金币不足！需要 ${GAME_COST} 金币才能开始游戏`, 'error');
+                return;
+            }
+            gachaStats.coins -= GAME_COST;
+            updateGachaUI();
             currentGame = 'snake';
             document.querySelector('.game-options').classList.add('hidden');
             document.getElementById('gameContainer').classList.remove('hidden');
@@ -6714,6 +7089,12 @@
         }
 
         function startTetrisGame() {
+            if (gachaStats.coins < GAME_COST) {
+                showGachaMessage(`金币不足！需要 ${GAME_COST} 金币才能开始游戏`, 'error');
+                return;
+            }
+            gachaStats.coins -= GAME_COST;
+            updateGachaUI();
             currentGame = 'tetris';
             document.querySelector('.game-options').classList.add('hidden');
             document.getElementById('gameContainer').classList.remove('hidden');
@@ -6721,10 +7102,62 @@
         }
 
         function start2048Game() {
+            if (gachaStats.coins < GAME_COST) {
+                showGachaMessage(`金币不足！需要 ${GAME_COST} 金币才能开始游戏`, 'error');
+                return;
+            }
+            gachaStats.coins -= GAME_COST;
+            updateGachaUI();
             currentGame = '2048';
             document.querySelector('.game-options').classList.add('hidden');
             document.getElementById('gameContainer').classList.remove('hidden');
             init2048Game();
+        }
+
+        function startEmbedGame() {
+            currentGame = 'embed';
+            document.querySelector('.game-options').classList.add('hidden');
+            document.getElementById('gameContainer').classList.remove('hidden');
+            
+            const canvas = document.getElementById('gameCanvas');
+            canvas.style.display = 'none';
+            
+            let embedContainer = document.getElementById('embedGameContainer');
+            if (!embedContainer) {
+                embedContainer = document.createElement('div');
+                embedContainer.id = 'embedGameContainer';
+                embedContainer.style.cssText = 'width: 100%; height: 400px; background: #000; border-radius: 8px; overflow: hidden;';
+                embedContainer.innerHTML = '<iframe src="https://www.jogos.com/embed/index.html?id=subway-surfers&adUserId=17766852764552263&sourceType=3&gd_sdk_referrer_url=Abamao.github.io" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>';
+                document.getElementById('gameContainer').insertBefore(embedContainer, document.getElementById('gameContainer').firstChild);
+            } else {
+                embedContainer.style.display = 'block';
+            }
+        }
+
+        function showEmbedGameIntro() {
+            const introPanel = document.createElement('div');
+            introPanel.id = 'embedGameIntro';
+            introPanel.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            introPanel.innerHTML = `
+                <div style="background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; margin: 20px; border: 2px solid var(--accent-color);">
+                    <div style="font-size: 4em; margin-bottom: 15px;">🏃‍♂️</div>
+                    <h2 style="color: var(--accent-color); margin-bottom: 15px;">地铁跑酷</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">
+                        经典跑酷游戏！躲避障碍，收集金币，<br>
+                        挑战最高分！
+                    </p>
+                    <div style="background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: #ff9800; font-size: 0.85em; margin: 0;">
+                            ⚠️ 由代理商提供，Abamao 对出现的任何广告不负责。
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="this.closest('#embedGameIntro').remove()" style="padding: 12px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; font-size: 1em;">返回</button>
+                        <button onclick="document.getElementById('embedGameIntro').remove(); startEmbedGame();" style="padding: 12px 30px; background: linear-gradient(135deg, #4caf50, #2e7d32); border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 1em; font-weight: bold;">开始游戏 ▶️</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(introPanel);
         }
 
         function closeGame() {
@@ -6733,14 +7166,37 @@
                 gameLoop = null;
             }
             currentGame = null;
+            document.onkeydown = null;
             document.querySelector('.game-options').classList.remove('hidden');
             document.getElementById('gameContainer').classList.add('hidden');
+            
+            const canvas = document.getElementById('gameCanvas');
+            canvas.style.display = 'block';
+            
+            const embedContainer = document.getElementById('embedGameContainer');
+            if (embedContainer) {
+                embedContainer.remove();
+            }
+            
+            const chasingRhythmContainer = document.getElementById('chasingRhythmContainer');
+            if (chasingRhythmContainer) {
+                chasingRhythmContainer.remove();
+            }
         }
 
         function restartGame() {
+            if (gachaStats.coins < GAME_COST) {
+                showGachaMessage(`金币不足！需要 ${GAME_COST} 金币才能重新开始`, 'error');
+                closeGame();
+                return;
+            }
+            gachaStats.coins -= GAME_COST;
+            updateGachaUI();
+            
             if (currentGame === 'snake') initSnakeGame();
             else if (currentGame === 'tetris') initTetrisGame();
             else if (currentGame === '2048') init2048Game();
+            else if (currentGame === 'embed') startEmbedGame();
         }
 
         // 贪吃蛇游戏
@@ -6810,7 +7266,11 @@
             function gameOver() {
                 clearInterval(gameLoop);
                 gameLoop = null;
-                alert('游戏结束！得分：' + gameScore);
+                const reward = Math.floor(gameScore / 10);
+                gachaStats.coins += reward;
+                updateGachaUI();
+                alert('游戏结束！得分：' + gameScore + '\n获得金币: ' + reward);
+                closeGame();
             }
 
             // 键盘控制
@@ -6950,7 +7410,11 @@
             function gameOver() {
                 clearInterval(gameLoop);
                 gameLoop = null;
-                alert('游戏结束！得分：' + gameScore);
+                const reward = Math.floor(gameScore / 10);
+                gachaStats.coins += reward;
+                updateGachaUI();
+                alert('游戏结束！得分：' + gameScore + '\n获得金币: ' + reward);
+                closeGame();
             }
 
             document.onkeydown = function(e) {
@@ -7084,9 +7548,34 @@
 
                     // 检查是否获胜
                     if (board.some(row => row.includes(2048))) {
-                        setTimeout(() => alert('恭喜！你达到了 2048！'), 100);
+                        setTimeout(() => {
+                            const reward = Math.floor(gameScore / 10);
+                            gachaStats.coins += reward;
+                            updateGachaUI();
+                            alert('恭喜！你达到了 2048！\n获得金币: ' + reward);
+                            closeGame();
+                        }, 100);
+                    } else if (isGameOver()) {
+                        setTimeout(() => {
+                            const reward = Math.floor(gameScore / 10);
+                            gachaStats.coins += reward;
+                            updateGachaUI();
+                            alert('游戏结束！得分：' + gameScore + '\n获得金币: ' + reward);
+                            closeGame();
+                        }, 100);
                     }
                 }
+            }
+
+            function isGameOver() {
+                for (let y = 0; y < size; y++) {
+                    for (let x = 0; x < size; x++) {
+                        if (board[y][x] === 0) return false;
+                        if (x < size - 1 && board[y][x] === board[y][x + 1]) return false;
+                        if (y < size - 1 && board[y][x] === board[y + 1][x]) return false;
+                    }
+                }
+                return true;
             }
 
             document.onkeydown = function(e) {
@@ -7106,6 +7595,33 @@
 
         function updateGameScore() {
             document.getElementById('gameScore').textContent = gameScore;
+        }
+
+        function updateGachaUI() {
+            const coinCount = document.getElementById('coinCount');
+            const mineCoins = document.getElementById('mineCoins');
+            const farmCoins = document.getElementById('farmCoins');
+            const wheelCoins = document.getElementById('wheelCoins');
+            
+            if (coinCount) coinCount.textContent = gachaStats.coins;
+            if (mineCoins) mineCoins.textContent = gachaStats.coins;
+            if (farmCoins) farmCoins.textContent = gachaStats.coins;
+            if (wheelCoins) wheelCoins.textContent = gachaStats.coins;
+            
+            const spinBtn = document.getElementById('spinBtn');
+            if (spinBtn) {
+                if (gachaStats.coins < 100) {
+                    spinBtn.innerHTML = '金币不足';
+                    spinBtn.style.background = 'var(--bg-input)';
+                    spinBtn.style.color = 'var(--text-muted)';
+                    spinBtn.style.cursor = 'not-allowed';
+                } else {
+                    spinBtn.innerHTML = '开始转动 (100💰)';
+                    spinBtn.style.background = 'linear-gradient(135deg, #e91e63, #c2185b)';
+                    spinBtn.style.color = 'white';
+                    spinBtn.style.cursor = 'pointer';
+                }
+            }
         }
 
         function activateMoyuMode() {
@@ -7373,6 +7889,145 @@
                     { name: 'V2EX', tag: '技术', desc: '程序员和创意工作者社区', url: 'https://www.v2ex.com' },
                     { name: 'GitHub Discussions', tag: '技术', desc: 'GitHub社区讨论区', url: 'https://github.com/discussions' },
                     { name: 'Stack Exchange', tag: '问答', desc: '专业问答网站网络', url: 'https://stackexchange.com' }
+                ]},
+                news: { name: '📰 新闻资讯', items: [
+                    { name: '今日头条', tag: '新闻', desc: '国内主流新闻聚合平台', url: 'https://www.toutiao.com' },
+                    { name: '腾讯新闻', tag: '新闻', desc: '腾讯新闻门户', url: 'https://news.qq.com' },
+                    { name: '网易新闻', tag: '新闻', desc: '网易新闻频道', url: 'https://news.163.com' },
+                    { name: '搜狐新闻', tag: '新闻', desc: '搜狐资讯平台', url: 'https://news.sohu.com' },
+                    { name: '36氪', tag: '科技', desc: '科技创业资讯平台', url: 'https://36kr.com' },
+                    { name: '虎嗅', tag: '科技', desc: '科技商业资讯', url: 'https://www.huxiu.com' },
+                    { name: 'TechCrunch', tag: '科技', desc: '国际科技新闻', url: 'https://techcrunch.com' },
+                    { name: 'The Verge', tag: '科技', desc: '科技产品评测', url: 'https://www.theverge.com' },
+                    { name: 'Engadget', tag: '科技', desc: '数码科技资讯', url: 'https://www.engadget.com' },
+                    { name: 'IT之家', tag: '科技', desc: '国内科技数码资讯', url: 'https://www.ithome.com' },
+                    { name: '少数派', tag: '数码', desc: '数字生活方式', url: 'https://sspai.com' },
+                    { name: 'AppSo', tag: '数码', desc: '应用技巧和数码资讯', url: 'https://www.appso.cn' },
+                    { name: '煎蛋', tag: '有趣', desc: '每日新鲜有趣', url: 'https://jandan.net' },
+                    { name: '果壳网', tag: '科普', desc: '科学有意思', url: 'https://www.guokr.com' },
+                    { name: '知乎日报', tag: '阅读', desc: '每日知乎精选', url: 'https://daily.zhihu.com' }
+                ]},
+                learn: { name: '📚 学习教育', items: [
+                    { name: 'B站', tag: '学习', desc: 'B站学习区', url: 'https://www.bilibili.com' },
+                    { name: '网易公开课', tag: '课程', desc: '网易免费在线课程', url: 'https://open.163.com' },
+                    { name: '腾讯课堂', tag: '课程', desc: '在线职业教育平台', url: 'https://ke.qq.com' },
+                    { name: '慕课网', tag: '编程', desc: '程序员的梦工厂', url: 'https://www.imooc.com' },
+                    { name: '极客时间', tag: '编程', desc: '高质量技术课程', url: 'https://time.geekbang.org' },
+                    { name: '牛客网', tag: '面试', desc: '程序员求职招聘平台', url: 'https://www.nowcoder.com' },
+                    { name: 'LeetCode', tag: '算法', desc: '编程算法刷题', url: 'https://leetcode.cn' },
+                    { name: '力扣', tag: '算法', desc: '算法刷题平台', url: 'https://leetcode.com' },
+                    { name: '菜鸟教程', tag: '教程', desc: '编程入门教程', url: 'https://www.runoob.com' },
+                    { name: 'W3Schools', tag: '教程', desc: 'Web开发教程', url: 'https://www.w3schools.com' },
+                    { name: 'Coursera', tag: '课程', desc: '国际在线课程', url: 'https://www.coursera.org' },
+                    { name: 'edX', tag: '课程', desc: 'MIT和Harvard创建的课程平台', url: 'https://www.edx.org' },
+                    { name: 'Khan Academy', tag: '教育', desc: '免费在线教育', url: 'https://www.khanacademy.org' },
+                    { name: '可汗学院', tag: '教育', desc: '免费国际教育资源', url: 'https://zh.khanacademy.org' },
+                    { name: '网易云课堂', tag: '课程', desc: '网易旗下职业技能学习平台', url: 'https://study.163.com' },
+                    { name: '大学资源网', tag: '课程', desc: '大学课程在线学习', url: 'http://www.dxzy163.com' },
+                    { name: '考试资源网', tag: '考试', desc: '各类考试资源', url: 'http://www.51test.net' },
+                    { name: '猿题库', tag: '考试', desc: '中考高考题库', url: 'https://www.yuantiku.com' },
+                    { name: '百度文库', tag: '文档', desc: '文档分享平台', url: 'https://wenku.baidu.com' },
+                    { name: '道客巴巴', tag: '文档', desc: '文档分享平台', url: 'https://www.doc88.com' }
+                ]},
+                reading: { name: '📖 阅读文学', items: [
+                    { name: '起点中文网', tag: '小说', desc: '网络文学平台', url: 'https://www.qidian.com' },
+                    { name: '纵横中文网', tag: '小说', desc: '小说阅读网站', url: 'https://www.zongheng.com' },
+                    { name: '番茄小说', tag: '小说', desc: '免费小说阅读', url: 'https://fanqienovel.com' },
+                    { name: '七猫小说', tag: '小说', desc: '免费小说阅读', url: 'https://www.qimao.com' },
+                    { name: '笔趣阁', tag: '小说', desc: '小说阅读网站', url: 'https://www.xbiquge.so' },
+                    { name: 'QQ阅读', tag: '小说', desc: '腾讯阅读平台', url: 'https://yuedu.qq.com' },
+                    { name: '微信读书', tag: '阅读', desc: '微信阅读平台', url: 'https://weread.qq.com' },
+                    { name: '豆瓣阅读', tag: '阅读', desc: '豆瓣电子书平台', url: 'https://read.douban.com' },
+                    { name: '亚马逊Kindle', tag: '阅读', desc: '电子书阅读', url: 'https://www.amazon.cn/kindle' },
+                    { name: '掌阅', tag: '阅读', desc: '移动阅读平台', url: 'https://www.zhangyue.com' },
+                    { name: '知乎', tag: '问答', desc: '问答社区', url: 'https://www.zhihu.com' },
+                    { name: '简书', tag: '写作', desc: '创作分享平台', url: 'https://www.jianshu.com' },
+                    { name: 'LOFTER', tag: '创作', desc: '兴趣创作社区', url: 'https://www.lofter.com' },
+                    { name: 'Medium', tag: '写作', desc: '国际写作平台', url: 'https://medium.com' },
+                    { name: '古诗词网', tag: '诗词', desc: '诗词鉴赏', url: 'https://www.gushici.net' }
+                ]},
+                download: { name: '💾 资源下载', items: [
+                    { name: 'Github', tag: '代码', desc: '代码资源下载', url: 'https://github.com' },
+                    { name: 'Gitee', tag: '代码', desc: '国内代码托管', url: 'https://gitee.com' },
+                    { name: '蓝奏云', tag: '网盘', desc: '文件分享网盘', url: 'https://www.lanzou.com' },
+                    { name: '阿里云盘', tag: '网盘', desc: '阿里云网盘', url: 'https://www.aliyundrive.com' },
+                    { name: '123云盘', tag: '网盘', desc: '高速网盘', url: 'https://www.123pan.com' },
+                    { name: '天翼云盘', tag: '网盘', desc: '电信云盘', url: 'https://cloud.189.cn' },
+                    { name: '奶牛快传', tag: '传输', desc: '临时文件传输', url: 'https://cowtransfer.com' },
+                    { name: '文叔叔', tag: '传输', desc: '文件传输工具', url: 'https://www.wenshushu.cn' },
+                    { name: 'Steam', tag: '游戏', desc: '游戏下载', url: 'https://store.steampowered.com' },
+                    { name: 'Epic', tag: '游戏', desc: '游戏下载', url: 'https://www.epicgames.com' },
+                    { name: 'Windows官方', tag: '系统', desc: 'Windows系统下载', url: 'https://www.microsoft.com/zh-cn/software-download' },
+                    { name: 'MSDN我告诉你', tag: '系统', desc: 'Windows系统镜像', url: 'https://next.itellyou.cn' },
+                    { name: 'UupDump', tag: '系统', desc: 'Windows更新下载', url: 'https://uupdump.net' },
+                    { name: 'Office', tag: '办公', desc: 'Office下载', url: 'https://office.com' },
+                    { name: 'Adobe', tag: '设计', desc: 'Adobe全家桶', url: 'https://www.adobe.com' },
+                    { name: 'Crack软件', tag: '软件', desc: '破解软件', url: 'https://www.yukshare.com' },
+                    { name: 'ApkPure', tag: '安卓', desc: 'APK下载', url: 'https://apkpure.com' },
+                    { name: '应用汇', tag: '安卓', desc: '安卓应用下载', url: 'http://www.appchina.com' },
+                    { name: 'PPT模板', tag: '模板', desc: '免费PPT模板', url: 'https://www.officeplus.cn' },
+                    { name: '创客贴', tag: '设计', desc: '在线设计平台', url: 'https://www.chuangkit.com' }
+                ]},
+                life: { name: '🏠 生活服务', items: [
+                    { name: '淘宝', tag: '购物', desc: '综合购物平台', url: 'https://www.taobao.com' },
+                    { name: '京东', tag: '购物', desc: '品质购物平台', url: 'https://www.jd.com' },
+                    { name: '拼多多', tag: '购物', desc: '社交电商平台', url: 'https://www.pinduoduo.com' },
+                    { name: '天猫', tag: '购物', desc: '品牌电商平台', url: 'https://www.tmall.com' },
+                    { name: '唯品会', tag: '购物', desc: '特卖电商', url: 'https://www.vip.com' },
+                    { name: '得物', tag: '潮牌', desc: '潮流电商平台', url: 'https://www.dewu.com' },
+                    { name: '美团', tag: '生活', desc: '本地生活服务', url: 'https://www.meituan.com' },
+                    { name: '大众点评', tag: '美食', desc: '餐饮评价平台', url: 'https://www.dianping.com' },
+                    { name: '饿了么', tag: '外卖', desc: '外卖点餐平台', url: 'https://www.ele.me' },
+                    { name: '携程', tag: '旅游', desc: '旅行服务平台', url: 'https://www.ctrip.com' },
+                    { name: '飞猪', tag: '旅游', desc: '阿里旅行平台', url: 'https://www.fliggy.com' },
+                    { name: '去哪儿', tag: '旅游', desc: '机票酒店预订', url: 'https://www.qunar.com' },
+                    { name: '12306', tag: '交通', desc: '火车票预订', url: 'https://www.12306.cn' },
+                    { name: '高铁管家', tag: '交通', desc: '出行服务', url: 'https://www.gaotie.cn' },
+                    { name: '滴滴出行', tag: '出行', desc: '网约车平台', url: 'https://www.didiglobal.com' },
+                    { name: '支付宝', tag: '支付', desc: '支付和金融服务', url: 'https://www.alipay.com' },
+                    { name: '微信支付', tag: '支付', desc: '移动支付', url: 'https://pay.weixin.qq.com' },
+                    { name: '58同城', tag: '生活', desc: '本地生活信息', url: 'https://www.58.com' },
+                    { name: 'BOSS直聘', tag: '招聘', desc: '找工作平台', url: 'https://www.zhipin.com' },
+                    { name: '前程无忧', tag: '招聘', desc: '招聘求职平台', url: 'https://www.51job.com' }
+                ]},
+                mc: { name: '⛏️ MC资源', items: [
+                    { name: 'MC百科', tag: 'MC', desc: '我的世界Wiki', url: 'https://www.mcmod.cn' },
+                    { name: 'MCJE Wiki', tag: 'MC', desc: 'Minecraft Wiki', url: 'https://minecraft.wiki' },
+                    { name: 'MCBBS', tag: 'MC', desc: 'MC中文论坛', url: 'https://www.mcbbs.net' },
+                    { name: 'MC指令', tag: 'MC', desc: '指令生成器', url: 'https://mccommand.scrong.top' },
+                    { name: 'Chunkbase', tag: 'MC', desc: '种子查询', url: 'https://www.chunkbase.com' },
+                    { name: 'Modrinth', tag: 'MC', desc: 'Mod资源站', url: 'https://modrinth.com' },
+                    { name: 'CurseForge', tag: 'MC', desc: '国外Mod站', url: 'https://www.curseforge.com/minecraft' },
+                    { name: 'PlanetMC', tag: 'MC', desc: 'MC服务器', url: 'https://www.planetminecraft.com' },
+                    { name: 'Minecraft Heads', tag: 'MC', desc: '头颅库', url: 'https://minecraft-heads.com' },
+                    { name: 'NameMC', tag: 'MC', desc: 'ID查询', url: 'https://namemc.com' },
+                    { name: 'OptiFine', tag: 'MC', desc: '高清修复下载', url: 'https://www.optifine.net' },
+                    { name: 'PCL2', tag: 'MC', desc: '启动器下载', url: 'https://pcl.yingxion.cn' },
+                    { name: 'HMCL', tag: 'MC', desc: '启动器下载', url: 'https://hmcl.huangyuhui.cn' },
+                    { name: 'BakaXL', tag: 'MC', desc: '启动器下载', url: 'https://www.bakaxl.com' },
+                    { name: '我的世界中文论坛', tag: 'MC', desc: 'MC爱好者社区', url: 'https://www.minebbs.com' }
+                ]},
+                abroad: { name: '🌐 国外网站', items: [
+                    { name: 'Google', tag: '搜索', desc: '全球最大搜索引擎', url: 'https://www.google.com' },
+                    { name: 'YouTube', tag: '视频', desc: '全球最大视频平台', url: 'https://www.youtube.com' },
+                    { name: 'Facebook', tag: '社交', desc: '社交媒体巨头', url: 'https://www.facebook.com' },
+                    { name: 'Twitter', tag: '社交', desc: '社交媒体平台', url: 'https://twitter.com' },
+                    { name: 'Instagram', tag: '图片', desc: '图片社交平台', url: 'https://www.instagram.com' },
+                    { name: 'Reddit', tag: '论坛', desc: '全球最大论坛', url: 'https://www.reddit.com' },
+                    { name: 'Wikipedia', tag: '百科', desc: '维基百科', url: 'https://www.wikipedia.org' },
+                    { name: 'Amazon', tag: '购物', desc: '全球电商平台', url: 'https://www.amazon.com' },
+                    { name: 'eBay', tag: '购物', desc: '拍卖购物网站', url: 'https://www.ebay.com' },
+                    { name: 'Netflix', tag: '影视', desc: '流媒体平台', url: 'https://www.netflix.com' },
+                    { name: 'Spotify', tag: '音乐', desc: '音乐流媒体', url: 'https://www.spotify.com' },
+                    { name: 'Discord', tag: '社区', desc: '游戏社交平台', url: 'https://discord.com' },
+                    { name: 'Twitch', tag: '直播', desc: '游戏直播平台', url: 'https://www.twitch.tv' },
+                    { name: 'GitHub', tag: '代码', desc: '代码托管平台', url: 'https://github.com' },
+                    { name: 'Stack Overflow', tag: '问答', desc: '技术问答社区', url: 'https://stackoverflow.com' },
+                    { name: 'Quora', tag: '问答', desc: '问答社区', url: 'https://www.quora.com' },
+                    { name: 'LinkedIn', tag: '职场', desc: '职业社交平台', url: 'https://www.linkedin.com' },
+                    { name: 'Pinterest', tag: '图片', desc: '图片收藏', url: 'https://www.pinterest.com' },
+                    { name: 'Tumblr', tag: '博客', desc: '轻博客平台', url: 'https://www.tumblr.com' },
+                    { name: 'WhatsApp', tag: '通讯', desc: '即时通讯', url: 'https://www.whatsapp.com' }
                 ]}
             }
         };
@@ -9177,6 +9832,92 @@
             });
         }
 
+        // 工具箱翻页功能
+        let currentToolboxPage = 1;
+        const totalToolboxPages = 3;
+
+        function goToToolboxPage(page) {
+            if (page < 1 || page > totalToolboxPages) return;
+            
+            currentToolboxPage = page;
+            
+            // 隐藏所有页
+            document.querySelectorAll('.toolbox-page').forEach(p => {
+                p.classList.add('hidden');
+            });
+            
+            // 显示当前页
+            const currentPage = document.querySelector(`.toolbox-page[data-page="${page}"]`);
+            if (currentPage) {
+                currentPage.classList.remove('hidden');
+            }
+            
+            // 更新页码按钮状态
+            document.querySelectorAll('.toolbox-page-btn').forEach((btn, index) => {
+                if (index + 1 === page) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // 更新导航按钮状态
+            document.getElementById('toolboxPrev').disabled = page === 1;
+            document.getElementById('toolboxNext').disabled = page === totalToolboxPages;
+            
+            // 更新进度条
+            const progress = (page / totalToolboxPages) * 100;
+            document.getElementById('toolboxProgressBar').style.width = progress + '%';
+        }
+
+        function changeToolboxPage(direction) {
+            const newPage = currentToolboxPage + direction;
+            if (newPage >= 1 && newPage <= totalToolboxPages) {
+                goToToolboxPage(newPage);
+            }
+        }
+
+        // 节奏跑酷游戏
+        function showChasingRhythmIntro() {
+            const introPanel = document.createElement('div');
+            introPanel.id = 'chasingRhythmIntro';
+            introPanel.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; display: flex; align-items: center; justify-content: center;';
+            introPanel.innerHTML = `
+                <div style="background: var(--bg-card); padding: 40px; border-radius: 20px; text-align: center; max-width: 500px; margin: 20px; border: 2px solid #9c27b0;">
+                    <div style="font-size: 4em; margin-bottom: 15px;">🎵</div>
+                    <h2 style="color: #9c27b0; margin-bottom: 15px;">节奏跑酷</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6;">
+                        跟随节奏奔跑！躲避障碍，收集音符，<br>
+                        挑战你的节奏感！
+                    </p>
+                    <div style="background: rgba(255,152,0,0.1); border: 1px solid rgba(255,152,0,0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: #ff9800; font-size: 0.85em; margin: 0;">
+                            ⚠️ 由代理商提供，Abamao 对出现的任何广告不负责。
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="this.closest('#chasingRhythmIntro').remove()" style="padding: 12px 30px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); cursor: pointer; font-size: 1em;">返回</button>
+                        <button onclick="document.getElementById('chasingRhythmIntro').remove(); startChasingRhythm();" style="padding: 12px 30px; background: linear-gradient(135deg, #9c27b0, #7b2cbf); border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 1em; font-weight: bold;">开始游戏 ▶️</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(introPanel);
+        }
+
+        function startChasingRhythm() {
+            const embedUrl = 'https://www.jogos.com/embed/index.html?id=chasingrhythm&adUserId=17766872955816393&sourceType=3&gd_sdk_referrer_url=Abamao.github.io';
+            
+            // 创建嵌入容器
+            const embedContainer = document.createElement('div');
+            embedContainer.id = 'chasingRhythmContainer';
+            embedContainer.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; height: 500px; background: #000; border-radius: 15px; overflow: hidden; z-index: 5000; border: 2px solid #9c27b0;';
+            embedContainer.innerHTML = `
+                <iframe src="${embedUrl}" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+                <button onclick="this.parentElement.remove()" style="position: absolute; top: 10px; right: 10px; padding: 8px 15px; background: rgba(255,255,255,0.2); border: none; border-radius: 5px; color: white; cursor: pointer; font-size: 14px;">关闭 ✕</button>
+            `;
+            document.body.appendChild(embedContainer);
+        }
+
         function toggleToolbox() {
             const toolbox = document.getElementById('mainToolbox');
             const search = document.getElementById('toolSearchContainer');
@@ -10794,7 +11535,16 @@
             petAdventures: 0,
             petBreedCount: 0,
             lastDailyQuestReset: null,
-            petSkins: {}
+            petSkins: {},
+            signStreak: 0,
+            lastSignDate: null,
+            miningOres: 0,
+            miningLevel: 1,
+            farmPlots: [],
+            farmHarvest: 0,
+            gems: 0,
+            pullTickets: 0,
+            redeemHistory: []
         };
 
         const petSystem = {
@@ -10917,6 +11667,393 @@
                 return this.expToLevel[Math.min(level, this.expToLevel.length - 1)] || 50000;
             }
         };
+
+        const redeemCodes = {
+            'MAOmao520': { coins: 500, desc: '欢迎奖励', type: 'once' },
+            'VIP888': { coins: 1000, desc: 'VIP奖励', type: 'once' },
+            'NEWUSER': { coins: 200, desc: '新用户礼包', type: 'once' },
+            'WELCOME': { coins: 300, desc: 'Welcome!', type: 'once' },
+            'ABCDEF': { coins: 100, desc: '测试码', type: 'once' },
+            'DAILY': { coins: 50, desc: '每日奖励', type: 'daily' },
+            'WEEKLY': { coins: 200, desc: '每周奖励', type: 'weekly' },
+            'ABAMAO': { coins: 888, desc: '专属奖励', type: 'once' },
+            'PETHUNTER': { pet: { name: '田园犬', icon: '🐕', rarity: 'common', skill: '看家', skillDesc: '守护金币' }, desc: '宠物礼包', type: 'once' },
+            'DRAGON': { pet: { name: '龙', icon: '🐉', rarity: 'legendary', skill: '龙息', skillDesc: '战斗无敌' }, desc: '神龙礼包', type: 'once' }
+        };
+
+        function redeemCode() {
+            const input = document.getElementById('redeemCode');
+            const code = input.value.trim().toUpperCase();
+            
+            if (!code) {
+                showGachaMessage('请输入兑换码！', 'error');
+                return;
+            }
+            
+            const redeemData = redeemCodes[code];
+            
+            if (!redeemData) {
+                showGachaMessage('兑换码不存在！', 'error');
+                return;
+            }
+            
+            const today = new Date().toDateString();
+            const lastRedeem = gachaStats.lastRedeemDate;
+            
+            if (redeemData.type === 'once') {
+                if (gachaStats.redeemedCodes && gachaStats.redeemedCodes[code]) {
+                    showGachaMessage('该兑换码已使用过！', 'error');
+                    return;
+                }
+            } else if (redeemData.type === 'daily') {
+                if (lastRedeem === today) {
+                    showGachaMessage('今日已领取过每日奖励！', 'error');
+                    return;
+                }
+            } else if (redeemData.type === 'weekly') {
+                const lastWeek = new Date();
+                lastWeek.setDate(lastWeek.getDate() - 7);
+                if (lastRedeem && new Date(lastRedeem) > lastWeek) {
+                    showGachaMessage('本周已领取过每周奖励！', 'error');
+                    return;
+                }
+            }
+            
+            let rewardText = '';
+            
+            if (redeemData.coins) {
+                gachaStats.coins += redeemData.coins;
+                rewardText = `+${redeemData.coins}💰`;
+                updateGachaUI();
+            }
+            
+            if (redeemData.pet) {
+                gachaStats.pets.push(redeemData.pet);
+                gachaStats.petLevel[redeemData.pet.name] = 1;
+                gachaStats.petExp[redeemData.pet.name] = 0;
+                gachaStats.petIntimacy[redeemData.pet.name] = 50;
+                gachaStats.petMood[redeemData.pet.name] = 70;
+                rewardText += (rewardText ? ', ' : '') + redeemData.pet.icon + redeemData.pet.name;
+                updatePetDisplay();
+            }
+            
+            if (!gachaStats.redeemedCodes) gachaStats.redeemedCodes = {};
+            if (redeemData.type === 'once') {
+                gachaStats.redeemedCodes[code] = true;
+            }
+            gachaStats.lastRedeemDate = today;
+            
+            const historyItem = {
+                code: code,
+                reward: rewardText,
+                time: new Date().toLocaleTimeString()
+            };
+            gachaStats.redeemHistory.unshift(historyItem);
+            if (gachaStats.redeemHistory.length > 10) gachaStats.redeemHistory.pop();
+            
+            updateRedeemHistory();
+            showGachaMessage(`兑换成功！获得：${rewardText}`, 'success');
+            input.value = '';
+        }
+        
+        function updateRedeemHistory() {
+            const historyDiv = document.getElementById('redeemHistory');
+            if (!historyDiv) return;
+            
+            if (gachaStats.redeemHistory.length === 0) {
+                historyDiv.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">暂无兑换记录</p>';
+                return;
+            }
+            
+            historyDiv.innerHTML = gachaStats.redeemHistory.map(item => `
+                <div style="display: flex; justify-content: space-between; padding: 8px; background: var(--bg-input); border-radius: 6px; margin-bottom: 6px;">
+                    <div>
+                        <div style="font-weight: bold;">${item.reward}</div>
+                        <div style="font-size: 0.7em; color: var(--text-muted);">${item.code}</div>
+                    </div>
+                    <div style="color: var(--text-muted); font-size: 0.7em;">${item.time}</div>
+                </div>
+            `).join('');
+        }
+
+        function updateSignUI() {
+            const today = new Date().toDateString();
+            const status = document.getElementById('signStatus');
+            const streakNum = document.getElementById('signStreakNum');
+            const btn = document.getElementById('signBtn');
+            
+            if (gachaStats.lastSignDate === today) {
+                status.innerHTML = '已签到 ✅';
+                status.style.color = '#4caf50';
+                btn.innerHTML = '今日已签到';
+                btn.style.background = 'var(--bg-input)';
+                btn.style.color = 'var(--text-muted)';
+                btn.style.cursor = 'not-allowed';
+            }
+            
+            streakNum.textContent = gachaStats.signStreak || 0;
+            
+            for (let i = 1; i <= 7; i++) {
+                const el = document.getElementById('sign' + i);
+                if (el && i <= (gachaStats.signStreak || 0)) {
+                    el.textContent = '✅';
+                    el.style.color = '#4caf50';
+                }
+            }
+        }
+
+        function doSign() {
+            const today = new Date().toDateString();
+            
+            if (gachaStats.lastSignDate === today) {
+                showGachaMessage('今日已签到！', 'error');
+                return;
+            }
+            
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (gachaStats.lastSignDate === yesterday.toDateString()) {
+                gachaStats.signStreak = (gachaStats.signStreak || 0) + 1;
+            } else {
+                gachaStats.signStreak = 1;
+            }
+            
+            if (gachaStats.signStreak > 7) gachaStats.signStreak = 7;
+            
+            const reward = gachaStats.signStreak * 20;
+            gachaStats.coins += reward;
+            gachaStats.lastSignDate = today;
+            
+            showGachaMessage(`签到成功！连续${gachaStats.signStreak}天，获得 ${reward}💰`, 'success');
+            updateSignUI();
+            updateGachaUI();
+            
+            if (gachaStats.signStreak === 7) {
+                const pet = petSystem.petPool[Math.floor(Math.random() * 3)];
+                gachaStats.pets.push(pet);
+                gachaStats.petLevel[pet.name] = 1;
+                gachaStats.petExp[pet.name] = 0;
+                gachaStats.petIntimacy[pet.name] = 50;
+                gachaStats.petMood[pet.name] = 70;
+                showGachaMessage(`恭喜获得第7天奖励: ${pet.icon}${pet.name}！`, 'legendary');
+                updatePetDisplay();
+            }
+        }
+
+        function updateMineUI() {
+            document.getElementById('mineCoins').textContent = gachaStats.coins;
+            document.getElementById('mineOres').textContent = gachaStats.miningOres || 0;
+            document.getElementById('mineLevel').textContent = gachaStats.miningLevel || 1;
+        }
+
+        function mineOre() {
+            const level = gachaStats.miningLevel || 1;
+            const chance = Math.random();
+            
+            if (chance < 0.3) {
+                const oreCount = Math.floor(Math.random() * 3) + level;
+                gachaStats.miningOres = (gachaStats.miningOres || 0) + oreCount;
+                document.getElementById('mineHint').textContent = `获得 ${oreCount} 个矿石！`;
+                showGachaMessage(`挖掘成功！获得 ${oreCount} 个矿石`, 'success');
+            } else if (chance < 0.5) {
+                const coinReward = level * 5;
+                gachaStats.coins += coinReward;
+                document.getElementById('mineHint').textContent = `挖到 ${coinReward}💰！`;
+                showGachaMessage(`挖到金币了！${coinReward}💰`, 'success');
+            } else {
+                document.getElementById('mineHint').textContent = '什么都没挖到...';
+            }
+            
+            updateMineUI();
+            updateGachaUI();
+            
+            const anim = document.getElementById('miningAnim');
+            anim.style.transform = 'scale(0.8)';
+            setTimeout(() => anim.style.transform = 'scale(1)', 100);
+        }
+
+        function sellOres() {
+            const ores = gachaStats.miningOres || 0;
+            if (ores === 0) {
+                showGachaMessage('没有矿石可卖！', 'error');
+                return;
+            }
+            
+            const level = gachaStats.miningLevel || 1;
+            const price = ores * level * 2;
+            gachaStats.coins += price;
+            gachaStats.miningOres = 0;
+            
+            showGachaMessage(`出售 ${ores} 个矿石，获得 ${price}💰`, 'success');
+            updateMineUI();
+            updateGachaUI();
+        }
+
+        function upgradePickaxe() {
+            const level = gachaStats.miningLevel || 1;
+            const cost = level * 100;
+            
+            if (gachaStats.coins < cost) {
+                showGachaMessage(`升级需要 ${cost}💰，金币不足！`, 'error');
+                return;
+            }
+            
+            gachaStats.coins -= cost;
+            gachaStats.miningLevel = level + 1;
+            
+            showGachaMessage(`镐子升级到 Lv.${level + 1}！`, 'success');
+            updateMineUI();
+            updateGachaUI();
+        }
+
+        function updateFarmUI() {
+            document.getElementById('farmCoins').textContent = gachaStats.coins;
+            document.getElementById('farmHarvest').textContent = gachaStats.farmHarvest || 0;
+            
+            const plots = gachaStats.farmPlots || [];
+            const now = Date.now();
+            
+            for (let i = 0; i < 6; i++) {
+                const el = document.querySelectorAll('#farmGrid > div')[i];
+                if (el && plots[i]) {
+                    const ready = now >= plots[i].harvestTime;
+                    el.style.background = ready ? 'linear-gradient(135deg, #8bc34a, #4caf50)' : 'linear-gradient(135deg, #795548, #5d4037)';
+                    el.style.borderColor = ready ? '#4caf50' : '#795548';
+                    el.querySelector('div:first-child').textContent = ready ? '🌾' : '🌱';
+                    el.querySelector('div:last-child').textContent = ready ? '可收获' : '生长中';
+                }
+            }
+        }
+
+        function clickFarmPlot(index) {
+            const plots = gachaStats.farmPlots || [];
+            const now = Date.now();
+            
+            if (plots[index] && now >= plots[index].harvestTime) {
+                const crop = plots[index];
+                const reward = crop.price * 2;
+                gachaStats.coins += reward;
+                gachaStats.farmHarvest = (gachaStats.farmHarvest || 0) + 1;
+                plots.splice(index, 1);
+                gachaStats.farmPlots = plots;
+                
+                showGachaMessage(`收获 ${crop.icon}${crop.name}，卖出 ${reward}💰！`, 'success');
+                updateFarmUI();
+                updateGachaUI();
+            }
+        }
+
+        function plantCrop(index, cost) {
+            const plots = gachaStats.farmPlots || [];
+            
+            if (plots.length >= 6) {
+                showGachaMessage('农场已满！', 'error');
+                return;
+            }
+            
+            if (gachaStats.coins < cost) {
+                showGachaMessage(`需要 ${cost}💰，金币不足！`, 'error');
+                return;
+            }
+            
+            const crops = [
+                { name: '萝卜', icon: '🌱', price: 10, time: 30000 },
+                { name: '胡萝卜', icon: '🥕', price: 30, time: 60000 },
+                { name: '玉米', icon: '🌽', price: 80, time: 120000 },
+                { name: '金瓜', icon: '🌟', price: 200, time: 300000 }
+            ];
+            
+            const crop = crops[index];
+            gachaStats.coins -= cost;
+            
+            plots.push({
+                ...crop,
+                harvestTime: Date.now() + crop.time
+            });
+            gachaStats.farmPlots = plots;
+            
+            showGachaMessage(`种下 ${crop.icon}${crop.name}，${crop.time/1000}秒后可收获！`, 'success');
+            updateFarmUI();
+            updateGachaUI();
+        }
+
+        const wheelRewards = [
+            { icon: '💰', text: '50金币', value: 50, type: 'coins' },
+            { icon: '💰', text: '100金币', value: 100, type: 'coins' },
+            { icon: '💰', text: '200金币', value: 200, type: 'coins' },
+            { icon: '💎', text: '10钻石', value: 10, type: 'gems' },
+            { icon: '🎫', text: '抽卡券', value: 1, type: 'ticket' },
+            { icon: '⭐', text: '神秘奖励', value: 500, type: 'coins' }
+        ];
+
+        function updateWheelUI() {
+            document.getElementById('wheelCoins').textContent = gachaStats.coins;
+            const btn = document.getElementById('spinBtn');
+            if (gachaStats.coins < 100) {
+                btn.innerHTML = '金币不足';
+                btn.style.background = 'var(--bg-input)';
+                btn.style.color = 'var(--text-muted)';
+                btn.style.cursor = 'not-allowed';
+            } else {
+                btn.innerHTML = '开始转动 (100💰)';
+                btn.style.background = 'linear-gradient(135deg, #e91e63, #c2185b)';
+                btn.style.color = 'white';
+                btn.style.cursor = 'pointer';
+            }
+        }
+
+        function spinWheel() {
+            if (gachaStats.coins < 100) {
+                showGachaMessage('金币不足！', 'error');
+                return;
+            }
+            
+            gachaStats.coins -= 100;
+            updateWheelUI();
+            updateGachaUI();
+            
+            const wheel = document.getElementById('wheel');
+            const result = document.getElementById('wheelResult');
+            const resultIcon = document.getElementById('wheelResultIcon');
+            const resultText = document.getElementById('wheelResultText');
+            
+            const randomDeg = Math.random() * 360;
+            const spins = 5;
+            const totalDeg = spins * 360 + randomDeg;
+            
+            wheel.style.transform = `rotate(${totalDeg}deg)`;
+            result.style.display = 'none';
+            
+            setTimeout(() => {
+                const idx = Math.floor(randomDeg / 60) % 6;
+                const reward = wheelRewards[idx];
+                
+                if (reward.type === 'coins') {
+                    gachaStats.coins += reward.value;
+                } else if (reward.type === 'gems') {
+                    gachaStats.gems = (gachaStats.gems || 0) + reward.value;
+                } else if (reward.type === 'ticket') {
+                    gachaStats.pullTickets = (gachaStats.pullTickets || 0) + reward.value;
+                }
+                
+                resultIcon.textContent = reward.icon;
+                resultText.textContent = `恭喜获得 ${reward.text}！`;
+                result.style.display = 'block';
+                
+                showGachaMessage(`转盘停止！获得 ${reward.text}`, reward.type === 'coins' && reward.value >= 200 ? 'legendary' : 'success');
+                updateWheelUI();
+                updateGachaUI();
+            }, 3200);
+            
+            setTimeout(() => {
+                wheel.style.transition = 'none';
+                wheel.style.transform = 'rotate(0deg)';
+                setTimeout(() => {
+                    wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+                }, 50);
+            }, 4000);
+        }
 
         function feedPet(petIndex) {
             const pet = gachaStats.pets[petIndex];
