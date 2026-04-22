@@ -58,16 +58,15 @@
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            animation: slideInLeft 0.5s ease;
         }
 
         .back-btn:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
@@ -78,7 +77,6 @@
             z-index: 1000;
             display: flex;
             gap: 10px;
-            animation: slideInRight 0.5s ease;
         }
 
         .icon-btn {
@@ -91,7 +89,7 @@
             color: white;
             font-size: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -110,37 +108,11 @@
             background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
             position: relative;
             z-index: 1;
-            animation: fadeInDown 0.8s ease;
-        }
-
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6); }
+            50% { transform: scale(1.02); }
         }
 
         header h1 {
@@ -149,8 +121,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 15px;
-            animation: pulse 2s ease infinite;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
         }
 
         header p {
@@ -173,7 +143,6 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             border: 1px solid var(--border-color);
-            animation: fadeInUp 0.5s ease;
         }
 
         .stat-value {
@@ -190,16 +159,10 @@
             margin-top: 5px;
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .search-bar {
-            max-width: 600px;
+            max-width: 400px;
             margin: 40px auto 20px;
             position: relative;
-            animation: fadeInUp 0.6s ease 0.2s both;
         }
 
         .search-bar input {
@@ -212,13 +175,12 @@
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
             color: white;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
         }
 
         .search-bar input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
         }
 
         .search-bar input::placeholder {
@@ -239,7 +201,6 @@
             gap: 10px;
             margin-bottom: 30px;
             flex-wrap: wrap;
-            animation: fadeInUp 0.6s ease 0.3s both;
         }
 
         .category-tab {
@@ -250,7 +211,7 @@
             color: var(--text-secondary);
             font-size: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             border: 1px solid transparent;
         }
 
@@ -282,36 +243,19 @@
             border-radius: 20px;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            transform: translateY(30px);
-            animation: cardAppear 0.5s ease forwards;
+            opacity: 1;
+            transform: none;
         }
 
-        .game-card:nth-child(1) { animation-delay: 0.1s; }
-        .game-card:nth-child(2) { animation-delay: 0.15s; }
-        .game-card:nth-child(3) { animation-delay: 0.2s; }
-        .game-card:nth-child(4) { animation-delay: 0.25s; }
-        .game-card:nth-child(5) { animation-delay: 0.3s; }
-        .game-card:nth-child(6) { animation-delay: 0.35s; }
-        .game-card:nth-child(7) { animation-delay: 0.4s; }
-        .game-card:nth-child(8) { animation-delay: 0.45s; }
-        .game-card:nth-child(9) { animation-delay: 0.5s; }
-        .game-card:nth-child(10) { animation-delay: 0.55s; }
-        .game-card:nth-child(11) { animation-delay: 0.6s; }
-        .game-card:nth-child(12) { animation-delay: 0.65s; }
-        .game-card:nth-child(13) { animation-delay: 0.7s; }
-        .game-card:nth-child(14) { animation-delay: 0.75s; }
-        .game-card:nth-child(15) { animation-delay: 0.8s; }
-        .game-card:nth-child(16) { animation-delay: 0.85s; }
-
-        @keyframes cardAppear {
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .game-card:nth-child(1) { }
 
         .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
+            transform: translateY(-5px);
             border-color: var(--accent-color);
-            box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+        }
+
+        .game-card.hidden {
+            display: none;
         }
 
         .game-card.hidden {
@@ -408,7 +352,7 @@
             font-size: 1em;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             position: relative;
             overflow: hidden;
         }
@@ -503,7 +447,7 @@
             border-radius: 10px;
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
             font-size: 16px;
         }
 
@@ -625,7 +569,7 @@
             border-radius: 25px;
             position: relative;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
         }
 
         .toggle-switch.active {
@@ -641,7 +585,7 @@
             border-radius: 50%;
             top: 2px;
             left: 2px;
-            transition: all 0.3s ease;
+            transition: all 0.15s ease;
         }
 
         .toggle-switch.active::after {
@@ -665,7 +609,7 @@
         <p>在这里，游戏就是一切</p>
         <div class="stats-bar">
             <div class="stat-item">
-                <div class="stat-value" id="totalGames">16</div>
+                <div class="stat-value" id="totalGames">26</div>
                 <div class="stat-label">游戏总数</div>
             </div>
             <div class="stat-item">
@@ -752,6 +696,16 @@
             { id: 'tower', name: '堆塔游戏', icon: '🗼', desc: '精准时机堆叠方块！', category: 'puzzle', tag: '益智' },
             { id: 'pacman', name: '吃豆人', icon: '👻', desc: '经典吃豆人，躲避幽灵！', category: 'classic', tag: '经典' },
             { id: 'tank', name: '坦克大战', icon: '💥', desc: '指挥坦克消灭敌人！', category: 'action', tag: '动作' },
+            { id: 'yorg', name: 'Yorg', icon: '🏰', desc: '塔防游戏，保护基地，连接采矿机和工厂！', category: 'online', tag: '在线' },
+            { id: 'generals', name: 'Generals', icon: '⚔️', desc: '策略对抗游戏，占领敌方王塔获胜！', category: 'online', tag: '在线' },
+            { id: 'slay', name: 'Slay', icon: '🔫', desc: '俯视角射击游戏，13种武器等你来战！', category: 'online', tag: '在线' },
+            { id: 'agar', name: 'Agar.io', icon: '🟢', desc: '经典io游戏始祖！吞食小圆圈让自己壮大！', category: 'online', tag: '在线' },
+            { id: 'slither', name: 'Slither.io', icon: '🐍', desc: '类似贪吃蛇的io游戏，吞食光点让自己长大！', category: 'online', tag: '在线' },
+            { id: 'diep', name: 'Diep.io', icon: '💣', desc: '坦克战斗游戏，升级坦克装备称霸战场！', category: 'online', tag: '在线' },
+            { id: 'surviv', name: 'Surviv.io', icon: '🔫', desc: '大乱斗游戏，双人组队搜刮武器战斗！', category: 'online', tag: '在线' },
+            { id: 'wings', name: 'Wings.io', icon: '✈️', desc: '飞行射击游戏，驾驶战斗机在天空中激战！', category: 'online', tag: '在线' },
+            { id: 'hole', name: 'Hole.io', icon: '⚫', desc: '化身黑洞，吞噬一切成为最强大黑洞！', category: 'online', tag: '在线' },
+            { id: 'paper', name: 'Paper.io', icon: '📝', desc: '领地争夺游戏，覆盖空白区域并吞并对手！', category: 'online', tag: '在线' },
         ];
 
         let stats = JSON.parse(localStorage.getItem('arcadiaStats')) || {
@@ -877,6 +831,16 @@
                     case 'tower': startTower(container); break;
                     case 'pacman': startPacman(container); break;
                     case 'tank': startTank(container); break;
+                    case 'yorg': window.location.href = 'https://yorg.io/'; break;
+                    case 'generals': window.location.href = 'https://generals.io/'; break;
+                    case 'slay': window.location.href = 'https://slay.one/'; break;
+                    case 'agar': window.location.href = 'https://agar.io/'; break;
+                    case 'slither': window.location.href = 'https://slither.io/'; break;
+                    case 'diep': window.location.href = 'https://diep.io/'; break;
+                    case 'surviv': window.location.href = 'https://surviv.io/'; break;
+                    case 'wings': window.location.href = 'https://wings.io/'; break;
+                    case 'hole': window.location.href = 'https://hole.io/'; break;
+                    case 'paper': window.location.href = 'https://paper.io/'; break;
                     case 'rhythm': window.location.href = 'https://www.jogos.com/embed/index.html?id=chasingrhythm&adUserId=17766872955816393&sourceType=3&gd_sdk_referrer_url=Abamao.github.io/arcadia/'; break;
                 }
             }, 500);
@@ -992,7 +956,7 @@
             canvas.height = window.innerHeight;
 
             const particles = [];
-            const particleCount = 100;
+            const particleCount = 30;
 
             for (let i = 0; i < particleCount; i++) {
                 particles.push({
