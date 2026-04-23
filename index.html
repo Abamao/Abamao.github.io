@@ -1428,8 +1428,23 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             max-width: 400px;
             width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
             line-height: 1.8;
             position: relative;
+        }
+        .info-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .info-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .info-content::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 3px;
+        }
+        .info-content::-webkit-scrollbar-thumb:hover {
+            background: #00a8cc;
         }
         .info-content h4 {
             margin-bottom: 15px;
@@ -7784,7 +7799,57 @@
                     { name: 'PyPI', tag: '包管理', desc: 'Python包索引', url: 'https://pypi.org' },
                     { name: 'Maven Central', tag: '包管理', desc: 'Java包仓库', url: 'https://search.maven.org' },
                     { name: 'Regex101', tag: '工具', desc: '正则表达式在线测试工具', url: 'https://regex101.com' },
-                    { name: 'JSON Crack', tag: '工具', desc: 'JSON数据可视化工具', url: 'https://jsoncrack.com' }
+                    { name: 'JSON Crack', tag: '工具', desc: 'JSON数据可视化工具', url: 'https://jsoncrack.com' },
+                    { name: 'GitKraken', tag: 'Git工具', desc: '可视化Git客户端，图形化操作更直观', url: 'https://www.gitkraken.com' },
+                    { name: 'SourceTree', tag: 'Git工具', desc: 'Atlassian出品的免费Git客户端', url: 'https://www.sourcetreeapp.com' },
+                    { name: 'TortoiseGit', tag: 'Git工具', desc: 'Windows shell集成的Git工具', url: 'https://tortoisegit.org' },
+                    { name: 'GitHub Desktop', tag: 'Git工具', desc: 'GitHub官方桌面客户端', url: 'https://desktop.github.com' },
+                    { name: 'Apache Maven', tag: '构建工具', desc: 'Java项目构建和依赖管理工具', url: 'https://maven.apache.org' },
+                    { name: 'Gradle', tag: '构建工具', desc: '强大的构建自动化工具', url: 'https://gradle.org' },
+                    { name: 'Jenkins', tag: 'CI/CD', desc: '开源自动化服务器', url: 'https://www.jenkins.io' },
+                    { name: 'GitHub Actions', tag: 'CI/CD', desc: 'GitHub内置持续集成服务', url: 'https://github.com/features/actions' },
+                    { name: 'Travis CI', tag: 'CI/CD', desc: '云端持续集成服务', url: 'https://travis-ci.com' },
+                    { name: 'CircleCI', tag: 'CI/CD', desc: '快速可靠的CI/CD平台', url: 'https://circleci.com' },
+                    { name: 'SonarQube', tag: '代码质量', desc: '代码质量和安全检测平台', url: 'https://www.sonarqube.org' },
+                    { name: 'ESLint', tag: '代码检查', desc: 'JavaScript代码检查工具', url: 'https://eslint.org' },
+                    { name: 'Prettier', tag: '代码格式化', desc: '代码格式化工具', url: 'https://prettier.io' },
+                    { name: 'Jest', tag: '测试', desc: 'JavaScript测试框架', url: 'https://jestjs.io' },
+                    { name: 'Mocha', tag: '测试', desc: 'JavaScript测试框架', url: 'https://mochajs.org' },
+                    { name: 'Cypress', tag: '测试', desc: '端到端测试框架', url: 'https://www.cypress.io' },
+                    { name: 'Selenium', tag: '测试', desc: '浏览器自动化测试工具', url: 'https://www.selenium.dev' },
+                    { name: 'Jira', tag: '项目管理', desc: 'Atlassian项目跟踪工具', url: 'https://www.atlassian.com/software/jira' },
+                    { name: 'Trello', tag: '项目管理', desc: '看板式项目管理工具', url: 'https://trello.com' },
+                    { name: 'Asana', tag: '项目管理', desc: '团队任务和项目管理', url: 'https://asana.com' },
+                    { name: 'ClickUp', tag: '项目管理', desc: '一体化工作管理平台', url: 'https://clickup.com' },
+                    { name: 'Swagger', tag: 'API文档', desc: 'API设计和文档工具', url: 'https://swagger.io' },
+                    { name: 'Postman API', tag: 'API工具', desc: 'API开发和协作平台', url: 'https://www.postman.com/api-platform' },
+                    { name: 'Insomnia', tag: 'API工具', desc: '现代化的API客户端', url: 'https://insomnia.rest' },
+                    { name: 'Hoppscotch', tag: 'API工具', desc: '开源API开发生态系统', url: 'https://hoppscotch.io' },
+                    { name: 'Firebase', tag: '后端服务', desc: 'Google移动应用开发平台', url: 'https://firebase.google.com' },
+                    { name: 'Supabase', tag: '后端服务', desc: '开源Firebase替代品', url: 'https://supabase.com' },
+                    { name: 'Heroku', tag: '云部署', desc: '云平台即服务', url: 'https://www.heroku.com' },
+                    { name: 'Vercel', tag: '云部署', desc: '前端开发者部署平台', url: 'https://vercel.com' },
+                    { name: 'Netlify', tag: '云部署', desc: '静态网站托管平台', url: 'https://www.netlify.com' },
+                    { name: 'AWS', tag: '云服务', desc: '亚马逊云计算服务', url: 'https://aws.amazon.com' },
+                    { name: 'Azure', tag: '云服务', desc: '微软云计算平台', url: 'https://azure.microsoft.com' },
+                    { name: 'Google Cloud', tag: '云服务', desc: '谷歌云计算服务', url: 'https://cloud.google.com' },
+                    { name: 'Alibaba Cloud', tag: '云服务', desc: '阿里云云计算服务', url: 'https://www.aliyun.com' },
+                    { name: '腾讯云', tag: '云服务', desc: '腾讯云计算服务', url: 'https://cloud.tencent.com' },
+                    { name: 'Kubernetes', tag: '容器编排', desc: '容器集群管理系统', url: 'https://kubernetes.io' },
+                    { name: 'Terraform', tag: '基础设施', desc: '基础设施即代码工具', url: 'https://www.terraform.io' },
+                    { name: 'Ansible', tag: '自动化', desc: 'IT自动化运维工具', url: 'https://www.ansible.com' },
+                    { name: 'Puppet', tag: '自动化', desc: '配置管理工具', url: 'https://puppet.com' },
+                    { name: 'Chef', tag: '自动化', desc: '基础设施自动化工具', url: 'https://www.chef.io' },
+                    { name: 'Grafana', tag: '监控', desc: '数据可视化和监控平台', url: 'https://grafana.com' },
+                    { name: 'Prometheus', tag: '监控', desc: '系统监控和告警工具包', url: 'https://prometheus.io' },
+                    { name: 'ELK Stack', tag: '日志', desc: '日志分析平台', url: 'https://www.elastic.co/elastic-stack' },
+                    { name: 'Sentry', tag: '错误追踪', desc: '应用错误监控平台', url: 'https://sentry.io' },
+                    { name: 'Datadog', tag: '监控', desc: '云监控和安全平台', url: 'https://www.datadoghq.com' },
+                    { name: 'New Relic', tag: '监控', desc: '应用性能监控', url: 'https://newrelic.com' },
+                    { name: 'Charles', tag: '调试', desc: 'HTTP代理和调试工具', url: 'https://www.charlesproxy.com' },
+                    { name: 'Fiddler', tag: '调试', desc: 'Web调试代理工具', url: 'https://www.telerik.com/fiddler' },
+                    { name: 'Wireshark', tag: '网络', desc: '网络协议分析工具', url: 'https://www.wireshark.org' },
+                    { name: 'Postman Interceptor', tag: '调试', desc: '浏览器请求拦截器', url: 'https://www.postman.com/downloads' }
                 ]},
                 design: { name: '🎨 设计工具', items: [
                     { name: 'Figma', tag: 'UI设计', desc: '在线协作设计工具，设计师必备', url: 'https://www.figma.com' },
@@ -8035,6 +8100,108 @@
                     { name: 'Pinterest', tag: '图片', desc: '图片收藏', url: 'https://www.pinterest.com' },
                     { name: 'Tumblr', tag: '博客', desc: '轻博客平台', url: 'https://www.tumblr.com' },
                     { name: 'WhatsApp', tag: '通讯', desc: '即时通讯', url: 'https://www.whatsapp.com' }
+                ]},
+                shopping: { name: '🛒 购物优惠', items: [
+                    { name: '淘宝', tag: '购物', desc: '国内最大电商平台，应有尽有', url: 'https://www.taobao.com' },
+                    { name: '京东', tag: '购物', desc: '自营物流快，品质有保障', url: 'https://www.jd.com' },
+                    { name: '拼多多', tag: '购物', desc: '百亿补贴真香，拼着买更便宜', url: 'https://www.pinduoduo.com' },
+                    { name: '天猫', tag: '购物', desc: '品牌旗舰店聚集地', url: 'https://www.tmall.com' },
+                    { name: '什么值得买', tag: '比价', desc: '消费决策平台，购物前先来看看', url: 'https://www.smzdm.com' },
+                    { name: '慢慢买', tag: '比价', desc: '历史价格查询，防止假促销', url: 'https://www.manmanbuy.com' },
+                    { name: '一淘', tag: '返利', desc: '阿里巴巴官方返利平台', url: 'https://www.etao.com' },
+                    { name: '聚划算', tag: '优惠', desc: '淘宝官方团购频道', url: 'https://ju.taobao.com' },
+                    { name: '苏宁', tag: '购物', desc: '家电数码好选择', url: 'https://www.suning.com' },
+                    { name: '唯品会', tag: '特卖', desc: '品牌特卖，天天有折扣', url: 'https://www.vip.com' },
+                    { name: '当当', tag: '图书', desc: '网上购书首选', url: 'http://www.dangdang.com' },
+                    { name: '闲鱼', tag: '二手', desc: '阿里巴巴旗下二手交易平台', url: 'https://www.goofish.com' },
+                    { name: '转转', tag: '二手', desc: '专业二手交易平台', url: 'https://www.zhuanzhuan.com' },
+                    { name: '得物', tag: '潮流', desc: '潮流商品鉴别交易平台', url: 'https://www.dewu.com' },
+                    { name: '识货', tag: '导购', desc: '虎扑旗下运动装备导购', url: 'https://www.shihuo.cn' }
+                ]},
+                health: { name: '🏥 健康医疗', items: [
+                    { name: '丁香医生', tag: '健康', desc: '专业健康科普和在线问诊', url: 'https://dxy.com' },
+                    { name: '好大夫在线', tag: '医疗', desc: '在线找医生问诊平台', url: 'https://www.haodf.com' },
+                    { name: '春雨医生', tag: '问诊', desc: '快速在线问诊服务', url: 'https://www.chunyuyisheng.com' },
+                    { name: '微医', tag: '医疗', desc: '互联网医院平台', url: 'https://www.guahao.com' },
+                    { name: '京东健康', tag: '购药', desc: '在线购药和健康管理', url: 'https://health.jd.com' },
+                    { name: '阿里健康', tag: '购药', desc: '天猫医药馆，买药方便', url: 'https://www.alihealth.cn' },
+                    { name: 'Keep', tag: '运动', desc: '运动健身指导和记录', url: 'https://www.gotokeep.com' },
+                    { name: '薄荷健康', tag: '健康', desc: '饮食记录和健康管理', url: 'https://www.boohee.com' },
+                    { name: '平安健康', tag: '医疗', desc: '平安旗下健康医疗平台', url: 'https://health.pingan.com' },
+                    { name: '39健康网', tag: '资讯', desc: '健康资讯和疾病百科', url: 'https://www.39.net' },
+                    { name: '寻医问药', tag: '医药', desc: '药品查询和健康咨询', url: 'https://www.xywy.com' },
+                    { name: '爱康国宾', tag: '体检', desc: '体检预约服务平台', url: 'https://www.ikang.com' },
+                    { name: '美年大健康', tag: '体检', desc: '体检预约和健康服务', url: 'https://www.health-100.cn' },
+                    { name: '快速问医生', tag: '问诊', desc: '在线医疗咨询', url: 'https://www.120ask.com' },
+                    { name: '用药助手', tag: '药品', desc: '丁香园旗下药品查询工具', url: 'https://drugs.dxy.cn' }
+                ]},
+                career: { name: '💼 职场求职', items: [
+                    { name: 'BOSS直聘', tag: '招聘', desc: '直接和老板谈，找工作神器', url: 'https://www.zhipin.com' },
+                    { name: '智联招聘', tag: '招聘', desc: '老牌招聘网站，职位多', url: 'https://www.zhaopin.com' },
+                    { name: '前程无忧', tag: '招聘', desc: '综合招聘服务平台', url: 'https://www.51job.com' },
+                    { name: '猎聘', tag: '高端', desc: '中高端人才招聘平台', url: 'https://www.liepin.com' },
+                    { name: '拉勾网', tag: '互联网', desc: '互联网招聘首选', url: 'https://www.lagou.com' },
+                    { name: '实习僧', tag: '实习', desc: '大学生实习招聘平台', url: 'https://www.shixiseng.com' },
+                    { name: '牛客网', tag: '求职', desc: '程序员求职笔试面试', url: 'https://www.nowcoder.com' },
+                    { name: '脉脉', tag: '职场', desc: '职场社交平台', url: 'https://maimai.cn' },
+                    { name: '看准网', tag: '点评', desc: '公司点评和薪资查询', url: 'https://www.kanzhun.com' },
+                    { name: '职友集', tag: '薪资', desc: '工资待遇查询平台', url: 'https://www.jobui.com' },
+                    { name: '简历本', tag: '简历', desc: '免费简历制作工具', url: 'https://www.jianliben.com' },
+                    { name: '超级简历', tag: '简历', desc: '智能简历制作工具', url: 'https://www.wondercv.com' },
+                    { name: '创客贴', tag: '设计', desc: '在线设计简历模板', url: 'https://www.chuangkit.com' },
+                    { name: '领英', tag: '职场', desc: '国际化职业社交平台', url: 'https://www.linkedin.com' },
+                    { name: '脉脉招聘', tag: '内推', desc: '内推招聘信息', url: 'https://maimai.cn/jobs' }
+                ]},
+                tech: { name: '🚀 科技前沿', items: [
+                    { name: 'Product Hunt', tag: '新品', desc: '发现最新科技产品', url: 'https://www.producthunt.com' },
+                    { name: 'Hacker News', tag: '技术', desc: 'Y Combinator技术社区', url: 'https://news.ycombinator.com' },
+                    { name: 'GitHub Trending', tag: '开源', desc: 'GitHub热门项目', url: 'https://github.com/trending' },
+                    { name: 'BetaList', tag: '创业', desc: '发现创业公司和产品', url: 'https://betalist.com' },
+                    { name: 'Slashdot', tag: '科技', desc: '科技新闻先驱', url: 'https://slashdot.org' },
+                    { name: 'TechCrunch', tag: '创业', desc: '科技创业资讯', url: 'https://techcrunch.com' },
+                    { name: 'The Verge', tag: '数码', desc: '科技产品和数字文化', url: 'https://www.theverge.com' },
+                    { name: 'Wired', tag: '科技', desc: '科技文化杂志', url: 'https://www.wired.com' },
+                    { name: 'Ars Technica', tag: '科技', desc: '深度科技新闻', url: 'https://arstechnica.com' },
+                    { name: 'Mashable', tag: '科技', desc: '数字文化和科技新闻', url: 'https://mashable.com' },
+                    { name: 'CNET', tag: '评测', desc: '科技产品评测', url: 'https://www.cnet.com' },
+                    { name: 'Engadget', tag: '数码', desc: '消费电子产品资讯', url: 'https://www.engadget.com' },
+                    { name: '极客公园', tag: '科技', desc: '国内科技媒体', url: 'https://www.geekpark.net' },
+                    { name: '36氪', tag: '创业', desc: '科技创业媒体', url: 'https://36kr.com' },
+                    { name: '机器之心', tag: 'AI', desc: '人工智能领域媒体', url: 'https://www.jiqizhixin.com' }
+                ]},
+                music: { name: '🎵 音乐创作', items: [
+                    { name: '网易云音乐', tag: '音乐', desc: '国内最受欢迎音乐平台', url: 'https://music.163.com' },
+                    { name: 'QQ音乐', tag: '音乐', desc: '曲库最全的音乐平台', url: 'https://y.qq.com' },
+                    { name: '酷狗音乐', tag: '音乐', desc: '在线音乐播放器', url: 'https://www.kugou.com' },
+                    { name: '酷我音乐', tag: '音乐', desc: '无损音乐播放', url: 'https://www.kuwo.cn' },
+                    { name: 'Spotify', tag: '流媒体', desc: '全球最大音乐流媒体', url: 'https://www.spotify.com' },
+                    { name: 'Apple Music', tag: '流媒体', desc: '苹果音乐服务', url: 'https://music.apple.com' },
+                    { name: 'SoundCloud', tag: '创作', desc: '独立音乐人平台', url: 'https://soundcloud.com' },
+                    { name: 'Bandcamp', tag: '独立', desc: '独立音乐销售平台', url: 'https://bandcamp.com' },
+                    { name: 'Splice', tag: '采样', desc: '音乐采样和音效资源', url: 'https://splice.com' },
+                    { name: 'Suno AI', tag: 'AI音乐', desc: 'AI音乐创作工具', url: 'https://www.suno.ai' },
+                    { name: 'Udio', tag: 'AI音乐', desc: 'AI歌曲生成工具', url: 'https://www.udio.com' },
+                    { name: 'AIVA', tag: 'AI作曲', desc: 'AI音乐作曲助手', url: 'https://www.aiva.ai' },
+                    { name: 'LANDR', tag: '母带', desc: '在线母带处理服务', url: 'https://www.landr.com' },
+                    { name: 'Midomi', tag: '识曲', desc: '哼唱识别歌曲', url: 'https://www.midomi.com' },
+                    { name: 'Musescore', tag: '乐谱', desc: '免费乐谱软件和社区', url: 'https://musescore.com' }
+                ]},
+                food: { name: '🍳 美食烹饪', items: [
+                    { name: '下厨房', tag: '菜谱', desc: '国内最大菜谱社区', url: 'https://www.xiachufang.com' },
+                    { name: '豆果美食', tag: '菜谱', desc: '优质食谱分享平台', url: 'https://www.douguo.com' },
+                    { name: '美食杰', tag: '菜谱', desc: '菜谱大全和美食资讯', url: 'https://www.meishij.net' },
+                    { name: '日食记', tag: '美食', desc: '治愈系美食视频', url: 'https://www.rishiji.com' },
+                    { name: '知乎美食', tag: '社区', desc: '美食话题讨论区', url: 'https://www.zhihu.com/topic/19550228' },
+                    { name: '大众点评', tag: '探店', desc: '餐厅评价和推荐', url: 'https://www.dianping.com' },
+                    { name: '美团', tag: '外卖', desc: '外卖订餐平台', url: 'https://www.meituan.com' },
+                    { name: '饿了么', tag: '外卖', desc: '阿里巴巴外卖平台', url: 'https://www.ele.me' },
+                    { name: '美团买菜', tag: '生鲜', desc: '在线买菜平台', url: 'https://maicai.meituan.com' },
+                    { name: '盒马鲜生', tag: '生鲜', desc: '新零售生鲜超市', url: 'https://www.freshippo.com' },
+                    { name: '叮咚买菜', tag: '生鲜', desc: '即时配送买菜', url: 'https://www.ddmc.com' },
+                    { name: '朴朴超市', tag: '生鲜', desc: '30分钟送达生鲜', url: 'https://www.pupumall.com' },
+                    { name: '小高姐', tag: '视频', desc: 'YouTube美食博主', url: 'https://www.youtube.com/@MagicIngredients' },
+                    { name: '王刚', tag: '视频', desc: '宽油美食视频', url: 'https://space.bilibili.com/290526283' },
+                    { name: '美食台', tag: '视频', desc: '专业美食视频平台', url: 'https://www.meishitai.com' }
                 ]}
             }
         };
