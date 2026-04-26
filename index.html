@@ -6101,6 +6101,7 @@
             <select id="searchEngine" class="engine-select" onchange="handleSearchEngineChange()" title="选择搜索引擎">
                 <option value="site">站内</option>
                 <option value="web">全网</option>
+                <option value="bing">必应</option>
                 <option value="baidu">百度</option>
                 <option value="bilibili">B站</option>
                 <option value="github">GitHub</option>
@@ -8392,6 +8393,7 @@
             const placeholders = {
                 site: '站内搜索资源...',
                 web: '全网搜索...',
+                bing: '必应搜索...',
                 baidu: '百度搜索...',
                 bilibili: 'B站搜索...',
                 github: 'GitHub 搜索...'
@@ -8745,6 +8747,7 @@
 
                 const engineUrls = {
                     web: 'https://www.google.com/search?q=',
+                    bing: 'https://www.bing.com/search?q=',
                     baidu: 'https://www.baidu.com/s?wd=',
                     bilibili: 'https://search.bilibili.com/all?keyword=',
                     github: 'https://github.com/search?q='
