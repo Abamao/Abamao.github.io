@@ -339,7 +339,19 @@
         .arcadia-btn:hover {
             box-shadow: 0 15px 40px rgba(156, 39, 176, 0.5);
         }
-        
+
+        .immersive-portal-btn {
+            margin-top: 15px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .immersive-portal-btn:hover {
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
         /* ============================================
            返回开始界面按钮 - 赛博朋克版
            ============================================ */
@@ -497,6 +509,30 @@
         .arcadia-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(156, 39, 176, 0.5);
+        }
+        .immersive-portal-btn {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .immersive-portal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
         }
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
         /* ============================================
@@ -4887,31 +4923,10 @@
         <span><kbd>?</kbd> 快捷键帮助</span>
     </div>
 
-    <!-- 沉浸模式 -->
-    <div id="immersiveMode" class="immersive-mode hidden">
-        <div class="immersive-time">
-            <div class="immersive-clock" id="immersiveClock">12:00</div>
-            <div class="immersive-date" id="immersiveDate">2024年1月1日 星期一</div>
-        </div>
-        <div class="immersive-search-container">
-            <div class="immersive-search-tabs">
-                <button class="immersive-tab active" data-engine="bilibili" onclick="switchImmersiveEngine('bilibili')">Bilibili</button>
-                <button class="immersive-tab" data-engine="bing" onclick="switchImmersiveEngine('bing')">必应</button>
-                <button class="immersive-tab" data-engine="google" onclick="switchImmersiveEngine('google')">Google</button>
-                <button class="immersive-tab" data-engine="baidu" onclick="switchImmersiveEngine('baidu')">百度</button>
-            </div>
-            <div class="immersive-search-box">
-                <input type="text" id="immersiveSearchInput" placeholder="搜索..." onkeydown="handleImmersiveSearch(event)">
-                <button class="immersive-search-btn" onclick="doImmersiveSearch()">🔍</button>
-            </div>
-        </div>
-        <button class="immersive-exit" onclick="exitImmersiveMode()" title="退出沉浸模式">✕</button>
-    </div>
-
     <div id="welcomePage">
         <canvas id="honeycombCanvas" style="position: absolute; top: 0; left: 0; pointer-events: none; z-index: -1;"></canvas>
         <div class="welcome-quote">在单一平台构建属于自己的生活方式。<span class="quote-author">——Github.com</span></div>
-        <button class="immersive-toggle" onclick="enterImmersiveMode()" title="进入沉浸模式">🌌</button>
+        <button class="immersive-toggle" onclick="window.location.href='immersive/index.html'" title="进入沉浸模式">🌌</button>
         <button class="windows11-toggle" onclick="showWindows11Modal()" title="Windows 11">💻</button>
         <div class="welcome-header">
             <div class="welcome-dot"></div>
