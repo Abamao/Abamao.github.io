@@ -102,6 +102,28 @@
             box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
         }
 
+        .prodia-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prodia-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+        }
+
         header {
             text-align: center;
             padding: 100px 20px 60px;
@@ -599,6 +621,9 @@
     <a href="../" class="back-btn">← 返回主页</a>
 
     <div class="top-bar">
+        <a href="../Prodia" class="prodia-btn" target="_blank" title="Prodia - 动画游戏天堂">
+            ✨ Prodia
+        </a>
         <button class="icon-btn" onclick="showSettings()" title="设置">⚙️</button>
         <button class="icon-btn" onclick="toggleFullscreen()" title="全屏">⛶</button>
         <button class="icon-btn" onclick="toggleNightMode()" title="夜间模式">🌙</button>
