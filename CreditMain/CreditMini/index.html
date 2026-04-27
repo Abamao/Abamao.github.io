@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditMini - 极简搜索</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: 700;
+            color: transparent;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1em;
+            margin-bottom: 40px;
+        }
+
+        .search-tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 24px;
+            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: white;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 5px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            background: transparent;
+            color: white;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-btn {
+            padding: 15px 25px;
+            border: none;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: opacity 0.3s;
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.8em;
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #00d4ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="logo">CreditMini</h1>
+        <p class="subtitle">极简搜索体验</p>
+
+        <div class="search-tabs">
+            <button class="tab active" data-engine="bing">必应</button>
+            <button class="tab" data-engine="baidu">百度</button>
+            <button class="tab" data-engine="bilibili">哔哩哔哩</button>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="输入搜索内容...">
+            <button class="search-btn" onclick="doSearch()">搜索</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="https://Abamao.github.io/CreditMain" class="back-link">← 返回 Credit</a>
+    </div>
+
+    <script>
+        let currentEngine = 'bing';
+        const searchUrls = {
+            bing: 'https://www.bing.com/search?q=',
+            baidu: 'https://www.baidu.com/s?wd=',
+            bilibili: 'https://search.bilibili.com/all?keyword='
+        };
+
+        // 切换搜索引擎
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentEngine = this.dataset.engine;
+                document.getElementById('searchInput').focus();
+            });
+        });
+
+        // 执行搜索
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query) {
+                window.location.href = searchUrls[currentEngine] + encodeURIComponent(query);
+            }
+        }
+
+        // 回车搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                doSearch();
+            }
+        });
+
+        // 页面加载时聚焦输入框
+        document.getElementById('searchInput').focus();
+    </script>
+</body>
+</html>
