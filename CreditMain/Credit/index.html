@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沉浸模式 - Immersive Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-card: rgba(26, 26, 46, 0.6);
+            --text-primary: #fff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --accent-color: #00d4ff;
+            --accent-gradient-btn: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f5f5f7;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --text-primary: #1d1d1f;
+            --text-secondary: rgba(0, 0, 0, 0.6);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --accent-color: #0071e3;
+            --accent-gradient-btn: linear-gradient(135deg, #0071e3, #7b2cbf);
+            --border-color: rgba(0, 0, 0, 0.1);
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s;
+        }
+
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(123, 44, 191, 0.1) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(180deg); }
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(50px); opacity: 0.8; }
+            50% { transform: translateY(-50px) translateX(-50px); opacity: 0.5; }
+            75% { transform: translateY(-150px) translateX(25px); opacity: 0.9; }
+        }
+
+        /* 沉浸模式 */
+        .immersive-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            transition: opacity 0.5s ease;
+        }
+
+        /* 时间显示 */
+        .immersive-time {
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .immersive-clock {
+            font-size: 5em;
+            font-weight: 200;
+            letter-spacing: 5px;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(0, 212, 255, 0.5); }
+            50% { text-shadow: 0 0 50px rgba(0, 212, 255, 0.8); }
+        }
+
+        .immersive-date {
+            font-size: 1.2em;
+            opacity: 0.7;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* 搜索容器 */
+        .immersive-search-container {
+            width: 90%;
+            max-width: 600px;
+        }
+
+        .immersive-search-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .immersive-tab {
+            padding: 8px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .immersive-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .immersive-tab.active {
+            background: var(--accent-gradient-btn);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .immersive-search-box {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .immersive-search-box:focus-within {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .immersive-search-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 15px 25px;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            outline: none;
+        }
+
+        .immersive-search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .immersive-search-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--accent-gradient-btn);
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .immersive-search-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        /* 控制按钮 */
+        .immersive-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .control-btn.home:hover {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .control-btn.theme:hover {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .control-btn.fullscreen:hover {
+            background: rgba(123, 44, 191, 0.2);
+            color: #7b2cbf;
+            border-color: #7b2cbf;
+        }
+
+        /* 彩虹渐变 NextCredit 按钮 */
+        .nextcredit-btn {
+            position: absolute;
+            top: 20px;
+            right: 180px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+            background-size: 300% 300%;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.3);
+            animation: rainbowShift 3s ease infinite;
+        }
+
+        @keyframes rainbowShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .nextcredit-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(255, 0, 128, 0.5);
+        }
+
+        .beta-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff0080;
+            font-size: 0.65em;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        [data-theme="light"] .nextcredit-btn {
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.2);
+        }
+
+        [data-theme="light"] .beta-badge {
+            background: white;
+        }
+
+        /* 快捷链接 */
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .quick-link {
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border-radius: 25px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        /* 欢迎语 */
+        .welcome-text {
+            position: absolute;
+            bottom: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+
+        .welcome-text span {
+            color: var(--accent-color);
+        }
+
+        /* CreditMini 低性能设备提示 */
+        .creditmini-tip {
+            position: absolute;
+            bottom: 80px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            opacity: 0.6;
+        }
+
+        .creditmini-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 8px;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            color: var(--accent-color);
+            font-size: 0.9em;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .creditmini-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .immersive-clock {
+                font-size: 3em;
+            }
+            .immersive-date {
+                font-size: 1em;
+            }
+            .immersive-tab {
+                padding: 6px 15px;
+                font-size: 0.85em;
+            }
+            .quick-links {
+                gap: 10px;
+            }
+            .quick-link {
+                padding: 8px 15px;
+                font-size: 0.8em;
+            }
+        }
+
+        /* 焦点状态 */
+        .immersive-search-box input:focus {
+            outline: none;
+        }
+
+        /* 选中文字样式 */
+        ::selection {
+            background: var(--accent-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景动画 -->
+    <div class="bg-animation"></div>
+    
+    <!-- 粒子效果 -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 沉浸模式主界面 -->
+    <div class="immersive-mode" id="immersiveMode">
+        <!-- NextCredit 彩虹按钮 -->
+        <a href="https://Abamao.github.io/CreditMain/NextCredit" class="nextcredit-btn" target="_blank">
+            前往 NextCredit
+            <span class="beta-badge">Beta</span>
+        </a>
+
+        <!-- 控制按钮 -->
+        <div class="immersive-controls">
+            <button class="control-btn home" onclick="goHome()" title="返回首页">🏠</button>
+            <button class="control-btn theme" onclick="toggleTheme()" title="切换主题">🌙</button>
+            <button class="control-btn fullscreen" onclick="toggleFullscreen()" title="全屏模式">⛶</button>
+        </div>
+
+        <!-- 时间显示 -->
+        <div class="immersive-time">
+            <div class="immersive-clock" id="immersiveClock">12:00</div>
+            <div class="immersive-date" id="immersiveDate">2024年1月1日 星期一</div>
+        </div>
+
+        <!-- 搜索区域 -->
+        <div class="immersive-search-container">
+            <div class="immersive-search-tabs">
+                <button class="immersive-tab active" data-engine="bilibili" onclick="switchEngine('bilibili')">Bilibili</button>
+                <button class="immersive-tab" data-engine="bing" onclick="switchEngine('bing')">必应</button>
+                <button class="immersive-tab" data-engine="google" onclick="switchEngine('google')">Google</button>
+                <button class="immersive-tab" data-engine="baidu" onclick="switchEngine('baidu')">百度</button>
+            </div>
+            <div class="immersive-search-box">
+                <input type="text" id="searchInput" placeholder="输入搜索内容..." onkeydown="handleSearch(event)">
+                <button class="immersive-search-btn" onclick="doSearch()">🔍</button>
+            </div>
+        </div>
+
+        <!-- 快捷链接 -->
+        <div class="quick-links">
+            <a href="https://www.bilibili.com" class="quick-link" target="_blank">B站</a>
+            <a href="https://www.youtube.com" class="quick-link" target="_blank">YouTube</a>
+            <a href="https://github.com" class="quick-link" target="_blank">GitHub</a>
+            <a href="https://www.zhihu.com" class="quick-link" target="_blank">知乎</a>
+            <a href="https://www.bing.com" class="quick-link" target="_blank">必应</a>
+            <a href="https://www.doubao.com" class="quick-link" target="_blank">豆包</a>
+        </div>
+
+        <!-- CreditMini 提示 -->
+        <div class="creditmini-tip">
+            您是低性能设备？
+            <a href="https://Abamao.github.io/CreditMini" class="creditmini-btn" target="_blank">
+                ⚡ 请参阅 CreditMini
+            </a>
+        </div>
+
+        <!-- 欢迎语 -->
+        <div class="welcome-text">
+            按 <span>Enter</span> 搜索 · 按 <span>Tab</span> 切换引擎 · 按 <span>F11</span> 全屏
+        </div>
+    </div>
+
+    <script>
+        // 搜索引擎配置
+        let currentEngine = 'bilibili';
+        const searchUrls = {
+            bilibili: 'https://search.bilibili.com/all?keyword=',
+            bing: 'https://www.bing.com/search?q=',
+            google: 'https://www.google.com/search?q=',
+            baidu: 'https://www.baidu.com/s?wd='
+        };
+
+        // 时钟更新
+        let clockInterval = null;
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('immersiveClock').textContent = `${hours}:${minutes}`;
+            
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            document.getElementById('immersiveDate').textContent = `${year}年${month}月${day}日 ${weekday}`;
+        }
+
+        // 切换搜索引擎
+        function switchEngine(engine) {
+            currentEngine = engine;
+            document.querySelectorAll('.immersive-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.engine === engine) {
+                    tab.classList.add('active');
+                }
+            });
+            document.getElementById('searchInput').focus();
+            
+            // 保存选择
+            localStorage.setItem('immersiveEngine', engine);
+        }
+
+        // 执行搜索
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            const url = searchUrls[currentEngine] + encodeURIComponent(query);
+            window.open(url, '_blank');
+            
+            // 保存搜索历史
+            saveSearchHistory(query);
+        }
+
+        // 处理搜索事件
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                doSearch();
+            } else if (event.key === 'Tab') {
+                event.preventDefault();
+                const engines = Object.keys(searchUrls);
+                const currentIndex = engines.indexOf(currentEngine);
+                const nextIndex = (currentIndex + 1) % engines.length;
+                switchEngine(engines[nextIndex]);
+            }
+        }
+
+        // 保存搜索历史
+        function saveSearchHistory(query) {
+            let history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+            history = history.filter(item => item !== query);
+            history.unshift(query);
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem('searchHistory', JSON.stringify(history));
+        }
+
+        // 主题切换
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('immersiveTheme', newTheme);
+            
+            // 更新按钮图标
+            const btn = document.querySelector('.control-btn.theme');
+            btn.textContent = newTheme === 'light' ? '☀️' : '🌙';
+        }
+
+        // 全屏切换
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('无法进入全屏:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // 返回首页
+        function goHome() {
+            window.location.href = '../index.html';
+        }
+
+        // 初始化粒子
+        function initParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // 初始化
+        function init() {
+            // 恢复主题设置
+            const savedTheme = localStorage.getItem('immersiveTheme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                const btn = document.querySelector('.control-btn.theme');
+                btn.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+            }
+
+            // 恢复搜索引擎设置
+            const savedEngine = localStorage.getItem('immersiveEngine');
+            if (savedEngine && searchUrls[savedEngine]) {
+                switchEngine(savedEngine);
+            }
+
+            // 启动时钟
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+
+            // 初始化粒子
+            initParticles();
+
+            // 聚焦搜索框
+            document.getElementById('searchInput').focus();
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            // ESC 返回首页
+            if (e.key === 'Escape') {
+                goHome();
+            }
+            // F11 全屏
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (clockInterval) {
+                clearInterval(clockInterval);
+            }
+        });
+    </script>
+</body>
+</html>

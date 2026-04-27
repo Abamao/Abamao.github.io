@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextCredit - 华丽沉浸体验</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00d4ff;
+            --secondary: #ff00ff;
+            --tertiary: #7b2cbf;
+            --gold: #ffd700;
+            --dark: #0a0a0a;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--dark);
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        /* 深邃星空背景 */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(0, 100, 200, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 0, 200, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(0, 50, 100, 0.3) 0%, transparent 70%),
+                linear-gradient(180deg, #0a0a1a 0%, #0d0d2b 50%, #0a0a1a 100%);
+            z-index: -2;
+        }
+
+        /* 浮动光点 */
+        .floating-lights {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .light-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            animation: floatOrb 20s infinite ease-in-out;
+        }
+
+        .light-orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: rgba(0, 150, 255, 0.3);
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .light-orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: rgba(100, 0, 255, 0.2);
+            top: 60%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .light-orb:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            background: rgba(0, 200, 200, 0.25);
+            bottom: 10%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        .light-orb:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: rgba(150, 50, 255, 0.2);
+            top: 30%;
+            right: 30%;
+            animation-delay: -15s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(50px, -30px) scale(1.1);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -20px) scale(1.05);
+            }
+        }
+
+        /* 网格背景 */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(50px); }
+        }
+
+        /* 粒子画布 */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 主容器 */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* Logo 区域 */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-size: 6em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 60px rgba(0, 212, 255, 0.5);
+            animation: logoPulse 3s ease-in-out infinite, logoFloat 6s ease-in-out infinite;
+            position: relative;
+        }
+
+        .logo::before {
+            content: 'NextCredit';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: blur(20px);
+            opacity: 0.5;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes logoGlow {
+            0% { filter: blur(20px) brightness(1); }
+            100% { filter: blur(30px) brightness(1.5); }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            animation: subtitleFade 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes subtitleFade {
+            0% { opacity: 0.4; letter-spacing: 10px; }
+            100% { opacity: 0.8; letter-spacing: 15px; }
+        }
+
+        /* 搜索区域 */
+        .search-section {
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 50px;
+        }
+
+        .engine-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .engine-tab {
+            padding: 12px 28px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.6);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .engine-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .engine-tab:hover::before {
+            left: 100%;
+        }
+
+        .engine-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .engine-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--tertiary));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1);
+            animation: tabPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes tabPulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.1); }
+            50% { box-shadow: 0 0 50px rgba(0, 212, 255, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.2); }
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 8px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 18px 30px;
+            color: white;
+            font-size: 1.1em;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .search-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .search-btn:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+        }
+
+        .search-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 快捷链接 */
+        .quick-links {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .quick-link {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .quick-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
+        }
+
+        .quick-link:hover {
+            color: white;
+            transform: translateY(-5px) scale(1.05);
+            border-color: transparent;
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .quick-link:hover::before {
+            opacity: 1;
+        }
+
+        /* 控制按钮 */
+        .controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .control-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.15) rotate(10deg);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        /* 返回 Credit 按钮 - 左下角黑蓝色 */
+        .back-credit-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 50%, #0d2b4d 100%);
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            border-radius: 25px;
+            color: rgba(200, 220, 255, 0.9);
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.4s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 50, 100, 0.3);
+        }
+
+        .back-credit-btn::before {
+            content: '←';
+            font-size: 1.1em;
+            transition: transform 0.3s;
+        }
+
+        .back-credit-btn:hover {
+            background: linear-gradient(135deg, #0d1a2d 0%, #1e2a4a 50%, #143a6d 100%);
+            border-color: rgba(0, 200, 255, 0.6);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 6px 30px rgba(0, 150, 255, 0.4);
+        }
+
+        .back-credit-btn:hover::before {
+            transform: translateX(-3px);
+        }
+
+        /* 时钟 */
+        .clock-section {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            text-align: left;
+            z-index: 100;
+        }
+
+        .clock {
+            font-size: 3em;
+            font-weight: 200;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, var(--primary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            letter-spacing: 5px;
+        }
+
+        .date {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 5px;
+            letter-spacing: 3px;
+        }
+
+        /* 装饰元素 */
+        .decoration {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .decoration-1 {
+            top: -100px;
+            left: -100px;
+            background: var(--primary);
+            animation: decoMove1 20s ease-in-out infinite;
+        }
+
+        .decoration-2 {
+            bottom: -100px;
+            right: -100px;
+            background: var(--secondary);
+            animation: decoMove2 20s ease-in-out infinite;
+        }
+
+        @keyframes decoMove1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        @keyframes decoMove2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-100px, -100px) scale(1.2); }
+        }
+
+        /* 提示文字 */
+        .hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .hint span {
+            color: var(--primary);
+            margin: 0 5px;
+        }
+
+        /* 加载动画 */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-size: 2em;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: loaderPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .logo { font-size: 3.5em; }
+            .clock { font-size: 2em; }
+            .search-box { flex-direction: column; border-radius: 25px; }
+            .search-btn { width: 100%; border-radius: 20px; }
+            .quick-links { gap: 10px; }
+            .quick-link { padding: 12px 20px; font-size: 0.9em; }
+            .controls { top: 15px; right: 15px; }
+            .clock-section { top: 15px; left: 15px; }
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--secondary), var(--gold));
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载动画 -->
+    <div class="loader" id="loader">
+        <div class="loader-text">NextCredit</div>
+    </div>
+
+    <!-- 背景效果 -->
+    <div class="aurora-bg"></div>
+    <div class="grid-overlay"></div>
+    <div class="floating-lights">
+        <div class="light-orb"></div>
+        <div class="light-orb"></div>
+        <div class="light-orb"></div>
+        <div class="light-orb"></div>
+    </div>
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- 装饰光球 -->
+    <div class="decoration decoration-1"></div>
+    <div class="decoration decoration-2"></div>
+
+    <!-- 时钟 -->
+    <div class="clock-section">
+        <div class="clock" id="clock">00:00</div>
+        <div class="date" id="date">2024年1月1日</div>
+    </div>
+
+    <!-- 控制按钮 -->
+    <div class="controls">
+        <button class="control-btn" onclick="window.location.href='https://Abamao.github.io'" title="返回 Abamao.github.io">🏠</button>
+        <button class="control-btn" onclick="toggleFullscreen()" title="全屏">⛶</button>
+    </div>
+
+    <!-- 返回 Credit 按钮 - 左下角 -->
+    <a href="https://Abamao.github.io/CreditMain" class="back-credit-btn">
+        返回 Credit
+    </a>
+
+    <!-- 主内容 -->
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo-section">
+            <h1 class="logo">NextCredit</h1>
+            <p class="subtitle">下一代搜索体验</p>
+        </div>
+
+        <!-- 搜索 -->
+        <div class="search-section">
+            <div class="engine-tabs">
+                <button class="engine-tab active" data-engine="bing" onclick="switchEngine('bing')">必应</button>
+                <button class="engine-tab" data-engine="google" onclick="switchEngine('google')">Google</button>
+                <button class="engine-tab" data-engine="baidu" onclick="switchEngine('baidu')">百度</button>
+                <button class="engine-tab" data-engine="bilibili" onclick="switchEngine('bilibili')">Bilibili</button>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="输入搜索内容..." onkeydown="handleSearch(event)">
+                <button class="search-btn" onclick="doSearch()">🔍</button>
+            </div>
+        </div>
+
+        <!-- 快捷链接 -->
+        <div class="quick-links">
+            <a href="https://www.bilibili.com" class="quick-link" target="_blank">📺 B站</a>
+            <a href="https://github.com" class="quick-link" target="_blank">💻 GitHub</a>
+            <a href="https://www.youtube.com" class="quick-link" target="_blank">▶️ YouTube</a>
+            <a href="https://www.zhihu.com" class="quick-link" target="_blank">📚 知乎</a>
+            <a href="https://www.doubao.com" class="quick-link" target="_blank">🤖 豆包</a>
+            <a href="https://www.deepseek.com" class="quick-link" target="_blank">🔮 DeepSeek</a>
+        </div>
+    </div>
+
+    <!-- 提示 -->
+    <div class="hint">
+        按 <span>Enter</span> 搜索 · 按 <span>Tab</span> 切换引擎 · 按 <span>ESC</span> 返回首页
+    </div>
+
+    <script>
+        // 配置
+        let currentEngine = 'bing';
+        const searchUrls = {
+            bing: 'https://www.bing.com/search?q=',
+            google: 'https://www.google.com/search?q=',
+            baidu: 'https://www.baidu.com/s?wd=',
+            bilibili: 'https://search.bilibili.com/all?keyword='
+        };
+
+        // 粒子系统
+        class ParticleSystem {
+            constructor() {
+                this.canvas = document.getElementById('particleCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: 0, y: 0 };
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+                this.createParticles();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                const count = window.innerWidth < 768 ? 30 : 60;
+                for (let i = 0; i < count; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        size: Math.random() * 3 + 1,
+                        color: Math.random() > 0.5 ? '#00d4ff' : '#ff00ff',
+                        alpha: Math.random() * 0.5 + 0.2
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.particles.forEach(p => {
+                    // 鼠标吸引效果
+                    const dx = this.mouse.x - p.x;
+                    const dy = this.mouse.y - p.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        p.vx += dx * 0.0001;
+                        p.vy += dy * 0.0001;
+                    }
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // 边界反弹
+                    if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
+
+                    // 绘制粒子
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.fill();
+                });
+
+                // 连线
+                this.particles.forEach((p1, i) => {
+                    this.particles.slice(i + 1).forEach(p2 => {
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 100) {
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(p1.x, p1.y);
+                            this.ctx.lineTo(p2.x, p2.y);
+                            this.ctx.strokeStyle = `rgba(0, 212, 255, ${0.2 * (1 - dist / 100)})`;
+                            this.ctx.lineWidth = 0.5;
+                            this.ctx.stroke();
+                        }
+                    });
+                });
+
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // 时钟更新
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}`;
+            
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            document.getElementById('date').textContent = `${year}年${month}月${day}日 ${weekdays[now.getDay()]}`;
+        }
+
+        // 切换搜索引擎
+        function switchEngine(engine) {
+            currentEngine = engine;
+            document.querySelectorAll('.engine-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.engine === engine) {
+                    tab.classList.add('active');
+                }
+            });
+            document.getElementById('searchInput').focus();
+            localStorage.setItem('nextcreditEngine', engine);
+        }
+
+        // 执行搜索
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            // 添加搜索动画效果
+            const btn = document.querySelector('.search-btn');
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => btn.style.transform = '', 100);
+            
+            window.open(searchUrls[currentEngine] + encodeURIComponent(query), '_blank');
+        }
+
+        // 处理搜索事件
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                doSearch();
+            } else if (event.key === 'Tab') {
+                event.preventDefault();
+                const engines = Object.keys(searchUrls);
+                const currentIndex = engines.indexOf(currentEngine);
+                const nextIndex = (currentIndex + 1) % engines.length;
+                switchEngine(engines[nextIndex]);
+            }
+        }
+
+        // 全屏切换
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // 返回首页
+        function goHome() {
+            window.location.href = '../index.html';
+        }
+
+        // 初始化
+        function init() {
+            // 恢复搜索引擎设置
+            const savedEngine = localStorage.getItem('nextcreditEngine');
+            if (savedEngine && searchUrls[savedEngine]) {
+                switchEngine(savedEngine);
+            }
+
+            // 启动时钟
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // 初始化粒子系统
+            new ParticleSystem();
+
+            // 隐藏加载动画
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+
+            // 聚焦搜索框
+            document.getElementById('searchInput').focus();
+        }
+
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                goHome();
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
