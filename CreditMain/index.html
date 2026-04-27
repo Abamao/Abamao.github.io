@@ -379,6 +379,37 @@
             color: var(--accent-color);
         }
 
+        /* CreditMini 低性能设备按钮 */
+        .creditmini-btn {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .creditmini-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: var(--text-secondary);
+        }
+
+        .creditmini-btn::before {
+            content: '⚡';
+            font-size: 1em;
+        }
+
         /* 响应式 */
         @media (max-width: 768px) {
             .immersive-clock {
@@ -463,6 +494,14 @@
             <a href="https://www.bing.com" class="quick-link" target="_blank">必应</a>
             <a href="https://www.doubao.com" class="quick-link" target="_blank">豆包</a>
         </div>
+
+        <!-- CreditMini 低性能设备入口 -->
+        <a href="https://Abamao.github.io/CreditMain/CreditMini" class="creditmini-btn" target="_self">
+            性能差？参阅 CreditMini 的使用！
+        </a>
+        <p style="text-align: center; margin-top: 10px; font-size: 0.8em; color: #00d4ff;">
+            CreditMini入口：Abamao.github.io/CreditMain/CreditMini
+        </p>
 
         <!-- 欢迎语 -->
         <div class="welcome-text">
