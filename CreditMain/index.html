@@ -284,6 +284,59 @@
             border-color: #7b2cbf;
         }
 
+        /* 彩虹渐变 NextCredit 按钮 */
+        .nextcredit-btn {
+            position: absolute;
+            top: 20px;
+            right: 180px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+            background-size: 300% 300%;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.3);
+            animation: rainbowShift 3s ease infinite;
+        }
+
+        @keyframes rainbowShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .nextcredit-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(255, 0, 128, 0.5);
+        }
+
+        .beta-badge {
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff0080;
+            font-size: 0.65em;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        [data-theme="light"] .nextcredit-btn {
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.2);
+        }
+
+        [data-theme="light"] .beta-badge {
+            background: white;
+        }
+
         /* 快捷链接 */
         .quick-links {
             display: flex;
@@ -368,6 +421,12 @@
 
     <!-- 沉浸模式主界面 -->
     <div class="immersive-mode" id="immersiveMode">
+        <!-- NextCredit 彩虹按钮 -->
+        <a href="https://Abamao.github.io/CreditMain/NextCredit" class="nextcredit-btn" target="_blank">
+            前往 NextCredit
+            <span class="beta-badge">Beta</span>
+        </a>
+
         <!-- 控制按钮 -->
         <div class="immersive-controls">
             <button class="control-btn home" onclick="goHome()" title="返回首页">🏠</button>
