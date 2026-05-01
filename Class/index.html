@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="10班电脑博物馆 - 探索电脑技术的发展历程，从经典硬件到现代软件，记录计算机技术的演变故事">
+    <meta name="keywords" content="电脑博物馆,计算机历史,硬件发展,软件技术,10班,电脑技术,IT历史">
+    <meta name="author" content="10班">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="10班电脑博物馆">
+    <meta property="og:description" content="探索电脑技术的发展历程，从经典硬件到现代软件">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <title>10班电脑博物馆</title>
     <style>
         @font-face {
@@ -1831,10 +1839,51 @@
         </div>
     </div>
 
+    <!-- 返回主页按钮 -->
+    <a href="https://Abamao.github.io" class="back-to-home" target="_blank">
+        ← 返回主页
+    </a>
+
+    <!-- 阅读时间估算 -->
+    <div class="reading-time">
+        <div class="stat">
+            <span class="label">预计阅读</span>
+            <span class="value" id="total-time">--分钟</span>
+        </div>
+        <div class="divider"></div>
+        <div class="stat">
+            <span class="label">还剩</span>
+            <span class="value" id="remaining-time">--分钟</span>
+        </div>
+    </div>
+
+    <!-- 主题切换按钮 -->
+    <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <div class="theme-icon">🌙</div>
+    </div>
+
     <!-- 阅读进度条 -->
-    <div class="progress-container">
+    <div class="progress-container" id="progressContainer">
         <div class="progress-bar" id="progressBar"></div>
         <span class="progress-text" id="progressText">0%</span>
+        <!-- 章节标记 -->
+        <div class="chapter-marks">
+            <div class="chapter-mark" style="left: 0%" data-chapter="1">
+                <div class="chapter-tooltip">第一章：初尝自由</div>
+            </div>
+            <div class="chapter-mark" style="left: 20%" data-chapter="2">
+                <div class="chapter-tooltip">第二章：追求极致</div>
+            </div>
+            <div class="chapter-mark" style="left: 45%" data-chapter="3">
+                <div class="chapter-tooltip">第三章：遇见ClassIsland</div>
+            </div>
+            <div class="chapter-mark" style="left: 70%" data-chapter="4">
+                <div class="chapter-tooltip">第四章：工具与守护</div>
+            </div>
+            <div class="chapter-mark" style="left: 95%" data-chapter="5">
+                <div class="chapter-tooltip">第五章：最终形态</div>
+            </div>
+        </div>
     </div>
 
     <!-- 返回顶部按钮 -->
@@ -1865,6 +1914,58 @@
         <button class="glossary-close" onclick="closeGlossary()">×</button>
         <div class="glossary-title" id="glossary-title"></div>
         <div class="glossary-description" id="glossary-description"></div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="control-panel">
+        <div class="control-btn" onclick="toggleSearch()" title="搜索">🔍</div>
+        <div class="control-btn" onclick="toggleToc()" title="目录">📑</div>
+        <div class="control-btn" onclick="toggleShare()" title="分享">📤</div>
+        <div class="control-btn" onclick="toggleReadingMode()" title="阅读模式">📖</div>
+        <div class="control-btn" onclick="toggleFontSizePanel()" title="字体大小">A</div>
+        <div class="control-btn" onclick="toggleFavorites()" title="收藏">⭐</div>
+    </div>
+
+    <!-- 收藏面板 -->
+    <div class="toc-panel" id="favoritesPanel">
+        <div class="toc-title">⭐ 我的收藏</div>
+        <div id="favoritesList" style="padding: 10px;"></div>
+        <div class="toc-item" onclick="addCurrentToFavorites()" style="color: #00d4ff; font-weight: bold; text-align: center;">+ 添加当前位置</div>
+    </div>
+
+    <!-- 字体大小调节面板 -->
+    <div class="font-size-controls" id="fontSizePanel" style="display: none;">
+        <div class="font-size-btn" onclick="changeFontSize(1)" title="放大">A+</div>
+        <div class="font-size-btn" onclick="changeFontSize(-1)" title="缩小">A-</div>
+        <div class="font-size-btn" onclick="resetFontSize()" title="重置">A</div>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-container" id="searchContainer">
+        <input type="text" class="search-box" id="searchBox" placeholder="搜索内容..." oninput="searchContent(this.value)">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- 目录面板 -->
+    <div class="toc-panel" id="tocPanel">
+        <div class="toc-title">📚 目录</div>
+        <div class="toc-item" onclick="scrollToChapter(1)">第一章：初尝自由</div>
+        <div class="toc-item" onclick="scrollToChapter(2)">第二章：追求极致</div>
+        <div class="toc-item" onclick="scrollToChapter(3)">第三章：遇见ClassIsland</div>
+        <div class="toc-item" onclick="scrollToChapter(4)">第四章：工具与守护</div>
+        <div class="toc-item" onclick="scrollToChapter(5)">第五章：最终形态</div>
+    </div>
+
+    <!-- 分享弹窗 -->
+    <div class="overlay" id="overlay" onclick="closeShare()"></div>
+    <div class="share-modal" id="shareModal">
+        <div class="share-close" onclick="closeShare()">×</div>
+        <div class="share-title">📤 分享给朋友</div>
+        <div class="share-buttons">
+            <div class="share-btn" onclick="shareViaTwitter()">🐦 Twitter</div>
+            <div class="share-btn" onclick="shareViaWeibo()">📱 微博</div>
+            <div class="share-btn" onclick="copyLink()">🔗 复制链接</div>
+        </div>
     </div>
 
     <script>
@@ -2227,26 +2328,202 @@
             }
         }
 
+        let hasExploded100 = false;
+        let hasShattered = false;
+
+        // 创建100%时的爆炸特效
+        function createExplosion() {
+            const existingExplosion = document.querySelector('.explosion');
+            if (existingExplosion) {
+                existingExplosion.remove();
+            }
+
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            
+            const colors = ['#2ed573', '#7bed9f', '#00ff80', '#5f27cd', '#00d4ff'];
+            const particleCount = 15;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+                const distance = 50 + Math.random() * 50;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDelay = Math.random() * 0.2 + 's';
+                particle.style.left = '75px';
+                particle.style.top = '10px';
+                
+                explosion.appendChild(particle);
+            }
+            
+            document.body.appendChild(explosion);
+            
+            setTimeout(() => {
+                if (explosion.parentNode) {
+                    explosion.remove();
+                }
+            }, 1000);
+        }
+
+        // 创建200%时的四分五裂特效
+        function createShatterEffect() {
+            const existingExplosion = document.querySelector('.explosion');
+            if (existingExplosion) {
+                existingExplosion.remove();
+            }
+
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            
+            const fragmentCount = 8;
+            const fragmentWidth = 150 / fragmentCount;
+            
+            for (let i = 0; i < fragmentCount; i++) {
+                const fragment = document.createElement('div');
+                fragment.className = 'fragment';
+                
+                fragment.style.width = fragmentWidth + 'px';
+                fragment.style.height = '20px';
+                
+                const angle = (Math.PI * 2 * i) / fragmentCount + (Math.random() - 0.5) * 0.8;
+                const distance = 80 + Math.random() * 100;
+                const fx = Math.cos(angle) * distance;
+                const fy = Math.sin(angle) * distance;
+                const fr = (Math.random() - 0.5) * 360;
+                
+                fragment.style.setProperty('--fx', fx + 'px');
+                fragment.style.setProperty('--fy', fy + 'px');
+                fragment.style.setProperty('--fr', fr + 'deg');
+                fragment.style.left = (i * fragmentWidth) + 'px';
+                fragment.style.top = '0px';
+                
+                explosion.appendChild(fragment);
+            }
+            
+            document.body.appendChild(explosion);
+            
+            setTimeout(() => {
+                if (explosion.parentNode) {
+                    explosion.remove();
+                }
+            }, 1500);
+        }
+
         // 更新阅读进度条
         function updateProgressBar() {
             const scrollTop = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            const scrollPercent = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            const basePercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            
+            // 计算扩展进度 (100%后继续增加到200%)
+            let scrollPercent;
+            if (basePercent <= 100) {
+                scrollPercent = Math.round(basePercent);
+            } else {
+                // 超过100%后，继续向后滚动增加进度到200%
+                const extraScroll = scrollTop - docHeight;
+                const maxExtraScroll = docHeight * 0.3; // 允许额外30%的滚动距离达到200%
+                const extraPercent = Math.min(100, (extraScroll / maxExtraScroll) * 100);
+                scrollPercent = Math.round(100 + extraPercent);
+            }
             
             const progressBar = document.getElementById('progressBar');
             const progressText = document.getElementById('progressText');
+            const progressContainer = document.querySelector('.progress-container');
             
-            progressBar.style.width = scrollPercent + '%';
+            // 进度条宽度最多显示100%，但文字显示实际百分比
+            const displayWidth = Math.min(scrollPercent, 100);
+            progressBar.style.width = displayWidth + '%';
             progressText.textContent = scrollPercent + '%';
             
             // 根据进度改变颜色
-            if (scrollPercent >= 20) {
+            if (scrollPercent >= 100) {
+                // 超过100%时使用过载模式颜色
+                progressBar.classList.add('overdrive');
+                progressBar.classList.remove('green', 'red');
+            } else if (scrollPercent >= 20) {
                 progressBar.classList.add('green');
-                progressBar.classList.remove('red');
+                progressBar.classList.remove('red', 'overdrive');
             } else {
                 progressBar.classList.add('red');
-                progressBar.classList.remove('green');
+                progressBar.classList.remove('green', 'overdrive');
             }
+            
+            // 100%时触发普通爆炸特效
+            if (scrollPercent === 100 && !hasExploded100) {
+                hasExploded100 = true;
+                createExplosion();
+                progressContainer.classList.add('completed');
+                
+                setTimeout(() => {
+                    progressContainer.classList.remove('completed');
+                }, 3000);
+            }
+            
+            // 200%时触发四分五裂特效
+            if (scrollPercent >= 200 && !hasShattered) {
+                hasShattered = true;
+                progressContainer.classList.add('shattered');
+                createShatterEffect();
+                
+                setTimeout(() => {
+                    progressContainer.classList.remove('shattered');
+                }, 500);
+            }
+            
+            // 进度下降时重置状态
+            if (scrollPercent < 100) {
+                hasExploded100 = false;
+            }
+            if (scrollPercent < 200) {
+                hasShattered = false;
+            }
+
+            // 更新章节完成标记
+            updateChapterMarks(scrollPercent);
+        }
+
+        // 更新章节标记
+        function updateChapterMarks(scrollPercent) {
+            const chapterMarks = document.querySelectorAll('.chapter-mark');
+            const chapterPositions = [0, 20, 45, 70, 95]; // 各章节在进度条上的位置
+
+            chapterMarks.forEach((mark, index) => {
+                const chapterPosition = chapterPositions[index];
+                if (scrollPercent >= chapterPosition) {
+                    mark.classList.add('completed');
+                } else {
+                    mark.classList.remove('completed');
+                }
+            });
+        }
+
+        // 计算阅读时间
+        function calculateReadingTime() {
+            const content = document.querySelector('.content-section');
+            const text = content.textContent;
+            const wordCount = text.length;
+            const totalMinutes = Math.ceil(wordCount / 400); // 400字/分钟
+            return totalMinutes;
+        }
+
+        // 更新阅读时间
+        function updateReadingTime() {
+            const totalMinutes = calculateReadingTime();
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = Math.min(1, scrollTop / docHeight);
+            const remainingMinutes = Math.ceil(totalMinutes * (1 - progress));
+
+            document.getElementById('total-time').textContent = totalMinutes + '分钟';
+            document.getElementById('remaining-time').textContent = remainingMinutes + '分钟';
         }
 
         // 滚动时显示/隐藏返回顶部按钮
@@ -2263,10 +2540,425 @@
             
             // 更新阅读进度条
             updateProgressBar();
+
+            // 更新阅读时间
+            updateReadingTime();
+
+            // 保存阅读进度
+            saveReadingProgress();
+
+            // 更新目录高亮
+            updateTocActive();
         });
         
-        // 页面加载时初始化进度条
-        document.addEventListener('DOMContentLoaded', updateProgressBar);
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            updateReadingTime();
+            initEasterEggs();
+            initTheme();
+            restoreReadingProgress();
+        });
+
+        // 初始化主题
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.querySelector('.theme-icon').textContent = '☀️';
+            }
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.querySelector('.theme-icon');
+            
+            body.classList.toggle('light-theme');
+            
+            if (body.classList.contains('light-theme')) {
+                themeIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 全局变量
+        let currentFontSize = 100;
+        let readingProgress = 0;
+
+        // 初始化时恢复阅读进度
+        function restoreReadingProgress() {
+            const savedProgress = localStorage.getItem('readingProgress');
+            if (savedProgress) {
+                readingProgress = parseFloat(savedProgress);
+            }
+            
+            const savedFontSize = localStorage.getItem('fontSize');
+            if (savedFontSize) {
+                currentFontSize = parseFloat(savedFontSize);
+                applyFontSize();
+            }
+        }
+
+        // 保存阅读进度
+        function saveReadingProgress() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            readingProgress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            localStorage.setItem('readingProgress', readingProgress);
+        }
+
+        // 字体大小调节
+        function toggleFontSizePanel() {
+            const panel = document.getElementById('fontSizePanel');
+            panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function changeFontSize(delta) {
+            currentFontSize = Math.max(70, Math.min(150, currentFontSize + delta * 10));
+            applyFontSize();
+            localStorage.setItem('fontSize', currentFontSize);
+        }
+
+        function resetFontSize() {
+            currentFontSize = 100;
+            applyFontSize();
+            localStorage.setItem('fontSize', currentFontSize);
+        }
+
+        function applyFontSize() {
+            const content = document.querySelector('.content-section');
+            content.style.fontSize = (currentFontSize * 0.01) + 'em';
+        }
+
+        // 搜索功能
+        function toggleSearch() {
+            const container = document.getElementById('searchContainer');
+            container.classList.toggle('active');
+            if (container.classList.contains('active')) {
+                document.getElementById('searchBox').focus();
+            } else {
+                document.getElementById('searchResults').classList.remove('active');
+            }
+        }
+
+        function searchContent(query) {
+            const resultsContainer = document.getElementById('searchResults');
+            resultsContainer.innerHTML = '';
+            
+            if (!query.trim()) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+            
+            const items = document.querySelectorAll('.timeline-item');
+            let results = [];
+            
+            items.forEach((item, index) => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query.toLowerCase())) {
+                    const title = item.querySelector('h3');
+                    const titleText = title ? title.textContent : '未找到标题';
+                    results.push({
+                        title: titleText,
+                        text: item.textContent.substring(0, 100) + '...',
+                        element: item
+                    });
+                }
+            });
+            
+            if (results.length > 0) {
+                results.forEach(result => {
+                    const div = document.createElement('div');
+                    div.className = 'search-result-item';
+                    div.innerHTML = `<div class="search-result-title">${result.title}</div><div class="search-result-text">${result.text}</div>`;
+                    div.onclick = () => {
+                        result.element.scrollIntoView({ behavior: 'smooth' });
+                        toggleSearch();
+                    };
+                    resultsContainer.appendChild(div);
+                });
+                resultsContainer.classList.add('active');
+            } else {
+                resultsContainer.innerHTML = '<div class="search-result-item"><div class="search-result-text">未找到相关内容</div></div>';
+                resultsContainer.classList.add('active');
+            }
+        }
+
+        // 目录功能
+        function toggleToc() {
+            const panel = document.getElementById('tocPanel');
+            panel.classList.toggle('active');
+            updateTocActive();
+        }
+
+        function updateTocActive() {
+            const chapters = [
+                document.querySelector('.content-section'),
+                document.querySelector('.timeline-item:nth-child(18)'),
+                document.querySelector('.timeline-item:nth-child(42)'),
+                document.querySelector('.timeline-item:nth-child(67)'),
+                document.querySelector('.timeline-item:nth-child(91)')
+            ];
+            
+            const tocItems = document.querySelectorAll('.toc-item');
+            const scrollTop = window.scrollY + 200;
+            
+            tocItems.forEach((item, index) => {
+                item.classList.remove('active');
+                if (chapters[index]) {
+                    const rect = chapters[index].getBoundingClientRect();
+                    if (scrollTop >= window.scrollY + rect.top) {
+                        tocItems.forEach(t => t.classList.remove('active'));
+                        item.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // 分享功能
+        function toggleShare() {
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('shareModal');
+            overlay.classList.toggle('active');
+            modal.classList.toggle('active');
+        }
+
+        function closeShare() {
+            const overlay = document.getElementById('overlay');
+            const modal = document.getElementById('shareModal');
+            overlay.classList.remove('active');
+            modal.classList.remove('active');
+        }
+
+        function shareViaTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('来看看10班的电脑博物馆吧！');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+        }
+
+        function shareViaWeibo() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('来看看10班的电脑博物馆吧！');
+            window.open(`https://service.weibo.com/share/share.php?url=${url}&title=${text}`, '_blank');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('链接已复制到剪贴板！');
+            });
+        }
+
+        // 阅读模式
+        function toggleReadingMode() {
+            document.body.classList.toggle('reading-mode');
+        }
+
+        // 收藏功能
+        function toggleFavorites() {
+            const panel = document.getElementById('favoritesPanel');
+            panel.classList.toggle('active');
+            renderFavorites();
+        }
+
+        function getFavorites() {
+            const favorites = localStorage.getItem('favorites');
+            return favorites ? JSON.parse(favorites) : [];
+        }
+
+        function addCurrentToFavorites() {
+            const scrollTop = window.scrollY;
+            const currentElement = document.elementFromPoint(
+                window.innerWidth / 2,
+                100
+            );
+            let title = '未命名位置';
+            if (currentElement) {
+                const header = currentElement.closest('.timeline-item')?.querySelector('h3');
+                if (header) {
+                    title = header.textContent;
+                }
+            }
+            
+            const favorites = getFavorites();
+            favorites.push({
+                title: title,
+                position: scrollTop,
+                timestamp: Date.now()
+            });
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            renderFavorites();
+            alert('收藏成功！');
+        }
+
+        function removeFavorite(index) {
+            const favorites = getFavorites();
+            favorites.splice(index, 1);
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            renderFavorites();
+        }
+
+        function goToFavorite(position) {
+            window.scrollTo({ top: position, behavior: 'smooth' });
+            document.getElementById('favoritesPanel').classList.remove('active');
+        }
+
+        function renderFavorites() {
+            const list = document.getElementById('favoritesList');
+            const favorites = getFavorites();
+            
+            if (favorites.length === 0) {
+                list.innerHTML = '<div style="color: #888; text-align: center; padding: 20px;">还没有收藏</div>';
+                return;
+            }
+            
+            list.innerHTML = favorites.map((fav, index) => `
+                <div class="toc-item" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span onclick="goToFavorite(${fav.position})">${fav.title}</span>
+                    <span onclick="removeFavorite(${index})" style="color: #ff4444; cursor: pointer;">×</span>
+                </div>
+            `).join('');
+        }
+
+        // 关闭面板时的键盘事件
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeGlossary();
+                closeShare();
+                const searchContainer = document.getElementById('searchContainer');
+                const tocPanel = document.getElementById('tocPanel');
+                const favoritesPanel = document.getElementById('favoritesPanel');
+                searchContainer.classList.remove('active');
+                tocPanel.classList.remove('active');
+                favoritesPanel.classList.remove('active');
+            }
+        });
+
+        // 初始化彩蛋
+        function initEasterEggs() {
+            // 初始化章节标记点击事件
+            const chapterMarks = document.querySelectorAll('.chapter-mark');
+            chapterMarks.forEach((mark, index) => {
+                mark.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    scrollToChapter(index + 1);
+                });
+            });
+
+            // 所有彩蛋效果
+            const eggEffects = [
+                'rainbow-text', 'bounce', 'spin', 'blink', 'pulse-size',
+                'shake', 'glow-strong', 'fade-in-out', 'float-up-down',
+                'slide-left-right', 'spin-scale', 'wave', 'flip', 'spiral',
+                'explode-big', 'lightning', 'elastic', 'jelly', 'wobble',
+                'swing', 'heart-beat', 'flip-in', 'zoom-in', 'rotate-in',
+                'bounce-in', 'slide-in', 'fade-in', 'pop-in', 'rainbow-blink',
+                'border-glow', 'rotate-3d', 'bounce-up-down', 'color-shift',
+                'bg-blink', 'border-dance', 'shadow-pulse', 'scale-glow',
+                'ripple', 'gradient-shift', 'blur-clear', 'neon', 'matrix',
+                'fire', 'wave-text', 'spin-glow', 'bounce-glow', 'blink-color',
+                'scale-rotate', 'wobble-glow', 'heart-beat-glow', 'wobble-glow-color',
+                'tornado', 'vortex', 'shimmer', 'twinkle', 'aurora',
+                'solar-flare', 'magnetic-pulse', 'rainbow-shimmer', 'twirl',
+                'cascade', 'domino', 'wave-row', 'synchronize', 'flicker',
+                'star-burst', 'confetti', 'sparkle', 'glitter', 'twinkle-glow',
+                'orbit', 'orbit-reverse', 'wave-reverse', 'slinky', 'accordion',
+                'stutter', 'hiccup', 'zigzag', 'bounce-zoom', 'spin-reverse',
+                'expand-pulse', 'wave-pulse', 'glow-pulse', 'twinkle-pulse',
+                'solar-flare-pulse', 'magnetic-pulse', 'tornado-pulse',
+                'vortex-pulse', 'shimmer-pulse', 'twinkle-pulse', 'aurora-pulse',
+                'glitter-pulse', 'glow-pulse-fast', 'glow-pulse-slow',
+                'rainbow-pulse', 'rainbow-pulse-fast', 'rainbow-pulse-slow',
+                'sparkle-pulse', 'twinkle-pulse', 'solar-flare-pulse',
+                'magnetic-pulse', 'tornado-pulse', 'vortex-pulse',
+                'shimmer-pulse', 'aurora-pulse'
+            ];
+
+            // 选择所有时间轴项目标题作为彩蛋触发器
+            const triggers = document.querySelectorAll('.timeline-item h3, .timeline-item p, .timeline-item .year');
+            
+            // 为每个触发器添加彩蛋效果
+            triggers.forEach(trigger => {
+                trigger.classList.add('easter-egg-trigger');
+                
+                // 点击触发随机彩蛋
+                trigger.addEventListener('click', function() {
+                    // 移除之前的效果
+                    eggEffects.forEach(effect => {
+                        this.classList.remove(effect);
+                    });
+                    
+                    // 随机选择一个效果
+                    const randomEffect = eggEffects[Math.floor(Math.random() * eggEffects.length)];
+                    this.classList.add(randomEffect);
+                    
+                    // 10秒后移除效果（除了无限循环的效果）
+                    const infiniteEffects = ['rainbow-text', 'heart-beat', 'rainbow-blink', 'border-glow',
+                        'rotate-3d', 'bounce-up-down', 'color-shift', 'shadow-pulse', 'scale-glow',
+                        'gradient-shift', 'neon', 'matrix', 'fire', 'wave-text', 'spin-glow',
+                        'bounce-glow', 'blink-color', 'scale-rotate', 'wobble-glow',
+                        'heart-beat-glow', 'wobble-glow-color'];
+                    
+                    if (!infiniteEffects.includes(randomEffect)) {
+                        setTimeout(() => {
+                            this.classList.remove(randomEffect);
+                        }, 10000);
+                    }
+                });
+
+                // 双击触发多个彩蛋
+                trigger.addEventListener('dblclick', function() {
+                    eggEffects.forEach(effect => {
+                        this.classList.remove(effect);
+                    });
+                    
+                    // 随机选择3-5个效果
+                    const numEffects = Math.floor(Math.random() * 3) + 3;
+                    const selectedEffects = [];
+                    for (let i = 0; i < numEffects; i++) {
+                        const randomEffect = eggEffects[Math.floor(Math.random() * eggEffects.length)];
+                        if (!selectedEffects.includes(randomEffect)) {
+                            selectedEffects.push(randomEffect);
+                            this.classList.add(randomEffect);
+                        }
+                    }
+                    
+                    // 15秒后移除效果
+                    setTimeout(() => {
+                        selectedEffects.forEach(effect => {
+                            this.classList.remove(effect);
+                        });
+                    }, 15000);
+                });
+            });
+
+            // 随机彩蛋：滚动时触发
+            let lastEggScroll = 0;
+            window.addEventListener('scroll', function() {
+                const now = Date.now();
+                if (now - lastEggScroll > 3000) { // 每3秒可能触发一次
+                    lastEggScroll = now;
+                    
+                    if (Math.random() < 0.2) { // 20%概率
+                        const randomTrigger = triggers[Math.floor(Math.random() * triggers.length)];
+                        if (randomTrigger) {
+                            eggEffects.forEach(effect => {
+                                randomTrigger.classList.remove(effect);
+                            });
+                            const randomEffect = eggEffects[Math.floor(Math.random() * eggEffects.length)];
+                            randomTrigger.classList.add(randomEffect);
+                            
+                            setTimeout(() => {
+                                randomTrigger.classList.remove(randomEffect);
+                            }, 8000);
+                        }
+                    }
+                }
+            });
+        }
 
         // 更新章节导航
         function updateChapterNav() {
@@ -2322,6 +3014,1259 @@
             scroll-behavior: smooth;
         }
 
+        /* 返回主页按钮 */
+        .back-to-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .back-to-home:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: translateX(-3px);
+        }
+
+        /* 阅读时间估算 */
+        .reading-time {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 30px;
+            color: #fff;
+            font-size: 0.9rem;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .reading-time .stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reading-time .label {
+            color: #88ccff;
+            font-size: 0.8rem;
+        }
+
+        .reading-time .value {
+            color: #00ff80;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .reading-time .divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(0, 212, 255, 0.3);
+        }
+
+        /* 主题切换按钮 */
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .theme-toggle:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: rotate(15deg);
+        }
+
+        .theme-icon {
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+        }
+
+        /* 亮色主题 */
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+        }
+
+        body.light-theme .content-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(52, 152, 219, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        body.light-theme .timeline-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(52, 152, 219, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        body.light-theme .timeline-item:hover {
+            border-color: #3498db;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.2);
+        }
+
+        body.light-theme .timeline-item h3 {
+            color: #2c3e50;
+        }
+
+        body.light-theme .timeline-item .year {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        body.light-theme .page-header {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.05));
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .page-title {
+            color: #2c3e50;
+            text-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .highlight {
+            background: linear-gradient(120deg, rgba(52, 152, 219, 0.2), rgba(155, 89, 182, 0.2));
+            color: #2c3e50;
+            text-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .glossary-modal {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(52, 152, 219, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        body.light-theme .glossary-title {
+            color: #2c3e50;
+        }
+
+        body.light-theme .glossary-description {
+            color: #34495e;
+        }
+
+        body.light-theme .back-to-top {
+            background: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .back-to-top:hover {
+            background: #3498db;
+            box-shadow: 0 8px 30px rgba(52, 152, 219, 0.6);
+        }
+
+        body.light-theme .chapter-dot {
+            background: rgba(52, 152, 219, 0.5);
+            border-color: rgba(52, 152, 219, 0.7);
+        }
+
+        body.light-theme .chapter-dot:hover {
+            background: #3498db;
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+        }
+
+        body.light-theme .chapter-dot.active {
+            background: #27ae60;
+            border-color: #2ecc71;
+            box-shadow: 0 0 20px rgba(39, 174, 96, 0.6);
+        }
+
+        body.light-theme .chapter-tooltip {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .progress-container {
+            background: rgba(52, 152, 219, 0.1);
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .progress-text {
+            color: #2c3e50;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        body.light-theme .reading-time {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.2), rgba(52, 152, 219, 0.05));
+            border-color: rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .reading-time .label {
+            color: #34495e;
+        }
+
+        body.light-theme .reading-time .value {
+            color: #27ae60;
+        }
+
+        body.light-theme .theme-toggle {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.1));
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+
+        body.light-theme .theme-toggle:hover {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.5), rgba(52, 152, 219, 0.3));
+            border-color: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .back-to-home {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.1));
+            border-color: rgba(52, 152, 219, 0.5);
+            color: #34495e;
+        }
+
+        body.light-theme .back-to-home:hover {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.5), rgba(52, 152, 219, 0.3));
+            border-color: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .chapter-mark {
+            background: #34495e;
+        }
+
+        body.light-theme .chapter-mark:hover {
+            background: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.8);
+        }
+
+        body.light-theme .chapter-mark.completed {
+            background: #27ae60;
+            box-shadow: 0 0 8px rgba(39, 174, 96, 0.6);
+        }
+
+        body.light-theme .chapter-mark .chapter-tooltip {
+            background: rgba(255, 255, 255, 0.98);
+            color: #2c3e50;
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .chapter-mark .chapter-tooltip::after {
+            border-top-color: rgba(255, 255, 255, 0.98);
+        }
+
+        /* 彩蛋效果 */
+        .easter-egg-trigger {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .easter-egg-trigger:hover {
+            transform: scale(1.05);
+        }
+
+        /* 彩蛋1: 彩虹文字 */
+        @keyframes rainbow {
+            0% { color: #ff0000; }
+            16% { color: #ff8000; }
+            33% { color: #ffff00; }
+            50% { color: #00ff00; }
+            66% { color: #0080ff; }
+            83% { color: #8000ff; }
+            100% { color: #ff0000; }
+        }
+
+        .rainbow-text {
+            animation: rainbow 2s linear infinite;
+        }
+
+        /* 彩蛋2: 弹跳 */
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .bounce {
+            animation: bounce 0.6s ease;
+        }
+
+        /* 彩蛋3: 旋转 */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin {
+            animation: spin 1s linear;
+        }
+
+        /* 彩蛋4: 闪烁 */
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0; }
+        }
+
+        .blink {
+            animation: blink 0.5s ease 3;
+        }
+
+        /* 彩蛋5: 放大缩小 */
+        @keyframes pulse-size {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        .pulse-size {
+            animation: pulse-size 0.5s ease 3;
+        }
+
+        /* 彩蛋6: 摇晃 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* 彩蛋7: 发光 */
+        @keyframes glow-strong {
+            0%, 100% { box-shadow: 0 0 5px #00d4ff, 0 0 10px #00d4ff; }
+            50% { box-shadow: 0 0 20px #00d4ff, 0 0 30px #00d4ff, 0 0 40px #00d4ff; }
+        }
+
+        .glow-strong {
+            animation: glow-strong 1s ease 3;
+        }
+
+        /* 彩蛋8: 褪色 */
+        @keyframes fade-in-out {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .fade-in-out {
+            animation: fade-in-out 1s ease 3;
+        }
+
+        /* 彩蛋9: 上下移动 */
+        @keyframes float-up-down {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+        }
+
+        .float-up-down {
+            animation: float-up-down 1s ease 3;
+        }
+
+        /* 彩蛋10: 左右移动 */
+        @keyframes slide-left-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+        }
+
+        .slide-left-right {
+            animation: slide-left-right 1s ease 3;
+        }
+
+        /* 彩蛋11: 旋转缩放 */
+        @keyframes spin-scale {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.5); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .spin-scale {
+            animation: spin-scale 1s ease;
+        }
+
+        /* 彩蛋12: 波浪 */
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            75% { transform: translateY(10px); }
+        }
+
+        .wave {
+            animation: wave 0.5s ease 3;
+        }
+
+        /* 彩蛋13: 镜像翻转 */
+        @keyframes flip {
+            0% { transform: scaleX(1); }
+            50% { transform: scaleX(-1); }
+            100% { transform: scaleX(1); }
+        }
+
+        .flip {
+            animation: flip 1s ease;
+        }
+
+        /* 彩蛋14: 螺旋 */
+        @keyframes spiral {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(1080deg) scale(0.5); }
+        }
+
+        .spiral {
+            animation: spiral 2s ease forwards;
+        }
+
+        /* 彩蛋15: 爆炸 */
+        @keyframes explode-big {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        .explode-big {
+            animation: explode-big 1s ease forwards;
+        }
+
+        /* 彩蛋16: 闪电 */
+        @keyframes lightning {
+            0%, 20%, 40%, 60%, 80%, 100% { opacity: 1; }
+            10%, 30%, 50%, 70%, 90% { opacity: 0; }
+        }
+
+        .lightning {
+            animation: lightning 0.3s ease 5;
+        }
+
+        /* 彩蛋17: 弹性 */
+        @keyframes elastic {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.5); }
+            50% { transform: scale(0.8); }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .elastic {
+            animation: elastic 0.8s ease;
+        }
+
+        /* 彩蛋18: 果冻 */
+        @keyframes jelly {
+            0%, 100% { transform: scale(1, 1); }
+            25% { transform: scale(0.9, 1.1); }
+            50% { transform: scale(1.1, 0.9); }
+            75% { transform: scale(0.95, 1.05); }
+        }
+
+        .jelly {
+            animation: jelly 0.7s ease;
+        }
+
+        /* 彩蛋19: 摇摆 */
+        @keyframes wobble {
+            0% { transform: translateX(0) rotate(0deg); }
+            15% { transform: translateX(-25%) rotate(-5deg); }
+            30% { transform: translateX(20%) rotate(3deg); }
+            45% { transform: translateX(-15%) rotate(-3deg); }
+            60% { transform: translateX(10%) rotate(2deg); }
+            75% { transform: translateX(-5%) rotate(-1deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+
+        .wobble {
+            animation: wobble 1s ease;
+        }
+
+        /* 彩蛋20: 荡秋千 */
+        @keyframes swing {
+            20% { transform: rotate(15deg); }
+            40% { transform: rotate(-10deg); }
+            60% { transform: rotate(5deg); }
+            80% { transform: rotate(-5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .swing {
+            transform-origin: top center;
+            animation: swing 1s ease;
+        }
+
+        /* 彩蛋21: 心跳 */
+        @keyframes heart-beat {
+            0%, 100% { transform: scale(1); }
+            14% { transform: scale(1.3); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.3); }
+            70% { transform: scale(1); }
+        }
+
+        .heart-beat {
+            animation: heart-beat 1.3s ease infinite;
+        }
+
+        /* 彩蛋22: 翻转 */
+        @keyframes flip-in {
+            0% { transform: perspective(400px) rotateY(90deg); opacity: 0; }
+            100% { transform: perspective(400px) rotateY(0deg); opacity: 1; }
+        }
+
+        .flip-in {
+            animation: flip-in 1s ease;
+        }
+
+        /* 彩蛋23: 缩放进入 */
+        @keyframes zoom-in {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .zoom-in {
+            animation: zoom-in 0.6s ease;
+        }
+
+        /* 彩蛋24: 旋转进入 */
+        @keyframes rotate-in {
+            0% { transform: rotate(-200deg) scale(0); opacity: 0; }
+            100% { transform: rotate(0) scale(1); opacity: 1; }
+        }
+
+        .rotate-in {
+            animation: rotate-in 1s ease;
+        }
+
+        /* 彩蛋25: 弹跳进入 */
+        @keyframes bounce-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .bounce-in {
+            animation: bounce-in 0.8s ease;
+        }
+
+        /* 彩蛋26: 滑动进入 */
+        @keyframes slide-in {
+            0% { transform: translateX(-100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide-in {
+            animation: slide-in 0.6s ease;
+        }
+
+        /* 彩蛋27: 淡入 */
+        @keyframes fade-in {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fade-in 1s ease;
+        }
+
+        /* 彩蛋28: 弹出 */
+        @keyframes pop-in {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .pop-in {
+            animation: pop-in 0.5s ease;
+        }
+
+        /* 彩蛋29: 闪烁彩虹 */
+        @keyframes rainbow-blink {
+            0%, 100% { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+            16% { color: #ff8000; text-shadow: 0 0 10px #ff8000; }
+            33% { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
+            50% { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+            66% { color: #0080ff; text-shadow: 0 0 10px #0080ff; }
+            83% { color: #8000ff; text-shadow: 0 0 10px #8000ff; }
+        }
+
+        .rainbow-blink {
+            animation: rainbow-blink 1s ease infinite;
+        }
+
+        /* 彩蛋30: 发光边框 */
+        @keyframes border-glow {
+            0%, 100% { border-color: rgba(0, 212, 255, 0.5); box-shadow: 0 0 5px rgba(0, 212, 255, 0.5); }
+            50% { border-color: rgba(0, 255, 128, 0.8); box-shadow: 0 0 20px rgba(0, 255, 128, 0.8); }
+        }
+
+        .border-glow {
+            animation: border-glow 1.5s ease infinite;
+        }
+
+        /* 彩蛋31: 3D旋转 */
+        @keyframes rotate-3d {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+
+        .rotate-3d {
+            animation: rotate-3d 2s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        /* 彩蛋32: 上下弹跳 */
+        @keyframes bounce-up-down {
+            0%, 100% { transform: translateY(0); }
+            25% { transform: translateY(-10px); }
+            75% { transform: translateY(10px); }
+        }
+
+        .bounce-up-down {
+            animation: bounce-up-down 0.6s ease infinite;
+        }
+
+        /* 彩蛋33: 颜色渐变 */
+        @keyframes color-shift {
+            0% { color: #00d4ff; }
+            25% { color: #ff6b6b; }
+            50% { color: #ffd93d; }
+            75% { color: #6bcb77; }
+            100% { color: #00d4ff; }
+        }
+
+        .color-shift {
+            animation: color-shift 3s ease infinite;
+        }
+
+        /* 彩蛋34: 背景闪烁 */
+        @keyframes bg-blink {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(0, 212, 255, 0.3); }
+        }
+
+        .bg-blink {
+            animation: bg-blink 0.5s ease 3;
+        }
+
+        /* 彩蛋35: 边框动画 */
+        @keyframes border-dance {
+            0%, 100% { border-radius: 20px; }
+            50% { border-radius: 0; }
+        }
+
+        .border-dance {
+            animation: border-dance 0.8s ease 3;
+        }
+
+        /* 彩蛋36: 文字阴影 */
+        @keyframes shadow-pulse {
+            0%, 100% { text-shadow: 0 0 5px rgba(0, 212, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 30px rgba(0, 212, 255, 0.6); }
+        }
+
+        .shadow-pulse {
+            animation: shadow-pulse 1s ease infinite;
+        }
+
+        /* 彩蛋37: 缩放发光 */
+        @keyframes scale-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 212, 255, 0.5); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 212, 255, 0.8); }
+        }
+
+        .scale-glow {
+            animation: scale-glow 1.5s ease infinite;
+        }
+
+        /* 彩蛋38: 波纹效果 */
+        @keyframes ripple {
+            0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.7); }
+            100% { box-shadow: 0 0 0 20px rgba(0, 212, 255, 0); }
+        }
+
+        .ripple {
+            animation: ripple 1s ease 3;
+        }
+
+        /* 彩蛋39: 渐变背景 */
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .gradient-shift {
+            background: linear-gradient(270deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        /* 彩蛋40: 模糊到清晰 */
+        @keyframes blur-clear {
+            0% { filter: blur(10px); opacity: 0; }
+            100% { filter: blur(0); opacity: 1; }
+        }
+
+        .blur-clear {
+            animation: blur-clear 1s ease;
+        }
+
+        /* 彩蛋41: 打字效果 */
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typewriter 2s steps(30) forwards;
+        }
+
+        /* 彩蛋42: 霓虹灯 */
+        @keyframes neon {
+            0%, 100% { 
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073, 0 0 40px #e60073;
+            }
+            50% { 
+                text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6, 0 0 50px #ff4da6;
+            }
+        }
+
+        .neon {
+            animation: neon 1.5s ease infinite;
+        }
+
+        /* 彩蛋43: 矩阵代码 */
+        @keyframes matrix {
+            0% { text-shadow: 0 0 5px #00ff00; }
+            50% { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+            100% { text-shadow: 0 0 5px #00ff00; }
+        }
+
+        .matrix {
+            color: #00ff00;
+            animation: matrix 1s ease infinite;
+        }
+
+        /* 彩蛋44: 火焰效果 */
+        @keyframes fire {
+            0% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; }
+            50% { text-shadow: 0 0 20px #ff4500, 0 0 40px #ff0000, 0 0 60px #ff8c00; }
+            100% { text-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; }
+        }
+
+        .fire {
+            color: #ff4500;
+            animation: fire 0.8s ease infinite;
+        }
+
+        /* 彩蛋45: 水波效果 */
+        @keyframes wave-text {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-5px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(5px); }
+            100% { transform: translateY(0); }
+        }
+
+        .wave-text {
+            display: inline-block;
+            animation: wave-text 0.5s ease infinite;
+        }
+
+        /* 彩蛋46: 旋转发光 */
+        @keyframes spin-glow {
+            0% { transform: rotate(0deg); box-shadow: 0 0 10px #00d4ff; }
+            50% { transform: rotate(180deg); box-shadow: 0 0 30px #00ff80, 0 0 50px #00d4ff; }
+            100% { transform: rotate(360deg); box-shadow: 0 0 10px #00d4ff; }
+        }
+
+        .spin-glow {
+            animation: spin-glow 2s linear infinite;
+        }
+
+        /* 彩蛋47: 弹跳发光 */
+        @keyframes bounce-glow {
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 10px #00d4ff; }
+            50% { transform: translateY(-20px); box-shadow: 0 0 30px #00ff80, 0 0 50px #00d4ff; }
+        }
+
+        .bounce-glow {
+            animation: bounce-glow 1s ease infinite;
+        }
+
+        /* 彩蛋48: 闪烁彩色 */
+        @keyframes blink-color {
+            0% { color: #ff6b6b; }
+            25% { color: #ffd93d; }
+            50% { color: #6bcb77; }
+            75% { color: #4d96ff; }
+            100% { color: #ff6b6b; }
+        }
+
+        .blink-color {
+            animation: blink-color 0.5s ease infinite;
+        }
+
+        /* 彩蛋49: 缩放旋转 */
+        @keyframes scale-rotate {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.5) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        .scale-rotate {
+            animation: scale-rotate 2s ease infinite;
+        }
+
+        /* 彩蛋50: 摇摆发光 */
+        @keyframes wobble-glow {
+            0%, 100% { transform: rotate(-3deg); box-shadow: 0 0 10px #00d4ff; }
+            50% { transform: rotate(3deg); box-shadow: 0 0 25px #00ff80, 0 0 40px #00d4ff; }
+        }
+
+        .wobble-glow {
+            animation: wobble-glow 0.8s ease infinite;
+        }
+
+        /* 彩蛋51: 粒子效果 */
+        @keyframes particle-float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        .particle-float {
+            animation: particle-float 2s ease forwards;
+        }
+
+        /* 彩蛋56: 流星雨 */
+        @keyframes meteor {
+            0% { transform: translateX(0) translateY(0); opacity: 1; }
+            100% { transform: translateX(100px) translateY(100px); opacity: 0; }
+        }
+
+        .meteor {
+            animation: meteor 1.5s ease forwards;
+        }
+
+        /* 彩蛋57: 心跳发光 */
+        @keyframes heart-beat-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px #ff0000; }
+            14% { transform: scale(1.3); box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4500; }
+            28% { transform: scale(1); box-shadow: 0 0 10px #ff0000; }
+            42% { transform: scale(1.3); box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4500; }
+            70% { transform: scale(1); box-shadow: 0 0 10px #ff0000; }
+        }
+
+        .heart-beat-glow {
+            animation: heart-beat-glow 1.5s ease infinite;
+        }
+
+        /* 彩蛋58: 摇摆发光 */
+        @keyframes wobble-glow-color {
+            0%, 100% { transform: rotate(-5deg); box-shadow: 0 0 15px #ff6b6b; }
+            25% { transform: rotate(5deg); box-shadow: 0 0 20px #ffd93d; }
+            50% { transform: rotate(-5deg); box-shadow: 0 0 25px #6bcb77; }
+            75% { transform: rotate(5deg); box-shadow: 0 0 20px #4d96ff; }
+        }
+
+        .wobble-glow-color {
+            animation: wobble-glow-color 1.2s ease infinite;
+        }
+
+        /* 控制面板 */
+        .control-panel {
+            position: fixed;
+            top: 135px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            font-size: 1.3rem;
+        }
+
+        .control-btn:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(145deg, rgba(0, 255, 128, 0.5), rgba(0, 255, 128, 0.3));
+            border-color: rgba(0, 255, 128, 0.8);
+        }
+
+        /* 字体大小调节 */
+        .font-size-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .font-size-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: #fff;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .font-size-btn:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* 阅读模式 */
+        .reading-mode .theme-toggle,
+        .reading-mode .control-panel,
+        .reading-mode .chapter-nav,
+        .reading-mode .progress-container,
+        .reading-mode .reading-time,
+        .reading-mode .back-to-home {
+            display: none;
+        }
+
+        .reading-mode .content-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .reading-mode .timeline-item {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        /* 搜索框 */
+        .search-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1002;
+            display: none;
+        }
+
+        .search-container.active {
+            display: block;
+        }
+
+        .search-box {
+            width: 400px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: rgba(0, 255, 128, 0.8);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0, 212, 255, 0.2);
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .search-result-text {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* 目录面板 */
+        .toc-panel {
+            position: fixed;
+            top: 50%;
+            right: 80px;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+            min-width: 200px;
+        }
+
+        .toc-panel.active {
+            display: block;
+        }
+
+        .toc-title {
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .toc-item {
+            padding: 10px 15px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
+
+        .toc-item:hover {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+        }
+
+        .toc-item.active {
+            background: rgba(0, 212, 255, 0.3);
+            color: #00ff80;
+        }
+
+        /* 分享弹窗 */
+        .share-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 1003;
+            display: none;
+        }
+
+        .share-modal.active {
+            display: block;
+        }
+
+        .share-title {
+            color: #00d4ff;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .share-btn {
+            padding: 12px 24px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .share-btn:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .share-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #ff6b6b;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .share-close:hover {
+            color: #ff0000;
+            transform: rotate(90deg);
+        }
+
+        /* 遮罩层 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1002;
+            display: none;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* 亮色主题适配 */
+        body.light-theme .control-btn {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.1));
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+
+        body.light-theme .control-btn:hover {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.5), rgba(52, 152, 219, 0.3));
+            border-color: rgba(52, 152, 219, 0.8);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+
+        body.light-theme .control-btn.active {
+            background: linear-gradient(145deg, rgba(39, 174, 96, 0.5), rgba(39, 174, 96, 0.3));
+            border-color: rgba(39, 174, 96, 0.8);
+        }
+
+        body.light-theme .font-size-controls {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .font-size-btn {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.1));
+            border-color: rgba(52, 152, 219, 0.5);
+            color: #2c3e50;
+        }
+
+        body.light-theme .search-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(52, 152, 219, 0.5);
+            color: #2c3e50;
+        }
+
+        body.light-theme .search-results {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .search-result-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+
+        body.light-theme .search-result-text {
+            color: #666;
+        }
+
+        body.light-theme .toc-panel {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(52, 152, 219, 0.3);
+        }
+
+        body.light-theme .toc-item {
+            color: #2c3e50;
+        }
+
+        body.light-theme .toc-item:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        body.light-theme .toc-item.active {
+            background: rgba(52, 152, 219, 0.2);
+            color: #27ae60;
+        }
+
+        body.light-theme .share-modal {
+            background: rgba(255, 255, 255, 0.98);
+            border-color: rgba(52, 152, 219, 0.5);
+        }
+
+        body.light-theme .share-btn {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.3), rgba(52, 152, 219, 0.1));
+            border-color: rgba(52, 152, 219, 0.5);
+            color: #2c3e50;
+        }
+
+        body.light-theme .share-btn:hover {
+            background: linear-gradient(145deg, rgba(52, 152, 219, 0.5), rgba(52, 152, 219, 0.3));
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.4);
+        }
+
         /* 阅读进度条 */
         .progress-container {
             position: fixed;
@@ -2354,6 +4299,20 @@
             background: linear-gradient(90deg, #ff4757, #ff6b81);
         }
 
+        .progress-bar.overdrive {
+            background: linear-gradient(90deg, #ff9f43, #ff6b6b, #ee5a24);
+            animation: overdrive-pulse 0.3s ease-in-out infinite;
+        }
+
+        @keyframes overdrive-pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
         .progress-text {
             position: absolute;
             right: 10px;
@@ -2363,6 +4322,151 @@
             text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
             pointer-events: none;
             z-index: 1;
+        }
+
+        /* 章节标记 */
+        .chapter-marks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .chapter-mark {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 4px;
+            height: 16px;
+            background: #fff;
+            border-radius: 2px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .chapter-mark:hover {
+            background: #00d4ff;
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .chapter-mark .chapter-tooltip {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .chapter-mark .chapter-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .chapter-mark:hover .chapter-tooltip {
+            opacity: 1;
+            visibility: visible;
+            bottom: 35px;
+        }
+
+        .chapter-mark.completed {
+            background: #00ff80;
+            box-shadow: 0 0 8px rgba(0, 255, 128, 0.6);
+        }
+
+        /* 爆炸特效 */
+        .explosion {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        /* 四分五裂碎片 */
+        .fragment {
+            position: absolute;
+            background: linear-gradient(145deg, #ff9f43, #ff6b6b);
+            border-radius: 2px;
+            animation: fragment-explode 1.5s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fragment-explode {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .progress-container.completed {
+            animation: pulse-glow 0.5s ease-in-out 3;
+        }
+
+        .progress-container.shattered {
+            animation: shatter-shake 0.5s ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(30, 213, 115, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(30, 213, 115, 0.8), 0 0 30px rgba(30, 213, 115, 0.6);
+            }
+        }
+
+        @keyframes shatter-shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
         }
 
         /* 返回顶部按钮 */
