@@ -1831,6 +1831,12 @@
         </div>
     </div>
 
+    <!-- 阅读进度条 -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <span class="progress-text" id="progressText">0%</span>
+    </div>
+
     <!-- 返回顶部按钮 -->
     <div class="back-to-top" onclick="scrollToTop()">↑</div>
 
@@ -2221,6 +2227,28 @@
             }
         }
 
+        // 更新阅读进度条
+        function updateProgressBar() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = docHeight > 0 ? Math.min(100, Math.round((scrollTop / docHeight) * 100)) : 0;
+            
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            
+            progressBar.style.width = scrollPercent + '%';
+            progressText.textContent = scrollPercent + '%';
+            
+            // 根据进度改变颜色
+            if (scrollPercent >= 20) {
+                progressBar.classList.add('green');
+                progressBar.classList.remove('red');
+            } else {
+                progressBar.classList.add('red');
+                progressBar.classList.remove('green');
+            }
+        }
+
         // 滚动时显示/隐藏返回顶部按钮
         window.addEventListener('scroll', function() {
             const backToTop = document.querySelector('.back-to-top');
@@ -2232,7 +2260,13 @@
 
             // 更新章节导航高亮
             updateChapterNav();
+            
+            // 更新阅读进度条
+            updateProgressBar();
         });
+        
+        // 页面加载时初始化进度条
+        document.addEventListener('DOMContentLoaded', updateProgressBar);
 
         // 更新章节导航
         function updateChapterNav() {
@@ -2286,6 +2320,49 @@
         /* 平滑滚动 */
         html {
             scroll-behavior: smooth;
+        }
+
+        /* 阅读进度条 */
+        .progress-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 150px;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff4757, #ff6b81);
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-bar.green {
+            background: linear-gradient(90deg, #2ed573, #7bed9f);
+        }
+
+        .progress-bar.red {
+            background: linear-gradient(90deg, #ff4757, #ff6b81);
+        }
+
+        .progress-text {
+            position: absolute;
+            right: 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* 返回顶部按钮 */
