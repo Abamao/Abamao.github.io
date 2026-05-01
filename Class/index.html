@@ -1831,7 +1831,81 @@
         </div>
     </div>
 
+    <!-- 返回顶部按钮 -->
+    <div class="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <!-- 章节导航 -->
+    <div class="chapter-nav">
+        <div class="chapter-dot" onclick="scrollToChapter(1)" data-chapter="1">
+            <div class="chapter-tooltip">第一章：初尝自由</div>
+        </div>
+        <div class="chapter-dot" onclick="scrollToChapter(2)" data-chapter="2">
+            <div class="chapter-tooltip">第二章：追求极致</div>
+        </div>
+        <div class="chapter-dot" onclick="scrollToChapter(3)" data-chapter="3">
+            <div class="chapter-tooltip">第三章：遇见ClassIsland</div>
+        </div>
+        <div class="chapter-dot" onclick="scrollToChapter(4)" data-chapter="4">
+            <div class="chapter-tooltip">第四章：工具与守护</div>
+        </div>
+        <div class="chapter-dot" onclick="scrollToChapter(5)" data-chapter="5">
+            <div class="chapter-tooltip">第五章：最终形态</div>
+        </div>
+    </div>
+
+    <!-- 词汇详情弹窗 -->
+    <div class="glossary-overlay" onclick="closeGlossary()"></div>
+    <div class="glossary-modal">
+        <button class="glossary-close" onclick="closeGlossary()">×</button>
+        <div class="glossary-title" id="glossary-title"></div>
+        <div class="glossary-description" id="glossary-description"></div>
+    </div>
+
     <script>
+        // 词汇数据库
+        const glossary = {
+            '冰点还原': '冰点还原（Deep Freeze）是一款系统还原软件，可以将系统冻结在某个状态，每次重启后自动恢复到冻结状态，常用于公共计算机环境如学校、网吧等。',
+            'Windows 7': '微软公司于2009年发布的操作系统，以其稳定性和经典的Aero界面著称，被广泛使用长达十年之久。',
+            'Windows 11': '微软公司于2021年发布的新一代操作系统，采用全新的现代化UI设计，包括居中任务栏、圆角窗口等特性。',
+            'TPM 2.0': '可信平台模块（Trusted Platform Module）是一种安全芯片，用于加密和安全存储敏感数据，Windows 11安装要求必须具备TPM 2.0。',
+            'SHA256': '一种密码学哈希函数，生成256位的哈希值，广泛用于数据完整性验证和数字签名。',
+            'IRQL': '中断请求级别（Interrupt Request Level），Windows内核中的中断优先级系统，驱动程序需要正确处理IRQL以避免系统崩溃。',
+            'TDR': '超时检测与恢复（Timeout Detection and Recovery），Windows用于检测和恢复GPU挂起的机制。',
+            'GPU': '图形处理器（Graphics Processing Unit），负责图形渲染和并行计算，是计算机显示和游戏性能的关键组件。',
+            '帧率': 'Frames Per Second（FPS），每秒显示的帧数，帧率越高画面越流畅。',
+            '内存泄漏': '程序在运行过程中未能正确释放不再使用的内存，导致内存占用持续增加，最终可能导致系统性能下降或崩溃。',
+            'WebView2': '微软提供的Web控件，允许开发者在应用程序中嵌入Web内容，基于Chromium引擎。',
+            'WPF': 'Windows Presentation Foundation，微软的图形界面框架，用于创建现代化的Windows应用程序。',
+            'GDI+': '图形设备接口+，Windows的2D图形库，用于绘制图形和文本。',
+            'Win32': 'Windows API的传统接口，用于开发原生Windows应用程序。',
+            'WinUI': 'Windows UI库，微软最新的UI框架，用于创建现代化的Windows应用程序界面。',
+            'WinRT': 'Windows Runtime，Windows 8及以上版本的应用程序运行时，提供现代应用程序接口。',
+            'Aero Glass': 'Windows Vista和Windows 7中的透明玻璃效果，是该时期的标志性视觉风格。',
+            'Aero Peek': 'Windows 7引入的功能，允许用户通过鼠标悬停查看桌面和窗口预览。',
+            'XAML': '可扩展应用程序标记语言，用于定义WPF和WinUI应用的用户界面。',
+            'Sonoma': 'macOS Sonoma，苹果公司2023年发布的macOS版本，以其桌面小部件和屏幕保护程序著称。',
+            'ClassIsland': '一款Windows桌面课表挂件软件，提供悬浮课表显示功能。',
+            'ClassWidget': '一款简洁的桌面课表工具，提供课表显示和时间提醒功能。',
+            'Inkeys': '一款触控手势工具，允许用户通过屏幕边缘手势触发各种操作。',
+            'StartAllBack': '一款Windows 11开始菜单和任务栏增强工具，可以将其恢复为Windows 7/10风格。',
+            'SlideToShutDown': 'Windows 11的滑动关机功能，通过手势滑动实现优雅的关机体验。',
+            'UU远程': '网易公司开发的远程控制软件，支持跨平台远程桌面连接。',
+            'M4 Mac Mini': '苹果公司基于M4芯片的Mac Mini桌面电脑，以其强大的性能和低功耗著称。',
+            'JSON': 'JavaScript对象表示法，一种轻量级的数据交换格式，易于阅读和编写。',
+            'UTC时间戳': '协调世界时（Universal Time Coordinated）时间戳，是一种标准的时间表示方式。',
+            'NTP服务器': '网络时间协议（Network Time Protocol）服务器，用于同步计算机系统时间。',
+            '25H2': 'Windows 11的版本代号，代表2025年下半年发布的更新版本。',
+            '23H2': 'Windows 11的版本代号，代表2023年下半年发布的更新版本。',
+            '24H2': 'Windows 11的版本代号，代表2024年下半年发布的更新版本。',
+            'Build 26200': 'Windows 11 25H2版本的内部版本号，用于标识具体的系统构建版本。',
+            'Wallpaper Engine': '一款动态壁纸软件，支持实时动画和交互式壁纸效果。',
+            'Dism++': '一款Windows系统维护工具，提供系统优化、清理和修复功能。',
+            'Wise Memory Optimizer': '一款内存优化工具，帮助释放系统内存，提升性能。',
+            'Autoruns': '微软提供的系统工具，用于查看和管理系统启动项。',
+            'devcon': 'Windows设备控制台工具，用于命令行管理设备驱动程序。',
+            'myfault.sys': '微软提供的测试驱动程序，用于模拟系统错误和崩溃。'
+        };
+
         // 随机跳转功能
         function goToRandomItem() {
             const items = document.querySelectorAll('.timeline-item');
@@ -1906,28 +1980,297 @@
             highlights.forEach((highlight, index) => {
                 highlight.style.animation = `pulse 2s ease-in-out ${index * 0.1}s infinite`;
             });
+
+            // 词汇点击事件
+            highlights.forEach(highlight => {
+                highlight.addEventListener('click', function() {
+                    const term = this.textContent;
+                    if (glossary[term]) {
+                        showGlossary(term, glossary[term]);
+                    }
+                });
+            });
+        });
+
+        // 返回顶部
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 词汇详情弹窗
+        function showGlossary(title, description) {
+            document.getElementById('glossary-title').textContent = title;
+            document.getElementById('glossary-description').textContent = description;
+            document.querySelector('.glossary-modal').classList.add('show');
+            document.querySelector('.glossary-overlay').classList.add('show');
+        }
+
+        function closeGlossary() {
+            document.querySelector('.glossary-modal').classList.remove('show');
+            document.querySelector('.glossary-overlay').classList.remove('show');
+        }
+
+        // 章节跳转
+        function scrollToChapter(chapter) {
+            const chapters = [
+                document.querySelector('.content-section'), // 第一章
+                document.querySelector('.timeline-item:nth-child(18)'), // 第二章
+                document.querySelector('.timeline-item:nth-child(42)'), // 第三章
+                document.querySelector('.timeline-item:nth-child(67)'), // 第四章
+                document.querySelector('.timeline-item:nth-child(91)')  // 第五章
+            ];
+            
+            if (chapters[chapter - 1]) {
+                chapters[chapter - 1].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // 滚动时显示/隐藏返回顶部按钮
+        window.addEventListener('scroll', function() {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+
+            // 更新章节导航高亮
+            updateChapterNav();
+        });
+
+        // 更新章节导航
+        function updateChapterNav() {
+            const chapters = [
+                document.querySelector('.timeline-item:nth-child(1)'),
+                document.querySelector('.timeline-item:nth-child(18)'),
+                document.querySelector('.timeline-item:nth-child(42)'),
+                document.querySelector('.timeline-item:nth-child(67)'),
+                document.querySelector('.timeline-item:nth-child(91)')
+            ];
+            
+            const dots = document.querySelectorAll('.chapter-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.remove('active');
+            });
+
+            for (let i = chapters.length - 1; i >= 0; i--) {
+                if (chapters[i] && chapters[i].getBoundingClientRect().top <= 150) {
+                    dots[i].classList.add('active');
+                    break;
+                }
+            }
+        }
+
+        // 关闭弹窗
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeGlossary();
+            }
         });
     </script>
 
     <style>
         @keyframes pulse {
             0%, 100% {
-                opacity: 1;
-                text-shadow: 0 0 10px #ffd700;
+                opacity: 0.9;
+                text-shadow: 0 0 8px rgba(0, 255, 128, 0.6);
             }
             50% {
-                opacity: 0.8;
-                text-shadow: 0 0 20px #ffd700, 0 0 30px #ffd700;
+                opacity: 0.7;
+                text-shadow: 0 0 15px rgba(0, 255, 128, 0.5), 0 0 25px rgba(0, 255, 128, 0.4);
             }
         }
 
         .highlight {
             animation: pulse 2s ease-in-out infinite;
+            cursor: help;
+            position: relative;
         }
 
         /* 平滑滚动 */
         html {
             scroll-behavior: smooth;
+        }
+
+        /* 返回顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.3), rgba(0, 212, 255, 0.1));
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: linear-gradient(145deg, rgba(0, 212, 255, 0.5), rgba(0, 212, 255, 0.3));
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* 词汇详情弹窗 */
+        .glossary-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(145deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+            border: 1px solid rgba(0, 255, 128, 0.5);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .glossary-modal.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .glossary-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1999;
+            transition: all 0.3s ease;
+        }
+
+        .glossary-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .glossary-title {
+            font-size: 1.5rem;
+            color: #00ff80;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .glossary-description {
+            font-size: 1rem;
+            color: #e0e0e0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .glossary-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            border: none;
+            background: rgba(0, 255, 128, 0.2);
+            color: #00ff80;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .glossary-close:hover {
+            background: rgba(0, 255, 128, 0.4);
+        }
+
+        /* 章节导航 */
+        .chapter-nav {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .chapter-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.3);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .chapter-dot:hover,
+        .chapter-dot.active {
+            background: rgba(0, 255, 128, 0.6);
+            box-shadow: 0 0 10px rgba(0, 255, 128, 0.5);
+            transform: scale(1.3);
+        }
+
+        .chapter-tooltip {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(0, 255, 128, 0.3);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            color: #00ff80;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .chapter-dot:hover .chapter-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 章节分隔线 */
+        .chapter-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 128, 0.5), transparent);
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .chapter-divider::before {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(0, 255, 128, 0.6);
+            font-size: 1.2rem;
         }
 
         /* 随机跳转闪烁效果 */
