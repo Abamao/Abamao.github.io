@@ -441,6 +441,54 @@
             background: var(--accent-color);
             color: white;
         }
+
+        /* Error 抖动动画 */
+        @keyframes errorShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            10% { transform: translate(-20px, -20px) rotate(-5deg); }
+            20% { transform: translate(20px, 20px) rotate(5deg); }
+            30% { transform: translate(-20px, 20px) rotate(-3deg); }
+            40% { transform: translate(20px, -20px) rotate(3deg); }
+            50% { transform: translate(-15px, -15px) rotate(-4deg); }
+            60% { transform: translate(15px, 15px) rotate(4deg); }
+            70% { transform: translate(-15px, 15px) rotate(-2deg); }
+            80% { transform: translate(15px, -15px) rotate(2deg); }
+            90% { transform: translate(-10px, -10px) rotate(-1deg); }
+        }
+
+        .error-shake {
+            animation: errorShake 0.1s linear infinite;
+        }
+
+        /* Error 屏幕 */
+        .error-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-size: 3em;
+            text-align: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .error-text {
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+            animation: blink 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
     </style>
 </head>
 <body>
@@ -513,6 +561,7 @@
     <script>
         // 搜索引擎配置
         let currentEngine = 'bilibili';
+        let themeClickCount = 0;
         const searchUrls = {
             bilibili: 'https://search.bilibili.com/all?keyword=',
             bing: 'https://www.bing.com/search?q=',
@@ -588,6 +637,14 @@
 
         // 主题切换
         function toggleTheme() {
+            themeClickCount++;
+
+            // 彩蛋：连续点击10次触发 Error
+            if (themeClickCount >= 10) {
+                triggerErrorScreen();
+                return;
+            }
+
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
@@ -597,6 +654,33 @@
             // 更新按钮图标
             const btn = document.querySelector('.control-btn.theme');
             btn.textContent = newTheme === 'light' ? '☀️' : '🌙';
+        }
+
+        // 触发 Error 屏幕
+        function triggerErrorScreen() {
+            // 1. 显示 Error 文本
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-screen';
+            errorDiv.innerHTML = `
+                <div class="error-text">Error:CI.sys</div>
+                <div style="font-size: 0.5em; color: #666;">System Failure</div>
+            `;
+            document.body.appendChild(errorDiv);
+
+            // 2. 屏幕剧烈抖动
+            document.body.classList.add('error-shake');
+
+            // 3. 慢慢看不见（透明度降低）
+            let opacity = 1;
+            const fadeInterval = setInterval(() => {
+                opacity -= 0.02;
+                errorDiv.style.opacity = opacity;
+                if (opacity <= 0) {
+                    clearInterval(fadeInterval);
+                    // 4. 跳转
+                    window.location.href = 'https://abamao.github.io/Class';
+                }
+            }, 50);
         }
 
         // 全屏切换
