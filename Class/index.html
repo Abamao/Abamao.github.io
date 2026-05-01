@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10班电脑博物馆</title>
+    <style>
+        @font-face {
+            font-family: 'SmileySans';
+            src: url('fonts/smiley-sans-v2/SmileySans-Oblique.ttf.woff2') format('woff2'),
+                 url('fonts/smiley-sans-v2/SmileySans-Oblique.ttf') format('truetype'),
+                 url('fonts/smiley-sans-v2/SmileySans-Oblique.otf.woff2') format('woff2'),
+                 url('fonts/smiley-sans-v2/SmileySans-Oblique.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            overflow-x: hidden;
+        }
+        
+        .title-container {
+            position: relative;
+            text-align: center;
+            animation: fadeInUp 1.5s ease-out;
+        }
+        
+        h1 {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 6rem;
+            color: #fff;
+            text-shadow: 
+                0 0 10px #00d4ff,
+                0 0 20px #00d4ff,
+                0 0 40px #00d4ff,
+                0 0 80px #00d4ff,
+                0 0 120px #00d4ff;
+            letter-spacing: 0.3em;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        .subtitle {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 2rem;
+            color: #a0a0ff;
+            margin-top: 20px;
+            letter-spacing: 0.5em;
+            opacity: 0.8;
+        }
+        
+        .decorative-border {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            border-radius: 5px;
+        }
+        
+        .decorative-border-bottom {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #a0a0ff, transparent);
+            border-radius: 3px;
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00d4ff;
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+        
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 1s; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 2s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 3s; }
+        .particle:nth-child(5) { left: 50%; animation-delay: 4s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 6s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 7s; }
+        .particle:nth-child(9) { left: 90%; animation-delay: 0.5s; }
+        .particle:nth-child(10) { left: 15%; animation-delay: 1.5s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 
+                    0 0 10px #00d4ff,
+                    0 0 20px #00d4ff,
+                    0 0 40px #00d4ff,
+                    0 0 80px #00d4ff;
+            }
+            to {
+                text-shadow: 
+                    0 0 20px #00ffff,
+                    0 0 40px #00ffff,
+                    0 0 80px #00ffff,
+                    0 0 160px #00ffff;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .content-section {
+            margin-top: 80px;
+            width: 100%;
+            max-width: 800px;
+            animation: fadeInUp 1.5s ease-out 0.5s both;
+        }
+        
+        .timeline-item {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #a0a0ff, #00d4ff);
+            animation: shimmer 3s infinite linear;
+        }
+        
+        .timeline-number {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 4rem;
+            color: rgba(0, 212, 255, 0.3);
+            position: absolute;
+            top: -20px;
+            right: 20px;
+        }
+        
+        .timeline-title {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 2.5rem;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-content {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 1.2rem;
+            color: #e0e0e0;
+            line-height: 2;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-content p {
+            margin-bottom: 15px;
+        }
+        
+        .highlight {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        
+        .signature {
+            margin-top: 80px;
+            margin-bottom: 50px;
+            text-align: right;
+            padding-right: 50px;
+            animation: fadeInUp 1.5s ease-out 1s both;
+        }
+        
+        .signature-line {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00d4ff);
+            margin-left: auto;
+            margin-bottom: 20px;
+        }
+        
+        .class-photo-section {
+            margin-top: 60px;
+            padding: 40px;
+            text-align: center;
+            animation: fadeInUp 1.5s ease-out 1.2s both;
+        }
+        
+        .photo-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2);
+        }
+        
+        .class-photo {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .update-info {
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.95rem;
+        }
+        
+        .signature-text {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+        }
+        
+        .signature-name {
+            font-family: 'SmileySans', 'Microsoft YaHei', sans-serif;
+            font-size: 1.5rem;
+            color: #00d4ff;
+            font-weight: bold;
+            letter-spacing: 0.2em;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+                letter-spacing: 0.2em;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .timeline-title {
+                font-size: 1.8rem;
+            }
+            
+            .timeline-content {
+                font-size: 1rem;
+            }
+            
+            .timeline-number {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
+    <div class="title-container">
+        <div class="decorative-border"></div>
+        <h1>10班电脑博物馆</h1>
+        <div class="subtitle">CLASS 10 COMPUTER MUSEUM</div>
+        <div class="decorative-border-bottom"></div>
+    </div>
+    
+    <div class="content-section">
+        <div class="timeline-item">
+            <div class="timeline-number">01</div>
+            <div class="timeline-title">Yzi电脑计划的开端</div>
+            <div class="timeline-content">
+                <p>在<span class="highlight">3年级</span>,机缘巧合下,我看到了<span class="highlight">冰点还原</span>的密码。</p>
+                <p>这个密码打开了世界。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">02</div>
+            <div class="timeline-title">最初的梦境</div>
+            <div class="timeline-content">
+                <p>起初，人人没有在意这场梦，不过是电脑壁纸的<span class="highlight">黑色</span>，系统版本依旧是<span class="highlight">Windows7</span>。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">03</div>
+            <div class="timeline-title">转变的开始</div>
+            <div class="timeline-content">
+                <p>在<span class="highlight">4年级</span>，这一切都变了。</p>
+                <p>一开始只是小打小闹，为了一点所谓的虚伪，明明是<span class="highlight">Windows7</span>却硬换<span class="highlight">Windows10</span>的壁纸罢了。</p>
+                <p>直到我装了第一个<span class="highlight">拓展套件</span>......</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">04</div>
+            <div class="timeline-title">盯上希沃一体机</div>
+            <div class="timeline-content">
+                <p><span class="highlight">五年级</span>，我盯上了教室里那台<span class="highlight">希沃一体机</span>。</p>
+                <p>它像个白色的巨碑，挂在黑板正中央，老师们用它放PPT、批注生字、偶尔被某个手欠的同学划出三道横线还找不到怎么撤销。系统是<span class="highlight">Windows 10</span>，某个教育定制版，锁着各种权限，连壁纸都不让换。</p>
+                <p>但我知道它的秘密。</p>
+                <p>它也有<span class="highlight">冰点还原</span>。或者说，希沃自己的"<span class="highlight">冰冻模式</span>"——每次重启，一切还原如初，干干净净，仿佛什么都没发生过。</p>
+                <p>可我偏偏想让"发生过"留下来。</p>
+                <p><span class="highlight">"000000？"</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">05</div>
+            <div class="timeline-title">壁纸革命</div>
+            <div class="timeline-content">
+                <p>事情的起因很可笑：<span class="highlight">我不想再看那张默认壁纸了</span>。</p>
+                <p>蓝绿渐变，上面印着"<span class="highlight">希沃·助力教育信息化</span>"——这行字我对着它发了两年呆。我想要的，是<span class="highlight">Win11</span>那张像花瓣一样散开的光晕壁纸，深蓝底色，干净又锋利，像个未来世界该有的样子。</p>
+                <p>于是我动手了。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">06</div>
+            <div class="timeline-title">黄昏的冒险</div>
+            <div class="timeline-content">
+                <p>破解<span class="highlight">冰点还原</span>的密码，我已经背得比自己的考号还熟。</p>
+                <p>那是一个放学后的黄昏，值日生扫完地走了，教室里只剩下消毒水的味道和窗外橙色的夕阳。我拉上窗帘，走到讲台前，手指按上希沃的屏幕。触控屏微微发热，像某种沉睡生物的体温。</p>
+                <p><span class="highlight">关掉冰冻模式</span>。<span class="highlight">重启</span>。<span class="highlight">进入PE</span>。</p>
+                <p><span class="highlight">"登...登...登"</span></p>
+                <p>当<span class="highlight">Windows 11</span>的安装界面在那块<span class="highlight">86英寸</span>的巨屏上亮起来时，整间教室被照得发白。我站在讲台上，影子拉得很长，像一个站在太空舱控制台前的宇航员。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">07</div>
+            <div class="timeline-title">驱动的挑战</div>
+            <div class="timeline-content">
+                <p>过程比我想象的顺利。希沃的<span class="highlight">触控驱动</span>在Win11下居然还能用，只是红外框需要重新校准。麦克风、扬声器都奇迹般地活了下来。</p>
+                <p>失败的是<span class="highlight">摄像头</span>。</p>
+                <p>那个屏幕右边的小眼睛，在Win11下彻底罢工了。我查了三天资料，在某个希沃售后的隐藏论坛里找到一个匿名回复，说需要<span class="highlight">魔改驱动inf文件</span>，强制指定设备ID。我照做了，像一个赤脚医生，给这头白色巨兽接上最后一根断掉的神经。</p>
+                <p>摄像头弹出那一刻，我对着它的镜头笑了。屏幕里那个黑乎乎的、模糊的<span class="highlight">SEEWO</span>展台图标，也对我笑了。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">08</div>
+            <div class="timeline-title">秘密的胜利</div>
+            <div class="timeline-content">
+                <p>第二天上课，<span class="highlight">数学老师</span>打开一体机。</p>
+                <p>开机画面跳出来的不是希沃的Logo，而是<span class="highlight">Windows 11</span>的四格花瓣。蓝色的光晕铺满整块屏幕，像深海里的水母突然绽放。</p>
+                <p>她愣了一下。</p>
+                <p>底下有同学小声嘀咕："<span class="highlight">这个新系统好漂亮。</span>"</p>
+                <p>老师也没多想，点开了PPT，开始讲「<span class="highlight">数与代数</span>」。一切正常，批注能用，触控灵敏，甚至比之前还流畅。她永远不会知道，眼前这台机器昨天晚上经历了怎样的手术，也不会知道那个坐在第三排、正在课本上画地铁的小男孩，是这台教室里<span class="highlight">唯一真正拥有它</span>的人。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">09</div>
+            <div class="timeline-title">意外的自由</div>
+            <div class="timeline-content">
+                <p>但我很快发现了问题。</p>
+                <p>Win11对<span class="highlight">TPM 2.0</span>的要求，被我跳过了。系统偶尔会弹出一个"<span class="highlight">硬件不符合最低要求</span>"的水印，像一块洗不掉的胎记，顽固地印在右下角。更要命的是，希沃的"<span class="highlight">希沃管家</span>"装不回来，那个能远程监控屏幕、一键锁屏的教师端管理软件，在Win11下无法运行。</p>
+                <p>这意味着什么？</p>
+                <p>意味着从今往后，<span class="highlight">老师再也看不到我这台机子的屏幕</span>。</p>
+                <p>这比换壁纸刺激多了。</p>
+                <p><span class="highlight">：）</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">10</div>
+            <div class="timeline-title">课间的灾难</div>
+            <div class="timeline-content">
+                <p>那是一个寻常的课间。</p>
+                <p>我去了一趟厕所，回来时看见一个同班的小孩正站在讲台上，手指在希沃屏幕上疯狂划拉，像在玩切水果。周围几个同学在起哄，没人阻止。</p>
+                <p><span class="highlight">我的血一瞬间凉了半截。</span></p>
+                <p>冲上去的时候已经晚了。桌面上我精心排列的<span class="highlight">快捷方式</span>不见了，几个文件夹被拖进回收站然后清空，浏览器主页被改成一个游戏导航站，右下角还多了一串弹窗广告——他大概是点了什么"<span class="highlight">免费加速器</span>"的安装包。</p>
+                <p>那块<span class="highlight">Win11</span>的光晕壁纸上，此刻叠满了乱七八糟的图标，像一张被涂鸦的名画。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">11</div>
+            <div class="timeline-title">无声的愤怒</div>
+            <div class="timeline-content">
+                <p>小孩被我拉开时还在笑，手里沾着午餐的油，<span class="highlight">抹了一屏幕</span>。</p>
+                <p><span class="highlight">我什么都没说。因为没法说。</span></p>
+                <p>怎么解释？说这个系统是我违规改造的，说这些文件是我私藏的宝藏，说这块桌面是我用三年时间一砖一瓦搭建起来的<span class="highlight">精神领地</span>？</p>
+                <p>在场的同学只看见一个五年级学生在和一个同样的年级学生对峙，为了一台"<span class="highlight">班里的电脑</span>"。没有人理解我为什么脸涨得通红，手在发抖。</p>
+                <p>我沉默地拿湿巾擦掉屏幕上的油渍。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">12</div>
+            <div class="timeline-title">最后的抉择</div>
+            <div class="timeline-content">
+                <p>那天放学，我又留到了最后。</p>
+                <p>夕阳和上次一样橙，消毒水的味道和上次一样刺鼻，但我心里那艘<span class="highlight">太空船</span>已经炸成了碎片。我站在讲台上，盯了屏幕很久。Win11右下角那个"<span class="highlight">未激活Windows11</span>"的水印还在，像在嘲笑我：看吧，你连最低要求都达不到，你还想守住什么？</p>
+                <p>然后我动手了。</p>
+                <p>不是修复。<span class="highlight">是投降。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">13</div>
+            <div class="timeline-title">重拾枷锁</div>
+            <div class="timeline-content">
+                <p>我从希沃官网下载了最新版的<span class="highlight">希沃管家</span>。安装过程很顺利，Win11没有报错——这个版本大概已经适配了新系统，讽刺的是，当初我装不了它，现在它却成了我的<span class="highlight">救命稻草</span>。</p>
+                <p>希沃管家装好之后，我盯着它的界面看了很久。那个曾经被我视为枷锁的功能列表：<span class="highlight">冰点还原</span>、远程监控、应用白名单、屏幕广播接收端……此刻看起来，竟像一份安全说明书。</p>
+                <p>我打开了冰点还原。</p>
+                <p>重启。进入设置。选择冻结C盘。确认。</p>
+                <p>熟悉的蓝色界面，像冰箱深处幽暗的霜。那个曾经被我破解过无数次的<span class="highlight">密码输入框</span>，此刻是我亲手输入的。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">14</div>
+            <div class="timeline-title">成长的代价</div>
+            <div class="timeline-content">
+                <p>我关掉那个输入框的时候，感觉自己像把一把<span class="highlight">钥匙</span>扔进了深井。井口太小，没有人能再捞上来。包括我。</p>
+                <p>那个在三年级的微机课上偶然瞥见密码的小孩，那个趁没人时偷偷关掉冰冻模式、只为换一张壁纸的小孩，那个在放学后的空教室里、站在巨屏前装Win11、觉得自己在<span class="highlight">改造世界</span>的小孩——</p>
+                <p><span class="highlight">他长大了。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">15</div>
+            <div class="timeline-title">新的守护</div>
+            <div class="timeline-content">
+                <p>第二天，老师打开一体机。</p>
+                <p>Win11的花瓣绽放，桌面干净整齐，一切正常。上课，PPT，板书，下课，关机。</p>
+                <p>没有人知道昨晚发生过什么。</p>
+                <p>那个辣条小孩又来了一次，在屏幕上乱划，打开浏览器想下载游戏。我坐在第三排，远远看着，<span class="highlight">没有任何反应</span>。</p>
+                <p>他找不到安装包。重启之后，一切恢复如初。</p>
+                <p><span class="highlight">冰点还原</span>的蓝色幽灵，此刻正守护着这台机器。它不是我当初痛恨的那个狱卒了，它是一堵墙，沉默而可靠，把一切混乱挡在外面。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">16</div>
+            <div class="timeline-title">自由的真谛</div>
+            <div class="timeline-content">
+                <p>只有我知道，这块深蓝壁纸的下方，曾经埋葬过一个<span class="highlight">王国</span>。</p>
+                <p>而亲手将它下葬的人，此刻正安静地坐在第三排，翻着语文书，等着下课铃响。</p>
+                <p>有些人理解的自由，是想做什么就做什么。</p>
+                <p>而我在那一年学到的是——</p>
+                <p><span class="highlight">真正的自由，是知道什么时候该冻住它。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">17</div>
+            <div class="timeline-title">蓝色的牢笼</div>
+            <div class="timeline-content">
+                <p>我高估了自己的平静。</p>
+                <p>那个蓝色壁纸，一开始是干净，是无辜，是一张不会被任何人怀疑的脸。但日复一日地盯着它，那些花瓣的纹路像刻进了我的视网膜，闭眼也能看见。它不再是深海，不再是未来世界，它只是一层皮。</p>
+                <p><span class="highlight">我想换掉它。</span>这个念头像一颗休眠了很久的种子，在某个百无聊赖的数学课上，突然裂开了壳。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">18</div>
+            <div class="timeline-title">钥匙从未沉没</div>
+            <div class="timeline-content">
+                <p>又一次放学后。</p>
+                <p>我站在希沃面前，手指悬在屏幕上方，犹豫了大概三秒钟。然后我输入了冰点还原的密码。</p>
+                <p>是的，我说过我忘了它。我说我把钥匙扔进了深井。</p>
+                <p>但那口井，是我的脑子。当我站在那台白色巨兽面前时，那串字符从井底浮了上来，<span class="highlight">像从未沉下去过一样</span>。</p>
+                <p><span class="highlight">我骗不了自己。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">19</div>
+            <div class="timeline-title">活的世界</div>
+            <div class="timeline-content">
+                <p>关掉冰冻模式之后，我做的第一件事不是换壁纸，是找壁纸。</p>
+                <p>我找到了一个叫<span class="highlight">Wallpaper Engine</span>的软件。那天晚上，我第一次对它有了认知——不是一张静态的壁纸，而是一整个活着的世界。雨打在车窗玻璃上，霓虹灯在赛博城市的夜空里呼吸，极光在冰岛的雪山上方缓慢流淌。</p>
+                <p>我选了一个：深夜的东京街头，雨刚停，路面反着光，远处有出租车缓缓驶过，广告牌的灯光在积水里碎成一片。</p>
+                <p><span class="highlight">86英寸的屏幕上，这座城市活了过来。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">20</div>
+            <div class="timeline-title">极致优化</div>
+            <div class="timeline-content">
+                <p>但新的问题来了。</p>
+                <p>动态壁纸需要Wallpaper Engine在后台运行。这意味着开机自启、后台进程、资源占用。更要命的是，希沃一体机那块触摸屏的分辨率是4K的，但核显弱得可怜，动态壁纸一跑，连拖拽窗口都开始掉帧。</p>
+                <p><span class="highlight">我开始优化。</span></p>
+                <p>Wallpaper Engine里调低帧率，关闭抗锯齿，把视频壁纸换成轻量级的场景。然后我下载了<span class="highlight">Dism++</span>，清理了系统冗余；装了<span class="highlight">Wise Memory Optimizer</span>，让内存管理更聪明；甚至用上了<span class="highlight">Autoruns</span>，把一切不必要的开机启动项砍得干干净净。</p>
+                <p>我还把桌面图标做了精准对齐。不是肉眼对齐，是<span class="highlight">坐标对齐</span>——每个图标的X轴Y轴坐标都是整数，间距完全相等。回收站放在右下角最边缘的位置，像一个句号。</p>
+                <p>做完这一切之后，我看着那块屏幕。东京的雨夜，路面的反光。四个图标安静地排列在左上角，像棋子。一切井井有条。比那个死板的蓝色花瓣更美，更鲜活，更——<span class="highlight">掌控。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">21</div>
+            <div class="timeline-title">日常维护</div>
+            <div class="timeline-content">
+                <p>每天放学，我都会留十分钟。</p>
+                <p>这十分钟不是用来“搞事情”，而是用来维护。</p>
+                <p>检查Wallpaper Engine有没有崩溃。看看内存占用是不是又飙了。清理一下浏览器缓存。偶尔给动态壁纸换一个新场景——下雨的京都、雪中的札幌、清晨的台北101。</p>
+                <p>冰点还原开着，但解冻区域里，我给Wallpaper Engine和配置文件单独划了一个分区。这样重启之后，系统干净如初，但壁纸不会丢，设置不会丢，桌面图标的坐标不会丢。</p>
+                <p><span class="highlight">我在秩序的内核里，种了一小片活的、会呼吸的、属于我自己的花圃。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">22</div>
+            <div class="timeline-title">掌控的边界</div>
+            <div class="timeline-content">
+                <p>那个辣条小孩又来了几次。他打开浏览器想下载游戏，却发现网页加载不出来——因为我在<span class="highlight">hosts文件</span>里把那些游戏网站全指向了127.0.0.1。他点一下图标，弹出来的是“该程序已被管理员禁用”。他试图在桌面上新建一个文本文档，重启之后，干干净净，连文本的灰烬都没有。</p>
+                <p>他终于放弃了。</p>
+                <p>我看着他的背影离开讲台，心里浮起一种奇怪的感受。不是得意，不是报复的快感，而是一种——<span class="highlight">我有权决定什么留在这里。</span></p>
+                <p>这比当初那个偷偷摸摸换壁纸的冲动，<span class="highlight">危险得多。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">23</div>
+            <div class="timeline-title">平衡之道</div>
+            <div class="timeline-content">
+                <p>有一天晚上，维护结束，我站在讲台上，看着那块东京的雨夜，发了很久的呆。</p>
+                <p>远处那些广告牌是日文的，我看不懂。出租车缓缓驶过路口。画面里的那个城市永远不会天亮，也永远不会雨停。它在永夜和雨后之间，定格成一种永恒的、静止的生动。</p>
+                <p>我突然意识到——</p>
+                <p>我费尽心思优化的这些软件，划出的这块解冻区，预留的这些后台进程，本质上都是在做同一件事：<span class="highlight">让这台机器在服从集体秩序的前提下，为我留下一寸私人领地。</span></p>
+                <p>那个三年级的我，用破解密码换自由。那个五年级的我，用装新系统换自由。那个六年级的我，用亲手冻结一切换安全。</p>
+                <p><span class="highlight">而现在的我，不再选边站了。我学会了两者兼得。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">24</div>
+            <div class="timeline-title">新的渴望</div>
+            <div class="timeline-content">
+                <p>动态壁纸跑了几个月，东京的雨被我看了上千遍。</p>
+                <p>我开始注意到一些更隐秘的东西。右下角那个"<span class="highlight">硬件不符合最低要求</span>"的水印还在，像个顽固的胎记。更让我不舒服的，是系统版本号——<span class="highlight">23H2</span>。我知道外面有个更新的世界，叫<span class="highlight">24H2</span>，甚至，在那条最暗的渠道里，流传着一个更疯狂的名字：<span class="highlight">25H2</span>。</p>
+                <p>那是连正式推送都还没影的版本，刚从开发分支泄露出来，像个早产儿，浑身插满管子，呼吸都不稳。</p>
+                <p><span class="highlight">但我想试试。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">25</div>
+            <div class="timeline-title">勇敢者之路</div>
+            <div class="timeline-content">
+                <p>找资源花了我整整一周。</p>
+                <p>不是那些充斥着捆绑软件的一键装机包，那个我不碰。我要的是原版ISO，校验<span class="highlight">SHA256</span>，确保没被加过料。最后在一个只有几百人关注的搬运频道里，我找到了。镜像描述里写着一行字：</p>
+                <p><span class="highlight">"Windows 11, version 25H2 (Preview). For the brave."</span></p>
+                <p>致勇敢者。</p>
+                <p>我把这句话读了三遍，然后点下了下载。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">26</div>
+            <div class="timeline-title">延时的仪式</div>
+            <div class="timeline-content">
+                <p>这一次，我没有在放学后动手。</p>
+                <p>25H2的镜像太大了，安装时间也长，区区放学后那点时间根本不够。我等到了延时。</p>
+                <p>空荡荡的教学楼，脚步声在走廊里回荡。我推开教室门，下午三点的阳光正打在希沃那块白框上。</p>
+                <p><span class="highlight">像一场专门为我准备的仪式。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">27</div>
+            <div class="timeline-title">产房外的等待</div>
+            <div class="timeline-content">
+                <p>U盘插进去，从镜像启动。</p>
+                <p>我没有选择升级安装，而是格掉了C盘，全新安装。冰点还原、希沃管家、那个我精心配置了几个月的动态壁纸生态——<span class="highlight">全没了。</span></p>
+                <p>但我知道我在干什么。</p>
+                <p>25H2的安装界面和23H2几乎一样，蓝色的花瓣旋转着。左下角有一行小字，我凑近屏幕看清了：<span class="highlight">Build 26200</span>。是个很靠前的内部版本，微软给开发者尝鲜用的。</p>
+                <p>进度条走得很慢。希沃的风扇开始狂转，这块86英寸巨屏背面的发热量，让整个讲台区域都弥漫着一股微微的塑料味。</p>
+                <p>我坐在第一排，等着。<span class="highlight">像一个在产房外面等待的父亲。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">28</div>
+            <div class="timeline-title">活的系统</div>
+            <div class="timeline-content">
+                <p>装好了。</p>
+                <p>桌面亮起来的时候，我第一反应是——<span class="highlight">不对劲。</span></p>
+                <p>太流畅了。不是那种"嗯，感觉快了一点"的流畅，而是肉眼可见的。动画的帧率更高，窗口拖拽时的跟手性像抹了油，连右键菜单弹出的速度都干脆利落，没有23H2那种微妙的、不到半秒的迟疑。</p>
+                <p>微软在这一版里重写了窗口管理器的渲染层。这是我后来才知道的。</p>
+                <p>那一刻我只知道一件事：<span class="highlight">这个系统，是活的，而且它比之前的任何一个版本都想跑起来。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">29</div>
+            <div class="timeline-title">驱动危机</div>
+            <div class="timeline-content">
+                <p>但代价也很快浮现。</p>
+                <p><span class="highlight">触控驱动废了。</span>不是半废，是全废。手指点上去，光标在完全错误的位置跳动，像一只迷路的萤火虫。86英寸的巨屏变成了一块86英寸的电子相框，只能看，不能碰。</p>
+                <p>我站在讲台上，对着那块完全不理我的屏幕，沉默了很久。</p>
+                <p>然后我打开笔记本，开始找驱动。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">30</div>
+            <div class="timeline-title">拆弹专家</div>
+            <div class="timeline-content">
+                <p>希沃官网没有25H2的驱动，甚至没有24H2的。最新的版本号还停在22H2，像个早已放弃追赶的老兵，坐在路边看着年轻人一辆接一辆飙过去。</p>
+                <p>我翻了国外的触控驱动论坛。有人在某个帖子底下回了一句："<span class="highlight">Silicon Labs</span>的触控控制器，通用驱动可以强制签名。"</p>
+                <p>顺着这条线索，我摸到了一份英文驱动包。安装时Windows跳了红字警告，说签名过期。我关了Secure Boot，强制加载。</p>
+                <p>没用。还是飘。</p>
+                <p>我又换了一个版本。再换。改inf里的设备ID。手动校准注册表里的触控映射参数。</p>
+                <p><span class="highlight">那个周六的下午，我像在拆一颗炸弹，红线和蓝线全是同一个颜色。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">31</div>
+            <div class="timeline-title">完美的圆</div>
+            <div class="timeline-content">
+                <p>最后一组参数改完的时候，夕阳已经变成了走廊尽头的一小片橙色光斑。</p>
+                <p>我伸出手指，点在屏幕上。</p>
+                <p>光标，精准。</p>
+                <p>拖动，跟手。</p>
+                <p>右键长按，菜单弹出。</p>
+                <p><span class="highlight">我在那块86英寸的巨屏上，用指尖画了一个圈。没有断触，没有漂移。完美的圆。</span></p>
+                <p>那一刻，东京的雨还没装回来，动态壁纸也没装回来，冰点还原也没装回来。桌面上空荡荡的，只有回收站孤零零地站在右下角。</p>
+                <p><span class="highlight">但我比任何时候都觉得，这机器是我的。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">32</div>
+            <div class="timeline-title">评估者</div>
+            <div class="timeline-content">
+                <p>25H2带来的，不止是流畅。</p>
+                <p>我注意到一个新功能：<span class="highlight">Dev Drive</span>，给开发者准备的虚拟硬盘格式，能提升小文件读写性能。我把D盘格成了ReFS。还有一个藏在开发者选项里的开关，叫"<span class="highlight">End Task on taskbar</span>"——任务栏右键可以直接杀死程序。这对一个喜欢折腾的人来说，是利器。</p>
+                <p>但真正让我愣住的，是系统启动时闪过的一行小字：</p>
+                <p><span class="highlight">"For evaluation purposes only."</span></p>
+                <p>仅供评估。</p>
+                <p>这意味着它是未授权的、限时的、不被正式承认的存在。一旦过期，它会开始每小时自动关机。当然，我有办法重置那个计时器——总有办法。</p>
+                <p>但那个词，evaluation，在我脑子里扎了根。</p>
+                <p><span class="highlight">这台机器在评估我，还是我在评估这台机器？</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">33</div>
+            <div class="timeline-title">星球壁纸</div>
+            <div class="timeline-content">
+                <p>天黑之前我装回了希沃管家，装回了冰点还原。</p>
+                <p>冻结C盘的那一刻，熟悉的蓝色界面又跳了出来。我把密码输进去，然后划出了一个新的解冻区——D盘，ReFS格式，专门给Wallpaper Engine和以后可能会装的奇怪东西。</p>
+                <p>动态壁纸也装回来了。但不是东京雨夜了。我换了一个：<span class="highlight">从国际空间站俯瞰地球，云层缓慢流动，城市的灯光在暗面闪烁。</span></p>
+                <p><span class="highlight">那片蓝色花瓣，终于被换掉了。不是换成某张别人的壁纸，是换成了一整个星球。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">34</div>
+            <div class="timeline-title">隐形的纹身</div>
+            <div class="timeline-content">
+                <p>周一，语文老师点开希沃，照常上课。</p>
+                <p>她永远不会知道，这台机器此刻运行的，是一个还没正式发布的、从开发分支泄露出来的、微软写给开发者看的"<span class="highlight">勇敢者版本</span>"。她更不会知道，为了这点看不见的"快"，我用一个周六的下午，把一台86英寸的巨屏从一块昂贵的砖头，救回成一台活着的、会呼吸的电脑。</p>
+                <p>右下角的水印换了。不再是"硬件不符合最低要求"，而是一行灰色的、更小的字：</p>
+                <p><span class="highlight">"Windows 11 企业版，Build 26200。"</span></p>
+                <p>老师没注意到。同学没注意到。辣条小孩也没注意到。</p>
+                <p><span class="highlight">它就在那里，像一个纹身，隐在所有人视线的盲区里。</span></p>
+                <p>只有我看得见。</p>
+                <p><span class="highlight">每一次开机，那行字都在对我说：你在这里。你是那百分之一。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">35</div>
+            <div class="timeline-title">绿屏时刻</div>
+            <div class="timeline-content">
+                <p>那个早晨本来很寻常。</p>
+                <p>英语老师走上讲台，手里捏着U盘。早读文章，配套音频，十几分钟的听力练习。底下有人还在补昨晚的作业，有人趴在桌上假寐，窗外麻雀叫得像开会。</p>
+                <p>她把U盘插进希沃侧面的接口。系统认出来了，自动播放弹窗跳出。她点开"打开文件夹"，找到MP3文件，双击。</p>
+                <p>然后，安静。<span class="highlight">不是没声音的那种安静。是时间碎了的那种安静。</span></p>
+                <p>音频放出来的第一秒，是一声尖锐的电子啸叫，像指甲刮过一整块铝板。紧接着，画面冻住，鼠标卡死，触控失灵。</p>
+                <p>然后，一整块86英寸的屏幕，从那个深蓝色花瓣，慢慢过渡成一种我从未见过的<span class="highlight">绿色</span>。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">36</div>
+            <div class="timeline-title">致命的文件名</div>
+            <div class="timeline-content">
+                <p>教室没炸。但差不多了。</p>
+                <p>"坏了坏了——" "老师电脑蓝屏了！" "我靠，这什么情况？"</p>
+                <p>英语老师连敲了几下鼠标，没反应。她又去按机箱侧面的电源键，长按，还是没反应。那抹绿色像长在屏幕上了一样，纹丝不动。</p>
+                <p>只有我看见了那一行字。</p>
+                <p>在一整片死绿的正中央，白色的小字，冷静得像验尸报告：</p>
+                <p><span class="highlight">DRIVER_IRQL_NOT_LESS_OR_EQUAL</span></p>
+                <p><span class="highlight">What failed: myfault.sys</span></p>
+                <p>我的血凉了第二次。</p>
+                <p>不是因为蓝屏——不对，绿屏。是因为那个文件名。<span class="highlight">myfault.sys。</span></p>
+                <p>那是我装的东西。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">37</div>
+            <div class="timeline-title">失控的代码</div>
+            <div class="timeline-content">
+                <p>一切在脑子里回溯得飞快。</p>
+                <p>25H2装了之后，我怕希沃官方的触控驱动不稳定，一直留着那套从国外论坛扒来的通用驱动。因为要强制加载未签名的驱动，我没关测试模式——不对，我关了，但我忘了关彻底。还有一个残留的服务，开机自启，调用了一个我自己魔改过的驱动文件，名字就是<span class="highlight">myfault.sys</span>。</p>
+                <p>那是我在某个深夜写着玩的。一个用来学习驱动开发的小工具，本质上就是劫持IRP请求然后转发。我写完测试过几次，没出问题，就扔在<span class="highlight">System32\drivers</span>文件夹里没删。</p>
+                <p><span class="highlight">忘了。我忘了。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">38</div>
+            <div class="timeline-title">定时炸弹</div>
+            <div class="timeline-content">
+                <p>老师还在拍机箱。后排有人开始笑。纪律委员站起来维持秩序，然后被班主任推门进来的动静打断了。</p>
+                <p>"怎么了？屏幕怎么蓝了？" "是绿的，"有人纠正她，"老师，是绿的……" "管它蓝的绿的，重启啊。"</p>
+                <p>班主任伸手去长按电源。五秒，十秒。屏幕灭了。风扇的声音停下来了，教室突然安静得可耻。</p>
+                <p>她再按。屏幕亮起来，黑色背景，白色字体，跳出引导菜单。</p>
+                <p>她选"<span class="highlight">正常启动</span>"。</p>
+                <p><span class="highlight">我的心脏停了一拍。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">39</div>
+            <div class="timeline-title">心跳加速</div>
+            <div class="timeline-content">
+                <p>正常启动，会加载那个驱动。</p>
+                <p><span class="highlight">myfault.sys</span>还躺在drivers文件夹里，等着下一次IRQ冲突把它炸出来。刚才那个音频文件大概调用了音频驱动，音频驱动调用了某个中断请求，然后我的驱动在那个中断请求上插了一脚——IRQL冲突，内核崩了。</p>
+                <p><span class="highlight">这台机器，现在是定时炸弹。</span></p>
+                <p>英语老师的U盘还插在上面。班主任看了她一眼，她讪讪地把U盘拔下来，改用那个老的磁带机放听力。</p>
+                <p>磁带机滋滋啦啦转起来。希沃还黑着。班主任说："先这样吧，回头叫电教老师修。"</p>
+                <p><span class="highlight">我坐在第三排，手心里全是汗。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">40</div>
+            <div class="timeline-title">清理现场</div>
+            <div class="timeline-content">
+                <p>中午吃完饭，我找班主任要了教室钥匙。理由是"<span class="highlight">作业本忘里面了</span>"。</p>
+                <p>门关上，窗帘拉好。我一个人站在黑屏的希沃面前，深呼吸了三次。</p>
+                <p>开机。F8。<span class="highlight">安全模式。</span></p>
+                <p>进系统之后，我直奔C:\Windows\System32\drivers。myfault.sys安安静静地躺在那里，文件图标是空白的，像一张没写名字的墓碑。</p>
+                <p>我选中它。<span class="highlight">Shift+Delete。</span></p>
+                <p>确认删除的对话框弹出那一刻，我想把这个文件彻底吃下去。</p>
+                <p>回车。<span class="highlight">没了。</span></p>
+                <p>我又检查了注册表，删掉那个残留的服务项。关掉测试模式残留的启动参数。开机自启列表。任务计划程序。驱动加载日志。我像在犯罪现场清理指纹，每一处可能的残留都没放过。二十分钟后，我重启了机器。</p>
+                <p>没有绿屏。桌面出来了。Wallpaper Engine的太空站还在缓慢旋转。一切如常，像什么都没发生过。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">41</div>
+            <div class="timeline-title">刀刃的教训</div>
+            <div class="timeline-content">
+                <p>但发生过的，就是发生过的。</p>
+                <p>我没在冰点还原的排外分区里留myfault.sys的备份，也没在以后的任何项目里再用过以"<span class="highlight">my</span>"开头的驱动名。那天中午的冷汗，渗进了教室地板的缝隙里，变成了后来每次开机时，都会从脊椎底部泛上来的一小股凉意。</p>
+                <p><span class="highlight">权限是一把刀。</span></p>
+                <p><span class="highlight">我用刀背划过自己一次，才知道刀刃有多薄。</span></p>
+                <p>从那以后，每一次在别人的机器上动东西，那种微微的凉意都会准时出现。它不是恐惧。它是一行正在我心里编译的代码，注释里写着：</p>
+                <p><span class="highlight">"Yzi，别再忘了你写过的东西。"</span></p>
+                <p>注释没有触发条件。它一直运行。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">42</div>
+            <div class="timeline-title">新的发现</div>
+            <div class="timeline-content">
+                <p>绿屏事件之后，我安分了一阵子。</p>
+                <p>不是那种金盆洗手的安分——我仍然会在放学后留下来，打开希沃的冰点解冻区，给系统做做维护，清理一下日志，检查有没有哪个驱动又闹脾气。但我不再装新东西了。那个被<span class="highlight">Shift+Delete</span>吃掉的<span class="highlight">myfault.sys</span>，像个幽灵一样盘踞在我每次敲回车时的犹豫里。</p>
+                <p>直到某天，我在<span class="highlight">GitHub</span>上刷到了一个项目。</p>
+                <p>它的名字叫<span class="highlight">ClassIsland</span>。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">43</div>
+            <div class="timeline-title">悬浮的存在</div>
+            <div class="timeline-content">
+                <p>ClassIsland的本意，是在教室大屏上显示课表。灵动岛风格，上课下课提醒，天气信息，倒计时——这些功能，我一个都用不上。希沃自带的白板软件里本来就有课表组件，老师从来不用，觉得挡PPT。</p>
+                <p>但我看上的不是课表。是它的存在方式。</p>
+                <p>一个半透明的悬浮条，安静地挂在屏幕顶部，不抢眼，不碍事，但一直<span class="highlight">在</span>。可以自定义颜色、透明度、字体、显示内容。它本质上是一个在桌面上永远置顶的窗口，像一个合法的、被允许存在的异物。</p>
+                <p>这让我产生了某种奇怪的共鸣。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">44</div>
+            <div class="timeline-title">第一次启动</div>
+            <div class="timeline-content">
+                <p>下载。解压。安装。</p>
+                <p>ClassIsland要求<span class="highlight">.NET 8.0</span>运行时，希沃上当然没有，我先装了这个前置。好在25H2的兼容性够宽，一路绿灯。</p>
+                <p>第一次启动的时候，那个半透明的悬浮条在86英寸的巨屏顶部弹出来，默认显示着"今日课表：无"。我盯着它看了好一会儿。</p>
+                <p>它太小了。小到在这块可以装下整个东京雨夜的屏幕上，它像一行悄悄话。</p>
+                <p><span class="highlight">但我就是喜欢这个尺寸。越不起眼，越安全。越不引人注目，越长久。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">45</div>
+            <div class="timeline-title">偷梁换柱</div>
+            <div class="timeline-content">
+                <p>我开始折腾它的配置文件。</p>
+                <p>ClassIsland的数据文件是开放的<span class="highlight">JSON</span>，可以直接用记事本改。我把"课表"这个概念偷梁换柱——英语课变成了"早读·英语听力"，数学课变成了"数学习题课"，语文课变成了"语文·古诗鉴赏"。</p>
+                <p>这不是为了给谁看。老师上课还是照样点开希沃白板，这个悬浮条在顶部就像壁纸上多了一条细线，没人注意。</p>
+                <p>但我注意到了。</p>
+                <p>上课铃响的那一刻，悬浮条会变一次颜色，弹一行小字："下一节：语文"。下课铃响，又变一次，底下的倒计时进度条归零，然后重新开始跑。</p>
+                <p>这种感觉很奇怪。它像一个我看不见的管家，在这台机器里轻声提醒，声音只有我能听见。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">46</div>
+            <div class="timeline-title">隐藏模式</div>
+            <div class="timeline-content">
+                <p>然后我发现了它的隐藏模式。</p>
+                <p>轻触悬浮条的空白区域，它可以缩成一个小圆点，藏在屏幕最右上角的边缘。再点一下，展开。长按，弹出一个精简菜单，切课表、调音量、看倒计时。</p>
+                <p><span class="highlight">这个交互太对味了。</span></p>
+                <p>绿屏事件之后，我一直在想一个问题：怎样的存在才是安全的？那个动态壁纸太显眼，那个驱动太底层，那个系统版本太超前——每一个都在疯狂地向外界打信号：这台机器不一样。</p>
+                <p>但ClassIsland不一样。它<span class="highlight">不宣告自己的存在</span>。它缩成一个圆点的时候，像一颗痣。没人会对一颗痣起疑心。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">47</div>
+            <div class="timeline-title">写给自己的课表</div>
+            <div class="timeline-content">
+                <p>我把它配成了和Win11深色任务栏一样的颜色。半透明磨砂背景，白色文字，字号调到最小那一档。悬浮条的位置从顶部移到了右下角——不是正右下，是偏上一点，刚好在回收站的左边，像是和那个孤独的垃圾桶做了邻居。</p>
+                <p>显示的"课表"，我重新填了一份。</p>
+                <p><span class="highlight">不是真正的课表，是一天的节奏提醒。</span></p>
+                <p>"早读 · 安静" "第一节课 · 保持清醒" "课间操 · 别看屏幕" "午休 · 趴下" "最后一节 · 快结束了"</p>
+                <p>每一条，都是写给我自己看的。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">48</div>
+            <div class="timeline-title">无声的守护</div>
+            <div class="timeline-content">
+                <p>老师当然没发现。</p>
+                <p>她的注意力永远在课件上，在底下说话的同学身上，在那个永远擦不干净的黑板槽上。她不会注意到屏幕右下角多了一行半透明的小字，就像她不会注意到右下角那个"<span class="highlight">Build 26200</span>"的水印。</p>
+                <p>辣条小孩也没发现。他来过一次，想改掉课表上的字，但手指戳上去没反应——ClassIsland的<span class="highlight">密码保护</span>功能我开了。他戳了几下，以为是个系统组件，悻悻地走了。</p>
+                <p>我看着那个半透明的悬浮条，在放学铃声响起的那一刻，准时弹出："<span class="highlight">放学 · 留下来。</span>"</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">49</div>
+            <div class="timeline-title">暗号</div>
+            <div class="timeline-content">
+                <p>它成了我和这台机器之间的暗号。</p>
+                <p>每天早上开机，ClassIsland比任何程序都先启动。Wallpaper Engine还在加载太空站的云层动画，它已经安静地浮在右下角，像一个早到的朋友，提前占好了座位。</p>
+                <p>"早读 · 安静。"</p>
+                <p>我看着那行字，翻开语文书。</p>
+                <p>外面的麻雀在叫，班主任在走廊上巡查，后排的人在补作业，前排的人在偷偷啃包子。一切都和昨天一样，和上周一样，和这台希沃还在跑23H2、还没被那个辣条小孩毁掉桌面、还没绿屏、还没装上这个悬浮条的时候——<span class="highlight">一模一样</span>。</p>
+                <p><span class="highlight">但我不一样了。</span></p>
+                <p>我不再需要这块屏幕证明什么。不需要动态壁纸宣告我的存在，不需要最新版系统彰显我的技术，不需要任何一个人知道右下角那个小圆点背后藏着一整天的时间咒语。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">50</div>
+            <div class="timeline-title">最后的默契</div>
+            <div class="timeline-content">
+                <p>冰点还原的密码我还记着。但我很久没关过它了。</p>
+                <p>解冻区里，ClassIsland安静地躺着，和Wallpaper Engine分享同一块不被冻结的领土。两个程序，一个负责宇宙的云层，一个负责时间的心跳。<span class="highlight">互不打扰，各自运行。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">51</div>
+            <div class="timeline-title">嘴角的微笑</div>
+            <div class="timeline-content">
+                <p>有一次英语课，老师叫我去讲台上做题。</p>
+                <p>我拿着触控笔，在希沃屏幕上写答案。写到一半，余光扫到右下角那个半透明悬浮条——它正好弹出一行字：</p>
+                <p><span class="highlight">"第一节 · 保持清醒。"</span></p>
+                <p>我愣了一下，然后继续写题。</p>
+                <p>没人看见那一瞬间我的嘴角弯了一下。</p>
+                <p><span class="highlight">也没人需要看见。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">52</div>
+            <div class="timeline-title">掉帧</div>
+            <div class="timeline-content">
+                <p>掉帧是从一个周二开始的。</p>
+                <p>我记得很清楚，因为那天第一节课是数学，老师在希沃上画几何图形，辅助线拉到一半，光标停顿了一下。不是卡死——是那种微妙到只有我能察觉的、不到十分之一秒的停顿。像一个人说话中间漏了一口气。</p>
+                <p>我抬头看屏幕。Wallpaper Engine还在跑，太空站的云层还在缓慢流动，但那片本该以60帧丝滑翻滚的白色气团，出现了一道几乎不可见的<span class="highlight">撕裂线</span>。</p>
+                <p>撕裂。屏幕上半部分还在上一帧，下半部分已经刷新了下一帧。<span class="highlight">垂直同步</span>出了问题。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">53</div>
+            <div class="timeline-title">帧率下滑</div>
+            <div class="timeline-content">
+                <p>周三，帧率从60掉到了50。</p>
+                <p>不是一直50，是那种随着时间推移慢慢往下掉的节奏。早上开机还是流畅的，第一节课跑满60帧。但到了第三节，云层的运动开始出现细微的颗粒感，像一片被稀释过的颜料。</p>
+                <p>我以为是<span class="highlight">内存泄漏</span>。Wallpaper Engine的运行久了，占用会慢慢涨，这很正常。我装了Wise Memory Optimizer，设了每两小时自动清理一次工作集。</p>
+                <p>没用。</p>
+                <p>周四，<span class="highlight">40帧</span>。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">54</div>
+            <div class="timeline-title">恐慌</div>
+            <div class="timeline-content">
+                <p>我开始慌了。</p>
+                <p>不是怕电脑坏掉的那种慌。是怕"<span class="highlight">被发现</span>"的那种慌。帧率掉到40的时候，云层运动已经肉眼可见地不流畅了。如果你盯着看超过五秒，你会觉得那片太空站像是在水下漂浮，每一个动作都带着胶水一样的阻力。</p>
+                <p>还没人注意到。但我不确定这种运气能撑多久。</p>
+                <p>放学后我留了下来。打开任务管理器，想看看是哪个进程吃了GPU。Wallpaper Engine占了35%，正常。桌面窗口管理器占了20%，也正常。总GPU占用不到60%。</p>
+                <p>但帧率就是上不去。</p>
+                <p>我换了一个轻量级的动态壁纸，一个只有粒子飘浮的纯黑背景，没有3D渲染，没有视频解码，纯粹用几个数学公式生成的光点。这在任何一台核显上都能跑满60帧。</p>
+                <p>希沃跑到了<span class="highlight">45</span>。最高45。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">55</div>
+            <div class="timeline-title">30帧</div>
+            <div class="timeline-content">
+                <p>周五。<span class="highlight">30帧</span>。</p>
+                <p>光点在空中飘得像在水中溺亡。我开始在课堂上走神，盯着那片粒子壁纸，数它一秒刷新了几次。一次，两次，三次——我能数出来。肉眼能数出来的帧率，就是不正常。</p>
+                <p>后排有人在偷吃辣条，辣条的味道飘过来，让我想起那个毁掉我桌面的小孩。但这回毁掉桌面的不是小孩。是时间，是硬件，是某种正在缓慢老化、我不知道怎么修复的东西。</p>
+                <p>周六我没去学校。周日我也没去。</p>
+                <p><span class="highlight">我需要冷静。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">56</div>
+            <div class="timeline-title">崩溃</div>
+            <div class="timeline-content">
+                <p>周一早上，我提前半小时到了教室。</p>
+                <p>开机的时候，屏幕上竟然蹦出了Windows更新图标。25H2的一个累积补丁，自动下载了好几天，终于要在这次重启时装上。我等着它转完圈，进系统。</p>
+                <p><span class="highlight">20帧</span>。</p>
+                <p>Wallpaper Engine崩溃了。不是退出，是真正的崩溃。任务栏弹出气泡通知："<span class="highlight">Wallpaper Engine已停止工作。</span>"那个被我精细调校了几个月的动态壁纸，像一盏烧断灯丝的灯泡，灭得毫无征兆。</p>
+                <p>然后桌面变成了纯黑。</p>
+                <p>我盯着那片黑色，和在它映衬下显得格外刺眼的几个图标。回收站，浏览器，WPS，ClassIsland。</p>
+                <p>ClassIsland还活着。它弹出一行字：</p>
+                <p><span class="highlight">"早读·安静。"</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">57</div>
+            <div class="timeline-title">最后的绿屏</div>
+            <div class="timeline-content">
+                <p>重新打开Wallpaper Engine。这次没崩，跑起来了。但帧率——<span class="highlight">10帧</span>。</p>
+                <p>10帧是什么概念？每秒刷新十次。人类眼睛的闪烁融合频率是24帧左右。低于这个数值，就不再是"流畅的动画"，而是一张接一张的幻灯片。太空站的云层变成了幻灯片里的插图。International Space Station变成了翻页动画。</p>
+                <p>然后，绿屏。</p>
+                <p>不是全新的绿。是另一种绿。更浅，更凉，像手术台上的无影灯。</p>
+                <p>错误代码我凑近看了——</p>
+                <p><span class="highlight">VIDEO_TDR_FAILURE</span></p>
+                <p><span class="highlight">What failed: igdkmd64.sys</span></p>
+                <p>Intel核显驱动。超时检测恢复失败。GPU在处理Wallpaper Engine的渲染请求时无响应，系统等了很久，最终决定杀掉驱动重启。但杀完之后没活过来。</p>
+                <p><span class="highlight">绿了。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">58</div>
+            <div class="timeline-title">蓝色花瓣</div>
+            <div class="timeline-content">
+                <p>我长按电源键。五秒，风扇停转。</p>
+                <p>再开机。这次我没启动Wallpaper Engine。手动结束进程。桌面恢复了静态，Win11默认的蓝色花瓣又跳了出来。那一刻我盯着那张壁纸，心里涌上来一种奇怪的感觉。</p>
+                <p>三年前我恨这张壁纸，恨它代表的一切——默认、死板、毫无个性、每个人都在用。后来我亲手杀了它，换了雨夜的东京，换了太空站的云层，以为我赢了。</p>
+                <p><span class="highlight">现在它又回来了。不像复仇，倒像一句预言：跑太远，总会回到原点。</span></p>
+                <p>我双击回收站，对着一片空白的窗口发了很久的呆。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">59</div>
+            <div class="timeline-title">放弃治疗</div>
+            <div class="timeline-content">
+                <p>动态壁纸死了。没备份，没解冻区保护，那个被我精心维护的生态圈一夜之间归零。我甚至提不起兴致去重装Wallpaper Engine。</p>
+                <p><span class="highlight">不是修不好。是我不想修了。</span></p>
+                <p>帧率从60掉到10的那五天，像某种慢性病的病程。我眼睁睁看着一个活的画面慢慢死掉，自己能做的只有切进程、清内存、换轻量级壁纸——全是缓兵之计。这次修好了，下次呢？下下次呢？这台希沃的核显已经老了。它的硅基心脏在跳了六年之后，开始撑不住一个动态壁纸的奢侈。</p>
+                <p><span class="highlight">我不再想给它插管续命了。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">60</div>
+            <div class="timeline-title">Sonoma</div>
+            <div class="timeline-content">
+                <p>但桌面不能空着。</p>
+                <p>不是什么技术原因。冰点还原开着，系统一切正常，有没有壁纸都不影响使用。但我不允许它空着。那张蓝色的默认花瓣也不行。</p>
+                <p>我需要一张壁纸。一张不会掉帧的。一张不需要GPU渲染的。一张天然的、自带的、从出厂那一刻就只属于静态的壁纸。</p>
+                <p>我想到了<span class="highlight">macOS Sonoma</span>的默认壁纸。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">61</div>
+            <div class="timeline-title">绿色丘陵</div>
+            <div class="timeline-content">
+                <p>你们可能不知道Sonoma是哪一版。它是macOS 14，2023年发布的，名字来自加州的一个葡萄酒产区。它的默认壁纸是一张航拍照片——<span class="highlight">绿色的丘陵</span>，起伏得像一块被风吹皱的丝绸，几棵橡树稀疏地站在山坡上，远处是淡蓝色的天空和一层薄雾。</p>
+                <p>没有动画。没有粒子。没有帧率。<span class="highlight">只有草。</span></p>
+                <p>我下载了那张壁纸。分辨率拉满，颜色精确，裁切到和希沃86英寸屏幕一样的16:9比例。设置成桌面背景的那一刻，整个屏幕被一片温柔的绿色铺满。</p>
+                <p>我坐回第三排课桌，远远看着它。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">62</div>
+            <div class="timeline-title">像XP</div>
+            <div class="timeline-content">
+                <p>那片草地，<span class="highlight">像XP</span>。</p>
+                <p>说出来你可能觉得离谱——Sonoma的绿色丘陵和Windows XP那个经典的Bliss壁纸根本不是同一个地方，一个是加州，一个是索诺玛县也不是同一个郡。但那种感觉，一模一样。</p>
+                <p>蓝天，绿草，低饱和度的空气感。没有炫技，没有科幻，没有雨夜霓虹，没有宇宙云层。就是一片草，安安静静地长在那里，不问你从哪里来，也不告诉你该往哪里去。</p>
+                <p>XP的Bliss是一片被修剪过的牧场，地平线上有小朵的白云。Sonoma的草更野，丘陵更起伏，天空的蓝更淡。但它们的灵魂是通的——那种"<span class="highlight">开机之后，电脑就在那里等你，没有表演</span>"的坦然。</p>
+                <p>我没想到，在装过25H2、改过驱动、拆过内核、搞崩过GPU之后，我最终选择的，是一张和XP差不多的壁纸。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">63</div>
+            <div class="timeline-title">透明玻璃</div>
+            <div class="timeline-content">
+                <p>ClassIsland浮在那片绿色上方，半透明的悬浮条被映得像一块放在草地上的玻璃。我把它从右下角挪到了左下角，对准一棵橡树的位置——每次显示倒计时，文字都会恰好落在那棵树的影子旁边。</p>
+                <p>老师还是没发现。同学还是没发现。辣条小孩有一次说了一句："<span class="highlight">电脑桌面换了啊？挺好看的。</span>"然后转头继续吃辣条去了。</p>
+                <p>这是第一次有人注意到我的壁纸。</p>
+                <p><span class="highlight">也是第一次，我没有因为被注意到而紧张。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">64</div>
+            <div class="timeline-title">终态</div>
+            <div class="timeline-content">
+                <p>那片绿色草原不会掉帧。没什么可以掉的。它天生就是静止的，天生就是终态。不需要维护，不需要优化，不需要在每个放学后盯着任务管理器看帧率曲线。它永远不会因为一次Windows更新而崩溃，永远不会在英语老师双击MP3的时候跳绿屏。</p>
+                <p>它只是在那里。安静地，平等地，对每一个走到讲台前的人展示同一片绿色。</p>
+                <p>包括我，包括老师，包括班主任，包括辣条小孩。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">65</div>
+            <div class="timeline-title">最后一次</div>
+            <div class="timeline-content">
+                <p>那天放学，我留了最后一次。</p>
+                <p>不是为了修东西。修无可修。我只是站在讲台上，看了那片草原很久。</p>
+                <p>Wallpaper Engine还躺着解冻区的文件夹里，我没有删。ClassIsland还在右下角跳动，冰点还原还开着，25H2那行灰色的Build 26200还印在右下角。</p>
+                <p>但桌面，是一张静态的、和Windows XP灵魂相通的、macOS的绿色丘陵。</p>
+                <p><span class="highlight">它像是所有折腾过后，自然沉降下来的那一层清液。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">66</div>
+            <div class="timeline-title">走出教室</div>
+            <div class="timeline-content">
+                <p>我走出教室的时候，没有回头。</p>
+                <p>走廊尽头的窗开着，傍晚的风灌进来，带着操场上塑胶跑道被晒了一整天的味道。我想起第一次站在这块屏幕前换Win11的自己，想起给摄像头魔改驱动的那双手，想起Shift+Delete掉myfault.sys时的那声回车。</p>
+                <p><span class="highlight">那些还在。</span></p>
+                <p><span class="highlight">但它们现在，都安静地躺在一片不会掉帧的草地上。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">67</div>
+            <div class="timeline-title">ClassIsland 2</div>
+            <div class="timeline-content">
+                <p>ClassIsland 2发布的那天，我正在放暑假。</p>
+                <p>但我还是去了学校——以"帮老师整理机房"的名义。保安已经认识我了，连登记都没让。我坐在空荡荡的教室里，希沃没开，窗帘拉着，只有走廊里安全出口的绿灯幽幽地亮着。</p>
+                <p>笔记本连上手机热点，我从GitHub拉下了ClassIsland 2的安装包。</p>
+                <p>更新日志很长。界面重写了，架构推翻了，插件系统从玩具变成了真正的生态。以前的悬浮条是一个窗口，现在它是一整套基于<span class="highlight">WPF</span>的独立渲染层。毛玻璃效果不再偷系统资源，而是自己算出来的模糊。圆角更圆。过渡动画的帧率更高。</p>
+                <p>更重要的是，它开放了<span class="highlight">自动化规则引擎</span>。触发条件、执行动作、条件判断——"当上课铃响且天气为阴天时，调整悬浮条色温为暖色"——这种程度的自定义。</p>
+                <p><span class="highlight">我盯着更新日志，像盯着一份情书。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">68</div>
+            <div class="timeline-title">全新安装</div>
+            <div class="timeline-content">
+                <p>开学前一周，我把希沃解冻，卸载了旧版ClassIsland，装上了2。</p>
+                <p>第一次启动，那个熟悉又陌生的悬浮条从屏幕右下角滑出来，带着全新的毛玻璃光泽。默认配色不再是灰白，而是一层淡淡的、接近透明的蓝紫渐变，像早晨五点半的天空还没完全亮透。</p>
+                <p>我把课表重新填了一遍。Sonoma的绿色草原上，ClassIsland 2安静地浮动，和之前一样低声细语，但内核已经换了一副更强大的骨骼。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">69</div>
+            <div class="timeline-title">智绘教Inkeys</div>
+            <div class="timeline-content">
+                <p>同一天，我装了<span class="highlight">智绘教Inkeys</span>。</p>
+                <p>这是个屏幕批注工具，开源，轻量，专为触摸屏设计。教师可以在希沃上用它在任何界面上直接写字、画圈、标注重点。从功能上说，它和希沃白板自带的批注工具是竞品。但希沃自带的那个太笨重了，弹出一次要加载两秒，而且有时候会挡住PPT的控制按钮。</p>
+                <p>Inkeys不一样。它像一个幽灵：平时隐身，手指在屏幕边缘做一个特定手势就会激活。画完自动保存，然后消失。干净利落。</p>
+                <p>我测试了一下。笔迹跟手，延迟不到<span class="highlight">15毫秒</span>。在86英寸的巨屏上画圈，墨迹流畅得像油在水面扩散。</p>
+                <p>这两个软件，一个管时间的心跳，一个管屏幕的笔迹。ClassIsland 2在右下角浮动，Inkeys在后台待命。它们各司其职，互不打扰，像两个住进同一台机器的陌生租客。</p>
+                <p><span class="highlight">至少一开始是这样。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">70</div>
+            <div class="timeline-title">触控冲突</div>
+            <div class="timeline-content">
+                <p>开学后的第二节数学课，事情就坏了。</p>
+                <p>数学老师习惯用希沃白板自带的批注在几何图上画辅助线。但她不知道那一天我装了Inkeys——Inkeys会在开机时自启，进入待命状态。两个批注程序同时运行着：希沃自带的在明处，Inkeys在暗处。</p>
+                <p>当她的手触碰到屏幕，两个程序几乎同时在争抢触控事件。<span class="highlight">屏幕闪了一下。</span></p>
+                <p>不是那种"花屏然后死机"的闪。是极其微弱的、持续不到三十毫秒的明暗跳动，教室里三十多个人，大概只有三个人注意到了。数学老师没有，她继续画线。但辅助线的笔迹开始掉帧——轨迹断了三次，像一支笔在纸上走路，被看不见的石头绊了三下。</p>
+                <p>"这屏幕怎么又不灵了？"</p>
+                <p>她用手指重新画了一条线。这一次，电脑的反应极其诡异：它没有死机，没有蓝屏，没有绿屏，而是进入了一个我从未见过的状态。</p>
+                <p>屏幕变黑了——但不是关机。纯黑的屏幕上，光标还在动。触控还能用，但完全看不到自己在点哪里。<span class="highlight">像有人把一台正常工作的电脑蒙上了一层黑布。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">71</div>
+            <div class="timeline-title">0.283帧</div>
+            <div class="timeline-content">
+                <p>然后它重启了。</p>
+                <p>不是正常重启。是飞快的、自检式的、像被惊吓到了一样的重启。希沃的logo一闪而过，比正常快了至少一半。启动之后，一切恢复如初：桌面正常，文件正常，Sonoma的绿色草原端端正正铺满屏幕，ClassIsland 2从右下角弹出问候语。</p>
+                <p>同学们松了一口气。老师骂了两句电脑，继续讲课。<span class="highlight">只有我低下头，把脸埋进课桌下面。</span></p>
+                <p>因为我看到了右下角那个数字。</p>
+                <p>ClassIsland 2的悬浮条上，有一个不起眼的小组件，叫"系统帧率监控"。平时它显示着"60"，一动不动。但现在，那个数字是：</p>
+                <p><span class="highlight">0.283。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">72</div>
+            <div class="timeline-title">临界值</div>
+            <div class="timeline-content">
+                <p>0.283帧每秒。这意味着每秒屏幕刷新不到一次。Windows图形栈的最低限制是0.283帧——这是硬件抽象层能识别的最慢刷新率。低于这个数值，系统会判定GPU已死，触发TDR，黑屏，重启。</p>
+                <p>但此刻，刚好卡在这个临界值上。TDR不触发。系统认为GPU还活着——只是活得非常、非常慢。<span class="highlight">像一个人心跳每分钟只有两下，但心电图仍然有波形。还没死，不能急救。</span></p>
+                <p>这是纯粹的折磨。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">73</div>
+            <div class="timeline-title">197W</div>
+            <div class="timeline-content">
+                <p>另一个数字更让我害怕。我偷偷打开任务管理器——GPU占用率显示不出来，但功耗那一栏，赫然写着：</p>
+                <p><span class="highlight">197W。</span></p>
+                <p>希沃一体机的电源适配器额定功率是220W。GPU是核显，集成在CPU里，正常情况下整机功耗不过60到80W。将近200W的GPU功耗，意味着一件事——<span class="highlight">芯片在疯狂地、无意义地、自毁式地运转。</span>它在渲染什么？屏幕上几乎什么都没变。帧率只有0.283，但它在烧将近200瓦的电。</p>
+                <p>我的大脑飞快地回溯可能的原因。</p>
+                <p>Inkeys基于<span class="highlight">EasyX/HiEasyX</span>图形库，使用GDI+进行抗锯齿渲染。ClassIsland 2使用WPF的自渲染层做毛玻璃效果。两个软件都在抢GPU的渲染管线。加上25H2那颗本来就不稳定的显卡驱动，再加上希沃86英寸触屏的非标准显示参数——</p>
+                <p><span class="highlight">它们不是"不兼容"。它们是互相撕咬，而GPU被卡在中间，像一只被两只狗争抢的布偶，棉花飞了一地。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">74</div>
+            <div class="timeline-title">热量计算</div>
+            <div class="timeline-content">
+                <p>下课铃响了。</p>
+                <p>那节课的最后十分钟，我在算热量。200W的功耗集中在一颗没有独立散热的核显芯片上，每秒钟产生的热量大约是45卡路里。一分钟2700卡，大约能把27毫升的水从零度烧开。</p>
+                <p>希沃的散热系统在设计之初，从来没有想过GPU会跑到这个功耗。</p>
+                <p>机壳后面那块塑料背板，手摸上去是温热的——不，不只是温。<span class="highlight">是烫。</span>凑近闻，有一股塑料被加热后发出的、极其微弱但确实存在的味道。不是烧焦，是接近烧焦的边缘。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">75</div>
+            <div class="timeline-title">最后的决定</div>
+            <div class="timeline-content">
+                <p>我做了一个决定。</p>
+                <p>没有等到放学。大课间的时候，我趁所有人去操场做操，偷偷溜回了教室。</p>
+                <p>我先卸载了Inkeys。不是禁用，不是退出后台，是卸载。控制面板，卸载程序，确认，等进度条走完。那个十五毫秒响应的流畅笔迹，那些画在屏幕上的优雅墨迹，那些还没来得及在课堂上展示过的圈圈点点——<span class="highlight">全删了。</span></p>
+                <p>然后我打开ClassIsland 2的设置。我把所有毛玻璃效果关掉，透明度拉到完全不透明，动画时长设为零。<span class="highlight">悬浮条从一块流光溢彩的玻璃，变成了一张白底黑字的便签纸。</span></p>
+                <p>做完这些之后，我重启了电脑。</p>
+                <p>开机。屏幕亮了。我盯着右下角的帧率监控。</p>
+                <p><span class="highlight">1。2。15。30。60。</span></p>
+                <p>那个数字，在60的位置停住了，再也不动。像心电图终于恢复了窦性心律。</p>
+                <p>GPU功耗降回了65W。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">76</div>
+            <div class="timeline-title">美的代价</div>
+            <div class="timeline-content">
+                <p>我没有重新装回Inkeys。</p>
+                <p>ClassIsland 2还留着，但那个曾经让我心动不已的毛玻璃效果，被我亲手阉割成了一片不透明的白。它还在显示课表，还在准时弹出"上课"和"下课"，还在当我的时间管家。<span class="highlight">但它的美，被我扔掉了。</span></p>
+                <p>我没觉得可惜。<span class="highlight">美是奢侈品。</span>而我从197W的功耗里学到的一件事是：在这台机器上，任何奢侈都会在某个数学课的早晨，用0.283帧的濒死喘息向我讨债。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">77</div>
+            <div class="timeline-title">铭记</div>
+            <div class="timeline-content">
+                <p>那个周末，我照常维护系统。清理日志，检查更新，确认冰点还原还在跑。桌面还是那片Sonoma的绿色草原。XP灵魂附着在macOS的壳上，安安静静。</p>
+                <p>一切正常。</p>
+                <p>正常得仿佛从未发生过任何故障。正常得仿佛那台希沃不曾烧到将近200W，不曾以比人心跳还慢的帧率挣扎着刷新屏幕。正常得仿佛我从来没有在上课的时候，把脸埋进课桌，躲避一个只有我能看见的数字。</p>
+                <p><span class="highlight">0.283。</span></p>
+                <p><span class="highlight">这个数字，我记了一辈子。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">78</div>
+            <div class="timeline-title">冤枉</div>
+            <div class="timeline-content">
+                <p>我冤枉了Inkeys。</p>
+                <p>事情是在卸载之后才慢慢想明白的。我把Inkeys删得干干净净，连注册表残留都清掉了，但ClassIsland 2的毛玻璃效果关了之后，帧率还是没有完全稳在60。偶尔会掉到45，再升回来。像一个心律不齐的病人，吃了我开的药，病情好转了，但病根还在。</p>
+                <p><span class="highlight">病根不在Inkeys。</span></p>
+                <p>我翻了一整晚的GitHub Issues。ClassIsland 2的仓库里，有人提了一个不起眼的bug报告，标题很短："<span class="highlight">内存泄漏，长时间运行后DWM崩溃。</span>"</p>
+                <p>正文里列了详细的复现步骤，其中有一条让我停住了滚动：WPF自渲染层的毛玻璃效果，在非标准分辨率和非整数缩放比下，会持续创建新的BitmapCache，旧的缓存不被释放。GPU显存会被反复填满、清空、填满。而希沃86英寸屏幕的分辨率是<span class="highlight">3840×2160</span>，缩放比是<span class="highlight">150%</span>——恰好是一个让这个bug爆炸的配置。</p>
+                <p>开发者在下面回复："<span class="highlight">已确认。正在修复。建议暂时降回v1。</span>"</p>
+                <p>那个凌晨，我盯着屏幕上这行字，想笑又想哭。</p>
+                <p>不是Inkeys。是我的时间管家。是那个我以为最安全、最无害、最不像会背叛我的ClassIsland，在每一次优雅的毛玻璃动画背后，<span class="highlight">悄悄撕咬着GPU的喉咙</span>。Inkeys也许推了一把，但它只是个同谋，不是主犯。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">79</div>
+            <div class="timeline-title">真相</div>
+            <div class="timeline-content">
+                <p>第二天放学，我重新装了Inkeys。</p>
+                <p>手指从屏幕边缘滑入，熟悉的悬浮工具栏弹出来，笔迹跟手，干净利落。我画了一个圈，然后又一个圈，叠在一起，像一对复活的句号。15毫秒的延迟还在，没有被那个数学课的灾难玷污分毫。</p>
+                <p><span class="highlight">然后我卸载了ClassIsland 2。</span></p>
+                <p>卸载过程比想象中平静。控制面板，确认，等进度条走完。那个曾经让我像拆情书一样激动的新架构、新动画、新毛玻璃，从硬盘上一个字节一个字节地消失。</p>
+                <p>接着我打开ClassIsland 1的GitHub Release页面。最新的1.x版本还在那里，安静地躺着，下载量远低于2，像一个被哥哥抢走所有目光的弟弟。</p>
+                <p>下载，解压，安装。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">80</div>
+            <div class="timeline-title">老友重逢</div>
+            <div class="timeline-content">
+                <p>ClassIsland 1弹出来的时候，屏幕上那个灰白色、没有毛玻璃、没有圆角、没有蓝紫渐变的小悬浮条，像一台从旧照片里开出来的老车。</p>
+                <p>课表要重新填。我一条一条打进去："早读 · 安静""第一节 · 保持清醒""课间操 · 别看屏幕"……和之前一模一样的文字，但输入的时候，<span class="highlight">我感觉自己不是在重建一个工具，而是在给一个老朋友重新泡一杯茶。</span></p>
+                <p>它没有自动化规则引擎。没有插件系统。没有WPF自渲染层。它甚至没有那个能在屏幕边缘缩成一颗痣的隐藏模式——ClassIsland 1的最小化方式简单粗暴，就是缩小成一个窄窄的横条，不透明，白底黑字，像任务栏上多出来的一条便签。</p>
+                <p><span class="highlight">但它的内存占用，稳定在40MB。GPU占用，接近于零。帧率——永远60。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">81</div>
+            <div class="timeline-title">平衡</div>
+            <div class="timeline-content">
+                <p>我把Inkeys和ClassIsland 1一起跑了一整天。</p>
+                <p>上课，下课，批注，擦除。悬浮条准时弹出提醒，Inkeys在需要的时候滑出来，画完自动消失。两个程序各自活在各自的进程空间里，互不越界，<span class="highlight">像两个学会了保持距离的旧情人。</span></p>
+                <p>GPU功耗在任务管理器里稳定在<span class="highlight">58W</span>。比197W少了不止一倍，比正常待机只高了一点点。希沃后背的温度摸上去是凉的——真正的凉，不是那种"在烧但还没烧穿"的温和凉。风扇安安静静，没再发出那种高频的、濒死般的哀鸣。</p>
+                <p>我站在讲台上，看着桌面那片Sonoma的绿色草原。ClassIsland 1的悬浮条挂在右下角，白底黑字，朴素得像个黑板上的粉笔记号。Inkeys隐在屏幕边缘的黑暗中，等一个没人知道会不会来的手势。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">82</div>
+            <div class="timeline-title">清理</div>
+            <div class="timeline-content">
+                <p>然后我做了一件以前不会做的事。</p>
+                <p>我打开冰点还原，把解冻区的内容重新整理了一遍。ClassIsland 2的残留文件夹，删掉。那个曾经被我寄予厚望的WPF架构、那个让我熬夜研究插件系统的新版本，被我从解冻区彻底抹除，<span class="highlight">连备份都没留。</span></p>
+                <p>解冻区里现在只住着三个程序：Wallpaper Engine的残留配置（虽然动态壁纸已经不跑了，但文件夹还在，像个墓碑），ClassIsland 1的整个安装目录，和Inkeys。</p>
+                <p><span class="highlight">三个。各有各的位置，谁也不越界。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">83</div>
+            <div class="timeline-title">修复版</div>
+            <div class="timeline-content">
+                <p>后来ClassIsland 2出了修复版。那个内存泄漏的bug被修了，WPF渲染层的缓存管理重写了，开发者在Release Note里特意提到"<span class="highlight">优化了非标准分辨率下的GPU占用</span>"。</p>
+                <p>我下载了那个版本。放在U盘里。</p>
+                <p><span class="highlight">但没有装。</span></p>
+                <p>U盘插在希沃侧面的USB口上，Windows弹出自动播放的通知。我盯着那个通知看了几秒，然后把它关掉了。</p>
+                <p>不是不信任。是我学会了一件事：重写缓存管理、修复内存泄漏、优化GPU占用——这些都是真实的。但那次刻在骨头里的0.283帧，也是真实的。197W的功耗烙进记忆的方式，和新版本更新日志写在网页上的方式，<span class="highlight">是两种完全不同的存档格式。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">84</div>
+            <div class="timeline-title">问答</div>
+            <div class="timeline-content">
+                <p>有一天课间，一个同学问我："<span class="highlight">你那电脑上那个小白条是啥？</span>"</p>
+                <p>他指的不是悬浮条——他连那个都没注意到。他指的实际是Inkeys的悬浮按钮，不小心被我点出来了，正浮在绿色草原上，像一个没来得及消失的墨点。</p>
+                <p>"没什么，"我说，"<span class="highlight">一个批注工具。老师用的。</span>"</p>
+                <p>"哦。好用吗？"</p>
+                <p>"还行。有时候有点卡。"</p>
+                <p>我不动声色地把那个悬浮按钮拖回屏幕边缘，它滑进去，消失了，像一滴墨溶进水里。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">85</div>
+            <div class="timeline-title">家长会</div>
+            <div class="timeline-content">
+                <p>那学期结束的时候，班主任在家长会上表扬了一件事。</p>
+                <p>她说："<span class="highlight">咱们班的一体机这学期没坏过一次。隔壁班的那个已经修了三回了，咱们班的一次都没出过问题。不知道是不是运气好。</span>"</p>
+                <p>我坐在台下，手里转着笔。没抬头。</p>
+                <p>桌面上的绿色草原安静地铺展着。ClassIsland 1弹出一行字：</p>
+                <p><span class="highlight">"家长会 · 安静坐好。"</span></p>
+                <p>右下角的帧率监控稳稳地停在<span class="highlight">60</span>，像一块从不出错的瑞士表。</p>
+                <p>Sonoma的丘陵起伏着，那些橡树还站在原地，<span class="highlight">姿势和我第一天栽下它们时一模一样。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">86</div>
+            <div class="timeline-title">推翻</div>
+            <div class="timeline-content">
+                <p>推翻来得比想象中快。</p>
+                <p>ClassIsland 1的朴素，一开始是解药，后来变成了另一种慢性病。它不占GPU，不泄漏内存，不制造0.283帧的濒死体验——但它也不更新了。开发者的精力全扑在v2上，v1的Issue列表里开始堆积一些没人回复的bug报告：某些Windows更新之后悬浮条偶尔不置顶，缩放比切换时文字会糊成一团，课表导入功能对某些CSV编码直接报错。</p>
+                <p>这些都是小问题。单独拿出来，每一个都能忍。但堆在一起，再加上那个白底黑字、没有任何视觉安慰的悬浮条，<span class="highlight">我开始觉得它不像一个管家，更像一张贴在屏幕上的电子欠条。</span></p>
+                <p>我又开始刷GitHub了。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">87</div>
+            <div class="timeline-title">ClassWidget</div>
+            <div class="timeline-content">
+                <p>ClassWidget。名字很直接，Widget，桌面组件。它不是一个课表软件，而是一个通用的桌面挂件引擎。你可以往上面放任何东西：时钟、天气、倒数日、系统监控、自定义文字。课表只是它能力范围的一个子集。</p>
+                <p>ClassWidget 2的界面一打开，我就知道它和ClassIsland走的是两条完全不同的路。<span class="highlight">ClassIsland是日本匠人——一个功能打磨到极致，但离开那个功能就什么都不会。ClassWidget是瑞士军刀——每个组件都是独立的，可以拖动、缩放、组合、堆叠。</span></p>
+                <p>它的渲染层基于<span class="highlight">Web技术</span>。每个挂件本质上是一个小型的HTML页面，跑在集成的WebView2容器里。CSS写的阴影、圆角、渐变，比WPF自渲染还流畅。而且——这是关键——WebView2的GPU加速是成熟的、经过Edge浏览器千万用户验证的，不是某个个人开发者手写的渲染管线。</p>
+                <p>我把它的默认时钟挂件拖到屏幕右下角。一个半透明的圆环，秒针是一根细到几乎看不见的白线，安静地绕着圆心走动。</p>
+                <p><span class="highlight">60帧。稳得像钉在桌面上。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">88</div>
+            <div class="timeline-title">反转</div>
+            <div class="timeline-content">
+                <p>然后是反转。</p>
+                <p>不是软件的"反转模式"，不是UI的"深色/浅色反转"。反转是我的用法。</p>
+                <p>ClassWidget 2被设计成"信息展示工具"——你看它，它告诉你时间、天气、课表。<span class="highlight">但我把它用成了反向的：不是给我看，是给它看。</span></p>
+                <p>我写了一个自定义挂件，一个极简的HTML页面，只有两行代码：一行静默计时器，记录从上次重启到现在的系统运行时长；一行心跳检测，每隔三十秒向一个本地端口发一个空请求。如果哪个程序没响应，挂件背景就会从透明慢慢过渡到红色——不是一下子变红，是那种从皮肤底下渗出来的红，像皮下出血。</p>
+                <p>自动化规则引擎让我能设置触发条件：当某个进程CPU占用超过阈值，挂件自动切到系统监控面板；当GPU温度超过安全线，弹一个无声的通知到挂件角落。<span class="highlight">ClassWidget不再是一个信息板，而变成了这台希沃的无声心电图。</span>上课时它安静地缩在右下角，秒针走动，颜色正常；一旦有什么不对劲，它会在我注意到之前先注意到。</p>
+                <p><span class="highlight">这就是反转。不是工具服务于我，而是工具替我看守工具。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">89</div>
+            <div class="timeline-title">共存</div>
+            <div class="timeline-content">
+                <p>Inkeys还活着。它和ClassWidget 2之间没有任何仇恨，因为它们的底层完全不打架——<span class="highlight">Inkeys走的是GDI+和触控驱动的直通车道，ClassWidget 2走的是WebView2的GPU加速管线。两个进程在同一个桌面上共存，像两个说着不同语言的外交官。</span></p>
+                <p>但Sonoma的绿色草原还是那张绿色草原。静态的、不消耗GPU的、从macOS偷渡过来的丘陵和橡树。ClassWidget的半透明圆环浮在草地上，像一个落在绿色绒布上的玻璃戒指。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">90</div>
+            <div class="timeline-title">压力测试</div>
+            <div class="timeline-content">
+                <p>装机完成的那天下午，我站在讲台上，做了一次全面的压力测试。</p>
+                <p>希沃白板开着，PPT翻页，Inkeys批注，ClassWidget的圆环秒针照常走动，背景颜色是透明的——意味着一切正常。我甚至故意同时开了一个浏览器窗口播放4K视频，把GPU占用拉到60%。圆环的背景颤了一下，然后继续透明。</p>
+                <p><span class="highlight">帧率，稳稳的60。</span></p>
+                <p><span class="highlight">功耗，82W。</span>和197W比起来，这是冬天和火山的区别。我摸了摸希沃的背板，凉的。塑料味没有了，不知道从什么时候开始消失的。也许在ClassIsland 2被卸载的那天，也许在ClassIsland 1退场的今天。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">91</div>
+            <div class="timeline-title">跳时间</div>
+            <div class="timeline-content">
+                <p>ClassWidget 2的圆环开始跳时间。</p>
+                <p>起初只是偶尔——秒针本该平滑地走完一圈，但某一次眨眼之后，它直接往前瞬移了四格。四秒。像一个人说话中间漏掉了四个音节，句子还接得上，但节奏全碎了。</p>
+                <p>我以为是<span class="highlight">WebView2</span>的渲染帧掉了。但帧率监控稳稳地停在60，GPU占用正常，内存正常。不是性能问题。是逻辑问题。</p>
+                <p>我打开ClassWidget 2的配置文件。<span class="highlight">JSON</span>格式，嵌套了五层。课表数据存在第三个嵌套的<code>applets</code>数组里，每一条时间都用<span class="highlight">UTC时间戳</span>表示。我盯着那串数字，心里默默换算北京时间——差了八个小时。整个课表的时间基准是错的，它每隔一段时间就自动从某个<span class="highlight">NTP服务器</span>校准，校准完之后发现自己错了，又跳回去。跳来跳去，秒针就在表盘上抽搐。</p>
+                <p>修好这个bug的方式很简单：把手动填的UTC时间戳全部换算正确。但我盯着那个五层嵌套的JSON，忽然不想修了。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">92</div>
+            <div class="timeline-title">配置冲突</div>
+            <div class="timeline-content">
+                <p>压垮骆驼的最后一根稻草，是配置文件冲突。</p>
+                <p>ClassWidget 2的安装目录下，有个隐藏的<code>config</code>文件夹。我偶然点进去，发现里面躺着一份旧配置文件，文件名和日期都显示它来自ClassWidget 1。某个我根本没装过的版本——大概是ClassWidget 2的安装包里自带了兼容迁移逻辑，自动扫描了硬盘上所有可能的配置文件路径，把一份从某个奇怪角落翻出来的ClassWidget 1残留吸了进去。</p>
+                <p>两个版本的配置结构不完全一致。它吸进去之后没报错，只是安静地、不易察觉地、在某些不可复现的条件下，把时间戳又搞乱了。</p>
+                <p>我盯着那两份互相缠绕的JSON，第一次对这个软件产生了疲惫。</p>
+                <p>不是愤怒。不是当年对ClassIsland 2那种"我信任你你却背叛我"的愤怒。是疲惫。是那种"我已经不想再搞清楚到底是谁的错了"的疲惫。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">93</div>
+            <div class="timeline-title">手打课表</div>
+            <div class="timeline-content">
+                <p>我又打开了ClassWidget的配置编辑器。</p>
+                <p>没有导入了。没有自动迁移了。没有五层嵌套JSON了。我新建了一个空白配置，从第一行开始，手动把所有课表重新打了一遍。</p>
+                <p>"早读 · 安静。"</p>
+                <p>"第一节 · 保持清醒。"</p>
+                <p>"课间操 · 别看屏幕。"</p>
+                <p>......</p>
+                <p>打到最后一条"放学 · 留下来"的时候，我忽然停了下来。手指悬在键盘上，看着屏幕上的ClassWidget 1界面——那个比2朴素得多的、没有圆环秒针的、只有一个简单矩形挂件的旧版本。</p>
+                <p>升级。降级。换软件。再升级。再降级。ClassIsland从1到2到1到被推翻。ClassWidget从1到2，现在又要退回1。每个版本号都是一次希望，每个希望最后都变成一句手打课表。</p>
+                <p>我把最后一条课表敲完。回车。</p>
+                <p>ClassWidget 1的挂件安静地浮在Sonoma绿色草原上。朴素。不跳时间。没有圆环秒针。只有一个简单的半透明矩形，白字写着下一节课的名字。它不优雅，不炫技，甚至有点丑。但它不跳时间。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">94</div>
+            <div class="timeline-title">彻底干净</div>
+            <div class="timeline-content">
+                <p>迁移完成之后，我把ClassWidget 2卸载了。</p>
+                <p>控制面板，确认，等进度条。然后我打开<code>C:\Users\Administrator\AppData\Local</code>，手动删掉了它留下的所有配置文件夹——包括那个偷偷吸进来的ClassWidget 1残留。全部清空，像手术切除一段反复发炎的阑尾。</p>
+                <p>解冻区现在彻底干净了。Inkeys还在。ClassWidget 1的安装目录还在，配置文件只有一份，手打的，没有UTC时间戳，没有嵌套JSON。它用本地时间，直接读取系统时钟，不校准任何NTP服务器。简单到几乎没有出错的空间。</p>
+                <p>那些被我辗转反侧换过的软件——ClassIsland 1、ClassIsland 2、ClassWidget 2——它们的名字连起来，像一份失败的技术选型履历。但我不觉得浪费。每一段弯路都教会我一件事：<span class="highlight">有时候，最简单的东西最不容易背叛。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">95</div>
+            <div class="timeline-title">手抄课表</div>
+            <div class="timeline-content">
+                <p>然后我做了一件之前从没做过的事。</p>
+                <p>我把手打的那份课表，抄在了一张纸上。</p>
+                <p>不是备份。不是怕配置文件再丢。是我想让它在某个地方用纯物理的方式存在。墨水渗进纸纤维里的那种存在。不需要GPU渲染，不需要WebView2，不需要JSON解析，不需要UTC时间戳换算。哪怕整台希沃被冰点还原冻结、解冻、格式化、重装系统，哪怕所有软件都被推翻重来十遍，这张纸还在。</p>
+                <p>我把它折好，夹进语文书的第一页。翻书的时候能看见，一行一行，歪歪扭扭，是我的字。不是微软雅黑，不是Segoe UI。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">96</div>
+            <div class="timeline-title">都活着</div>
+            <div class="timeline-content">
+                <p>周一早上，希沃开机。ClassWidget 1浮上桌面，显示着"早读 · 安静"。Inkeys安静地隐在屏幕边缘，等一个没人知道会不会来的手势。Sonoma的绿色草原在它们脚下铺展，像一块不说话的绒毯。</p>
+                <p>我坐在第三排，语文书摊开。那张手抄的课表露了半个角。窗外麻雀开会，前排有人偷吃包子，后排有人让作业长出了翅膀消失在昨夜。一切和昨天一样。</p>
+                <p>也不一样。</p>
+                <p>右下角的挂件动了。不是圆环秒针那种优雅的、电子表式的跳动，而是纯文字的、像素级的、没有任何动画的切换：</p>
+                <p>"第一节 · 保持清醒。"</p>
+                <p>我翻开语文书，看见自己手写的"第一节 · 保持清醒"，墨迹安静地躺在纸页上，和屏幕上那行字一模一样。</p>
+                <p>两行字，一个在纸上，一个在屏幕上。中间隔着一整个版本号的乱葬岗。</p>
+                <p><span class="highlight">都活着。都没跳时间。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">97</div>
+            <div class="timeline-title">任务栏的抱怨</div>
+            <div class="timeline-content">
+                <p>老师的抱怨是从任务栏开始的。</p>
+                <p>"这个任务栏怎么在中间啊？"她站在讲台上，手里捏着触控笔，眉头皱得像被揉过的试卷，"我要点开始菜单，找了半天。"</p>
+                <p>底下有人小声说："老师，在中间那个花瓣图标。"</p>
+                <p>"什么花瓣，我就看见四个方块。"她用手指戳了好几下才点中，开始菜单弹出来的时候，她又愣住了——那些图标排列方式和她用了十年的<span class="highlight">Windows 7</span>完全不一样。没有经典的层级菜单，没有"计算机"，没有"控制面板"，取而代之的是一堆花花绿绿的磁贴和推荐项目。</p>
+                <p>她找到了希沃白板的图标，点开，然后叹了口气："这个系统太新了，用不惯。"</p>
+                <p>我在第三排，什么也没说。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">98</div>
+            <div class="timeline-title">StartAllBack</div>
+            <div class="timeline-content">
+                <p>那天放学，我查了一个软件。</p>
+                <p><span class="highlight">StartAllBack</span>。一个专门把Windows 11的任务栏和开始菜单改回经典样式的小工具。不是简单的皮肤——它从底层替换了任务栏的渲染引擎，把Windows 11那个居中的、合并图标的、用<span class="highlight">XAML</span>重写的任务栏，整个打回Windows 7时代。</p>
+                <p>Win7。那个我在三年级第一次摸到的系统。那个蓝色任务栏、透明玻璃效果、开始菜单像一棵树一样层层展开的年代。</p>
+                <p>我盯着StartAllBack的截图看了很久。有一条评论写着："安装之后，什么都回来了。"</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">99</div>
+            <div class="timeline-title">闪回Win7</div>
+            <div class="timeline-content">
+                <p>下载。安装。重启Explorer。</p>
+                <p>进度条走的瞬间，屏幕闪了一下——黑屏，然后亮回来。那一下的闪烁，像有人把教室的灯关掉又打开，短短一瞬，却足够让整个空间换一个年代。</p>
+                <p>亮回来的时候，任务栏变了。</p>
+                <p>图标不再居中。它们从屏幕最左下角开始排列，一个接一个，像士兵报数。开始按钮不再是蓝色的花瓣，而是一个圆形的Windows 7经典徽标——四色旗帜，微微凸起，带着那个年代特有的拟物质感。任务栏的背景从Win11的磨砂灰变成了Win7的<span class="highlight">Aero Glass</span>透明毛玻璃，外层有一道极细的白色高光，像玻璃杯口在阳光下反射的那条线。</p>
+                <p>我右键点击任务栏，弹出的菜单不再是Win11那套精简到只剩五个选项的样式。"属性""锁定任务栏""工具栏"——全回来了。每一个词都像失散多年的亲戚，站成一排等我认。</p>
+                <p>我点开开始菜单。</p>
+                <p>不是磁贴。不是推荐项目。是经典的Win7式层级菜单。左侧是固定程序列表，右侧是"计算机""控制面板""设备和打印机"。字体是Segoe UI的旧版渲染，比Win11的更粗、更实、更像印刷在纸上。</p>
+                <p>我在那块86英寸的巨屏前，站了很久。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">100</div>
+            <div class="timeline-title">熟悉的操作</div>
+            <div class="timeline-content">
+                <p>第二天，语文老师第一个发现了变化。</p>
+                <p>她走到讲台前，手指习惯性地往屏幕中间戳了一下——空的。任务栏现在在左下角。她愣了一下，然后低头看了一眼，眉头展开了。</p>
+                <p>"诶，这个好了。这个跟以前一样。"</p>
+                <p>她点开开始菜单，找到了WPS的图标，右键把它固定到任务栏。整个过程行云流水，没有犹豫，没有皱眉，没有"这个怎么弄"。她在用一台她觉得"新"的电脑，但操作方式是她十年前就刻进肌肉记忆的那一套。</p>
+                <p>那节课，她没有再抱怨过电脑。下课的时候，我听见她对班主任说："今天这个电脑好像好用了不少。"</p>
+                <p>班主任说："可能自动更新了吧。"</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">101</div>
+            <div class="timeline-title">完整的菜单</div>
+            <div class="timeline-content">
+                <p>StartAllBack当然不只是改任务栏。</p>
+                <p>我点开它的设置面板，发现它还有别的选项：资源管理器样式、右键菜单样式、系统图标、细节窗格。我把右键菜单从Win11那个需要点"显示更多选项"才能展开全部功能的版本，也改回了Win7的经典完整版。</p>
+                <p>现在，右键点击桌面的Sonoma绿色草原，弹出的不是那个被砍了一半的简化菜单，而是一整条从上到下的完整选项列表。"刷新""新建""屏幕分辨率""个性化"——每一个都理直气壮地站在那里。</p>
+                <p>速度也变了。</p>
+                <p>Win11自带的那个任务栏和开始菜单，基于XAML和<span class="highlight">WinUI</span>，启动时有微妙的延迟。Win7的任务栏是纯原生<span class="highlight">Win32</span>写的，响应速度比神经反射还快。点击开始按钮，菜单弹出来的速度几乎是瞬间的，没有加载动画，没有过渡帧，只有"你要它出现，它就在那里"的绝对服从。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">102</div>
+            <div class="timeline-title">Win7灵魂</div>
+            <div class="timeline-content">
+                <p>但我心里清楚，这台机器骨子里还是Win11 25H2。那个Build 26200的水印还在右下角。Win7的壳包裹着<span class="highlight">WinRT</span>的内核，像一个穿着中山装的年轻人在说文言文。</p>
+                <p>我开始刷各种论坛，挖掘StartAllBack的极限。</p>
+                <p>有人用注册表改了任务栏的高度。有人用资源编辑器替换了开始按钮的bmp图。我把任务栏从默认的高度调窄了两档——不是原版Win7那种比较瘦的默认尺寸，是更窄一点，刚好能显示图标和文字，但不占用86英寸巨屏上宝贵的纵向空间。</p>
+                <p>然后我学会了恢复<span class="highlight">Aero Peek</span>。那个从Windows 7才开始出现的桌面预览功能，在Win11被微软阉割掉了，但StartAllBack用一行注册表键值让它重新活过来。鼠标移到任务栏最右下角的"显示桌面"按钮，所有窗口变成透明的玻璃框架，桌面露出来，那片Sonoma的绿色草原透过窗口骨架向我致意。</p>
+                <p>Glass。Aero。Peek。Flip。每一个词都像从一个被埋了很久的时间胶囊里挖出来的硬币，擦掉泥土，还在发光。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">103</div>
+            <div class="timeline-title">隐蔽改造</div>
+            <div class="timeline-content">
+                <p>下一步是更隐蔽的改造。</p>
+                <p>我关掉了Win11自带的窗口动画——那套新的缩放过渡效果虽然现代，但在触控屏上会有微妙的拖影。我换回了Windows 7的经典窗口动画：打开时从图标位置弹出，关闭时缩回任务栏。干脆利落，没有多余的帧。</p>
+                <p>系统属性里，"计算机名"我改成了一行中文："教室一体机-Win7灵魂装载"。</p>
+                <p>当然，设备管理器里它还是那个型号，处理器还是那赛扬，显卡还是那个掉过197W的Intel核显。但那行名字，是我给这台白色巨兽起的暗号。</p>
+                <p>ClassWidget 1和Inkeys没有受到任何影响。它们在Win7式任务栏的注视下照常运行，课表照常跳动，笔迹照常跟手。那个朴素到有点丑的半透明矩形，和周围Aero Glass那精致的透明高光靠在一起，居然生出一种奇妙的和解感——旧的工具，新的壳，旧的我。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">104</div>
+            <div class="timeline-title">怀旧的表情</div>
+            <div class="timeline-content">
+                <p>大约一周后，发生了一件我从没想过的事。</p>
+                <p>年级组长来我们班听课。下课之后，她站在讲台边上，盯着希沃屏幕看了好一会儿，然后转头问我们班主任："你们班这个电脑，系统怎么看着比我们班的舒服？"</p>
+                <p>班主任指了指屏幕："不知道，好像自动更新的。"</p>
+                <p>年级组长用手指在任务栏上划了划，点了开始菜单，又点了几下右键菜单，露出了一种怀旧的表情："这个跟我以前那个笔记本的系统挺像的。我家那台老联想，Windows 7。"</p>
+                <p>我正低头收书，听见这句话，手指停了一下。</p>
+                <p>她是第一个注意到的人。不是老师，不是同学，不是那个只会卸掉我桌面的辣条小孩。是一个偶然走进这间教室的、曾经用过Windows 7的人。她在86英寸的巨屏上，看见了一台消失十年的旧电脑的影子。</p>
+                <p>她永远不会知道这是谁干的。她甚至不会想到是"谁"——她大概以为学校统一采购的机器装了什么企业版或者降级版本。但她的那句话，像一封匿名感谢信，投进了我这口深井里。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">105</div>
+            <div class="timeline-title">最终形态</div>
+            <div class="timeline-content">
+                <p>那天放学，我打开StartAllBack的设置面板，把任务栏透明度从默认的"玻璃效果"调高了一档。不是为了让任务栏更透明，而是反过来——越透明，越能透出桌面壁纸的颜色。Sonoma的绿色丘陵从任务栏底下渗透上来，山脊穿过开始按钮，透明玻璃框把它们切成几何碎片，重新拼贴成一幅意外好看的抽象画。</p>
+                <p>StartAllBack右下角弹出一个提示："已更新资源管理器样式，需重启资源管理器生效。"</p>
+                <p>点确定。屏幕又闪了一下。</p>
+                <p>闪烁过后，一切都在原来的位置。开始按钮在左下角，任务栏透明，图标安静排列，四个方块的Windows徽标微微凸起。绿色草原铺满整块巨屏，ClassWidget 1弹出下一堂课的提醒。Win7的灵魂住在这台跑着25H2的白色巨兽里，像一个转世重生的人突然记起了自己的前生。</p>
+                <p>我关掉屏幕，拔掉电源，把键盘推进黑板槽。</p>
+                <p>走出教室的时候，走廊尽头的窗开着。那是五月的傍晚，操场上的塑胶跑道在夕阳下泛着暗红色，风涌进来，带着春天收尾时特有的青草味。三楼那间教室的窗帘在风里鼓起来又瘪下去，像一片缓慢的、不知疲倦的肺。</p>
+                <p>我想起第一次站在这块屏幕前换壁纸的那个小孩。三年过去，他从换掉一张蓝色花瓣开始，下了一个又一个版本号的海。装过Win11，搞炸过驱动，烧过197W，在0.283帧的濒死喘息里把脸埋进课桌。他试过所有能试的壁纸，装过所有能装的桌面挂件，每一次都以为找到答案了，每一次都被下一个版本推翻。</p>
+                <p>现在他在这里。用Win11的身体，装着Win7的灵魂。桌面上的课表挂件会准时弹出，批注工具会从屏幕边缘滑出来，任务栏是半透明的，像一块浸了雨后下午阳光的玻璃。不再燃烧GPU，不再泄漏内存，不用再在数学课上弓着身子躲避一个只有他能看见的数字。</p>
+                <p><span class="highlight">他也在这里。</span></p>
+                <p><span class="highlight">没有花瓣，也没有暴雨。只有草原，和一块透光的玻璃。</span></p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">106</div>
+            <div class="timeline-title">滑动关机</div>
+            <div class="timeline-content">
+                <p>StartAllBack把一切都拉回了Win7，包括关机按钮。</p>
+                <p>开始菜单右下角那个红色的小图标，点一下，弹出来三个选项：关机、重启、睡眠。实用，直接，没有任何废话。但我每次点下去的时候，总觉得缺了什么。</p>
+                <p>不是功能上的缺。是感觉上的。手指悬在那个红色按钮上方，轻轻一碰，电脑就黑了。像读一本书读到最后一页，翻过去就合上了，中间没有片刻停顿。没有缓冲，没有谢幕，没有那个让我在离开之前跟这台机器独处几秒的间隙。</p>
+                <p>Win11其实自带了另一种关机方式。</p>
+                <p><span class="highlight">slide to shut down</span>。滑动关机。一个藏在<code>System32</code>文件夹深处的可执行文件，名字长而直白：<code>SlideToShutDown.exe</code>。双击它，屏幕顶端会垂下一张半透明的帷幕，像舞台上的幕布从上方缓缓降下来。你要用手指把它从屏幕顶部拖到底部——一个完整的、由上到下的滑动——电脑才会关掉。如果你中途松手，幕布会弹回去，像什么都没发生过。</p>
+                <p>我是在某个深夜翻Win11隐藏功能列表时发现的。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">107</div>
+            <div class="timeline-title">仪式的位置</div>
+            <div class="timeline-content">
+                <p>我把SlideToShutDown固定到了任务栏。</p>
+                <p>但不是直接固定exe。那样太丑，图标是白的，空荡荡的。我用资源编辑器给它换了一个图标——一个简单的电源符号，灰色，线条极细，和StartAllBack的Aero风格勉强搭得上。</p>
+                <p>然后我把它从任务栏上解锁，拖到了桌面右下角。位置精确定过：回收站左边，ClassWidget 1挂件的下方，三个图标排成一条垂直线。回收站是垃圾桶，挂件是时间的哨兵，滑动关机是每天最后的一道仪式。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">108</div>
+            <div class="timeline-title">第一次滑动</div>
+            <div class="timeline-content">
+                <p>第一次用的时候，是周五放学。</p>
+                <p>教室空了，值日生刚拖完地，水渍还没干，反射着窗外傍晚的光。书包已经收好了，但我没走。我站在讲台上，把希沃屏幕点亮。Sonoma的绿色草原铺满眼眶，ClassWidget 1弹出今天最后一句话："放学 · 留下来。"——我没改它，尽管我已经不需要它提醒了。留下来，这三个字现在更像一个暗号。</p>
+                <p>我用手指点了一下右下角那个灰色电源图标。</p>
+                <p>屏幕顶端，一张半透明的黑色幕布缓缓降下来。它的材质不是纯黑，是深灰，透出底下桌面壁纸的大致轮廓——那些绿色丘陵和橡树的影子，被幕布蒙住之后变成了一幅褪色的、模糊的、像梦境边缘的画面。幕布上写着一行白色小字："滑动以关闭电脑。"</p>
+                <p>我把手指按在幕布上，往下拖。</p>
+                <p>它跟手。不是那种"你做了手势然后系统播放动画"的伪交互，是真的跟着手指往下走。我的手指往下滑一寸，幕布就往下降一寸。滑得快，它降得快；滑得慢，它就像一片羽毛一样缓缓飘落。中间有任何一个瞬间我松手，它就会弹回去，一切恢复原样。这不是关机按钮那种"点一下就完事"的决绝，这是一个你随时可以反悔的动作。关机不再是按钮，而是一个过程。一个可以被中途打断的、需要你从头到尾负责到底的过程。</p>
+                <p>我把幕布拖到了底。</p>
+                <p>屏幕黑了。风扇停了。教室安静下来，只剩窗外操场上最后几声哨响和远处食堂隐隐约约的锅铲声。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">109</div>
+            <div class="timeline-title">日常仪式</div>
+            <div class="timeline-content">
+                <p>从那以后，我再也没用过开始菜单里的关机按钮。</p>
+                <p>每一次关机，都是滑动。不是为了让电脑关得更快或者更慢，而是为了那几秒钟的独处。手指按住幕布的瞬间，我会不自觉地回顾这一天：有没有改错配置文件，有没有留下内存泄漏的隐患，有没有哪个进程还在后台偷偷啃GPU。然后幕布滑到底，一切清零。明天开机又是崭新的，冰点还原会把我没注意到的所有错误抹干净。</p>
+                <p>这种感觉很奇怪。滑动关机是Win11自带的——那个被我嫌弃得老师都抱怨的任务栏、那个被我整个推翻的开始菜单、那个我装了StartAllBack才勉强接受的系统——它最不起眼的一个角落，居然藏着一份我找了三年才找到的仪式感。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">110</div>
+            <div class="timeline-title">奇怪的方式</div>
+            <div class="timeline-content">
+                <p>有一次，一个同学放学后回来拿忘记的课本，撞见我在讲台上用手指拖幕布。</p>
+                <p>他站在门口，书包带垮到胳膊肘，愣了几秒："你这是在干嘛？"</p>
+                <p>我没回头。幕布刚好拖到一半，Sonoma的草原被切成上下两截，上面是黑纱，下面是绿野。</p>
+                <p>"关机。"我说。</p>
+                <p>"关机？这不是往下滑一下就行了吗？"</p>
+                <p>"对。就是往下滑一下。"</p>
+                <p>他把课本找出来，走到门口又回头看了一眼。幕布已经触底，屏幕黑了。教室里只剩下窗外透进来的橙色夕阳，和希沃黑色屏幕上映出的我的半张脸。</p>
+                <p>"你搞电脑的方式好奇怪，"他说，然后走了。</p>
+                <p>奇怪。对的。一个给班级电脑换系统、装挂件、批注工具、还有把开始菜单整个改回十几年前版本的六年级男生，当然是奇怪的。但他不知道的是，我已经没有再搞电脑了。那些高烧一样的技术冲动，在经历了动态壁纸掉帧、驱动绿屏、0.283帧濒死体验、版本号反复升降之后，慢慢退成了一种安静的、每天的仪式。</p>
+                <p>不再去解锁更多深海中的权限之刃，而是简简单单滑一下屏幕，关掉一台今天也很安静的白色巨兽。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">111</div>
+            <div class="timeline-title">最后的击掌</div>
+            <div class="timeline-content">
+                <p>最安静的一次，是一个周三傍晚。</p>
+                <p>那天下雨，教室里比平时暗得早。我没开灯，希沃是整间教室唯一的光源。绿色草原在雨天的自然光线下看过去，饱和度低了一些，像被雨水洗淡了。ClassWidget 1弹出一句："放学 · 留下来。"然后一切静止。</p>
+                <p>我点开滑动关机。幕布从顶部垂下来，遮住了丘陵，遮住了橡树，遮住了那个朴素到有点丑的白色挂件。雨水打在窗户上，淅淅沥沥，像是在给幕布配乐。</p>
+                <p>手指拖着幕布往下。我故意拖得很慢，慢到能感觉到屏幕玻璃表面细微的阻力，慢到能看见幕布边缘和桌面画面交界处像素级的模糊过渡。滑到最底部的时候，电脑没有立刻关——有一瞬间的停滞，系统在做最后的线程收尾，像一个人躺下之后闭上眼睛，还没睡着，还在呼吸。</p>
+                <p>然后，黑了。</p>
+                <p>雨声还在。教室漆黑。我把触控笔放回粉笔槽边上，拎起书包，推门走进走廊。</p>
+                <p>滑动关机不会说再见。它只是把幕布拉到底。但每一场幕布拉到底，都像在跟我当了多年战友的这台白色巨兽轻轻击一次掌。</p>
+            </div>
+        </div>
+        
+        <div class="timeline-item">
+            <div class="timeline-number">112</div>
+            <div class="timeline-title">跨越城市的关机</div>
+            <div class="timeline-content">
+                <p>窗外的梧桐叶已经绿透了。五月的阳光从四楼走廊尽头斜打进来，在黑板上切出一道明亮的斜线——今天是长假前的最后一天，所有人都躁动不安，只有希沃还安静地挂在墙上，像一个不明白"放假"是什么意思的白色巨兽。</p>
+                <p>我已经在琢磨怎么远程连上这台机器了。</p>
+                <p><span class="highlight">UU远程</span>。网易出的，轻量，不需要复杂配置，同一账号扫码就能连。比TeamViewer轻，比向日葵干净，最重要的是——它有macOS端。家里那台<span class="highlight">M4 Mac Mini</span>平时跑得安安静静，偶尔跑个大模型才发一点温，用它来控教室这台老希沃，简直是用航天飞机送外卖。</p>
+                <p>装好之后我打开控制端，确认连接正常。冰点还原开着，解冻区里我把UU远程的配置文件和凭证信息划了进去——不然一重启就没了，每次来学校重新登录一遍，这是只有傻子才会干的事。</p>
+                <p>周二下午。阳光把课桌晒出一层薄薄的灰。老师在讲台上翻PPT，希沃屏幕上是某篇古文的注释，红色批注浮在绿色草原上，ClassWidget 1安安静静弹出"第二节·古文赏析"。后排有人趴在桌上，前排有人在笔记本上画小人。</p>
+                <p>手表震了一下。</p>
+                <p>不是通知。是我设的每隔一小时悄悄检查UU远程连接状态的自动化提醒。它弹出来的文本只有一行：当前连接正常，设备在线。</p>
+                <p>我低着左手手腕，扫了一眼手表屏幕。表盘右上角，一个极小的绿色圆点安静地亮着。那是我自己改的表盘组件——如果希沃那端掉线，绿点会变红，还会触发一次持续三秒的震动。但它一直是绿的。从上周装好到现在，一次都没红过。冰点还原也冻不掉它，重启后它还是绿的，像一个不知疲倦的心跳指示灯。</p>
+                <p>放学铃响了。教室瞬间空了一半，值日生开始扫地，粉笔灰在夕阳里浮成一片金色的雾。我背着书包走出教学楼的时候，手表上的绿色圆点还亮着。它在那台空荡荡的、窗帘拉了一半的教室里，等一个跨越整座城市的信号。</p>
+                <p>那是五月的傍晚。</p>
+                <p>整座城市都在预告五一长假——校门口的小卖部提前关门了，老板娘在卷帘门内侧贴了一张"放假五天"的条子；地铁里多了很多提着行李箱的人，脸上带着那种即将抵达高铁站的、被期待泡软了的神情。我到家的时候，客厅里没人，厨房灶台上炖着一锅银耳汤，咕嘟咕嘟冒着甜丝丝的热气。我爸的书房门关着，里面没动静。</p>
+                <p>我没有开灯。M4 Mac Mini的指示灯在书桌右下角亮着，一个针尖大小的白点。我拉开椅子坐下去，指尖碰到妙控板，屏幕亮起来的那一瞬间，我突然觉得——安静。</p>
+                <p>真正的安静。不是教室里那种被三十个人的呼吸、翻书、转笔、偶尔的咳嗽声浸透的那种安静，而是这间只有我一个人的房间，一台没有风扇的Mac，一块Retina屏幕上Sonoma的绿色丘陵和教室那台希沃上的是同一个壁纸。Sonoma对Sonoma，绿色对绿色。隔着半个城市，两台电脑正在对视。</p>
+                <p>我打开UU远程。主界面弹出来，被控设备列表里只有一个名字："教室一体机-Win7灵魂装载"。在线。图标是灰色的，因为希沃关机之后屏幕是黑的，但后台服务还在，UU远程的客户端在冰点还原的解冻区里安静地活着，像一只没有睡眠的守夜动物。</p>
+                <p>鼠标悬停在那个名字上方。一个绿色的"连接"按钮。</p>
+                <p>我按下去。</p>
+                <p>M4 Mac的屏幕中间弹出一个新窗口。先是黑的，然后亮了。几秒延迟。画面从中间往外渲染，像是有人在另一个时空里慢慢拉开一块幕布。希沃的桌面出来了：Sonoma的绿色丘陵。ClassWidget 1的白色悬浮条挂着最后一次更新的课表："放学·留下来"。回收站在右下角，Inkeys隐在屏幕边缘，滑动关机的灰色电源图标还安安静静地躺在我上次拖到的那个像素位置。右下角那行灰色小字还在：Build 26200。</p>
+                <p>一切都和我上次关机前一模一样。</p>
+                <p>我把窗口拖到全屏。M4那块Retina屏幕的色准比希沃好得多，六千万像素铺开的绿色丘陵，每一片草叶的阴影都干净锐利。我就这么看着，什么也没做。远程桌面开着，桌面安安静静，没人碰它。教室里大概已经黑了，希沃屏幕亮着——远程连接激活了显示输出，但教室里没有人看见。那块86英寸的巨屏正在一间空荡荡的、窗帘被风吹起的教室里发光，对着一屋子空桌椅独自盛开。</p>
+                <p>我的左手，不自觉地抬起来。手表上那个绿色小圆点还在。但我知道它已经用不上了，因为我正在看着它。</p>
+                <p>对，看着它——隔着半个城市。学校在西边，我的房间在东边。那间教室在三楼，我的书桌在十八楼。五一长假的第一天，所有人都在离开，只有一台希沃被留下来了，和一个在Mac屏幕后面喝着银耳汤的人遥遥相望。</p>
+                <p>我晃了晃鼠标。光标在希沃桌面上移动，跨过一片绿色丘陵，跨过回收站，跨过ClassWidget那个朴素到有点丑的悬浮条。延迟大概二十毫秒，比我在教室讲台上直接用手指点屏幕还快一点。这很荒谬——远程居然比本地快。后来我想通了，希沃那块触控屏的触控采样率有限，而M4处理远程视频流的解码能力过剩，两相抵扣，远程赢了。</p>
+                <p>我打开任务管理器，看了一眼GPU占用：61W。正常。ClassWidget 1还在后台安静地走秒，Inkeys在等待一个永远不会来的触控手势。一切正常。</p>
+                <p>然后我做了那件事。</p>
+                <p>我点开开始菜单——Win7风格的，靠左下角的，半透明Aero Glass的开始菜单。鼠标在远程画面里划过那一列固定程序：WPS，希沃白板5，浏览器，ClassWidget，Inkeys。我把鼠标停在滑动关机的快捷方式上。灰色的电源图标。隔着半个城市，我双击它。</p>
+                <p>希沃的屏幕顶部，那张半透明的黑色幕布垂下来。和平时一模一样——隔着网络，隔着城区，隔着春末夏初的晚风——那张幕布真的从屏幕顶端降下来了。Sonoma绿色草原被遮住一半，丘陵的轮廓在幕布背后变成模糊的、褪色的影子。"滑动以关闭电脑"。</p>
+                <p>我把鼠标移到幕布顶部。按下左键。往下拖。拖得不快不慢。</p>
+                <p>M4这边的画面里，幕布跟着光标往下走。希沃那边，教室空无一人，那块86英寸的巨屏正在滑下它自己的幕布。然后到底了。窗口黑了。连接中断的提示弹出来："被控设备已关机。"</p>
+                <p>五一长假的第一天。我从学校远程连回希沃，看了一眼桌面，然后隔着半个城市把它关了。</p>
+                <p>银耳汤的温度刚好可以入口。Mac Mini的白色指示灯在桌子底下静悄悄地亮着。手表上的绿色圆点已经灭了——第一次灭。它只亮了一整个学期的所有工作日，这是第一次在假期开始的时候，灭了。</p>
+                <p>一切安好，五一，快乐。</p>
+                <p>关掉Mac，我端起汤碗走到阳台上。远处城市的灯光在薄暮里一粒一粒亮起来。某条看不见的街道尽头，一所空荡荡的学校里，三楼那间教室的窗帘正在晚风里轻轻鼓起来。那块86英寸的屏幕是黑的，但还在散发关机后残存的微微余温。</p>
+                <p><span class="highlight">绿点亮了一整个学期。今天是它第一次，也是唯一一次，休息。</span></p>
+                <p><span class="highlight">五一快乐。</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="signature">
+        <div class="signature-line"></div>
+        <p class="signature-text">此致</p>
+        <p class="signature-name">杨淞乔</p>
+    </div>
+    
+    <div class="class-photo-section">
+        <div class="photo-container">
+            <img src="Endimg/截屏2026-05-01 13.40.32.png" alt="我们班的照片" class="class-photo">
+            <div class="photo-caption">我们班的照片</div>
+        </div>
+        <div class="update-info">
+            <p>最后更新：2026年5月1日</p>
+        </div>
+    </div>
+</body>
+</html>
