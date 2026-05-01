@@ -647,6 +647,168 @@
         }
         .admin-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px var(--shadow-color); }
 
+        /* 划划水图标 */
+        .huashuishui-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: auto;
+            height: 50px;
+            padding: 0 18px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .huashuishui-icon:hover { 
+            transform: scale(1.15) rotate(5deg); 
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6), inset 0 2px 15px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 划划水面板 */
+        .huashuishui-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(5, 10, 25, 0.99));
+            z-index: 7000;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+        .huashuishui-panel.active {
+            display: flex;
+        }
+        .huashuishui-header {
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        .huashuishui-header h2 {
+            color: #fff;
+            margin: 0;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .close-huashuishui {
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.5);
+            color: #ff6b6b;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s;
+        }
+        .close-huashuishui:hover {
+            background: rgba(255, 107, 107, 0.4);
+            transform: scale(1.1);
+        }
+        .huashuishui-tabs {
+            display: flex;
+            gap: 0;
+            background: rgba(0, 10, 25, 0.8);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.2);
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+        .huashuishui-tab {
+            flex: 0 0 auto;
+            padding: 15px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+        .huashuishui-tab:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #fff;
+        }
+        .huashuishui-tab.active {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+        .huashuishui-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        .huashuishui-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .huashuishui-tab-content.active {
+            display: block;
+        }
+        .huashuishui-section-title {
+            color: #fff;
+            font-size: 1.3em;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+        .huashuishui-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .huashuishui-link-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .huashuishui-link-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+        .huashuishui-link-card h4 {
+            color: #fff;
+            margin: 0 0 8px 0;
+            font-size: 1.1em;
+        }
+        .huashuishui-link-card p {
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0 0 12px 0;
+            font-size: 0.9em;
+        }
+        .huashuishui-link-card a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85em;
+            word-break: break-all;
+        }
+        .huashuishui-link-card a:hover {
+            color: #764ba2;
+        }
+
         /* 成就按钮 */
         .achievement-btn {
             position: absolute;
@@ -5024,6 +5186,7 @@
     <button class="theme-toggle bg-toggle" onclick="changeBackground()" title="更换背景图">🖼️</button>
     <button class="theme-toggle cookie-toggle" onclick="clearAllData()" title="清除所有数据">🍪</button>
     <div class="fish-icon" title="VIP 权益" onclick="showFishPasswordModal(); unlockAchievement('fishClicker');"><span style="color: #ffb300; font-size: 1.2em;">👑</span> VIP 权益</div>
+    <div class="huashuishui-icon" title="划划水" onclick="openHuashuishuiPanel()">🐟 划划水</div>
 
     <!-- 鱼图标密码保护弹窗 -->
     <div id="fishPasswordModal" class="fish-password-modal">
@@ -5556,6 +5719,315 @@
                     </div>
                 </div>
             </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 划划水面板 -->
+    <div id="huashuishuiPanel" class="huashuishui-panel">
+        <div class="huashuishui-header">
+            <h2>🐟 划划水 - 资源导航</h2>
+            <button class="close-huashuishui" onclick="closeHuashuishuiPanel()">✕</button>
+        </div>
+        <div class="huashuishui-tabs">
+            <div class="huashuishui-tab active" onclick="switchHuashuishuiTab('hot')">🔥 热门平台</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('game')">🎮 在线游戏</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('dev')">👨‍💻 技术站</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('search')">🔍 资源搜索</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('office')">📋 办公工具</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('study')">📚 学习类</div>
+            <div class="huashuishui-tab" onclick="switchHuashuishuiTab('ai')">🤖 AI工具</div>
+        </div>
+        <div class="huashuishui-content">
+            <div id="hotContent" class="huashuishui-tab-content active">
+                <h3 class="huashuishui-section-title">🔥 热门平台</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.baidu.com', '_blank')">
+                        <h4>百度</h4>
+                        <p>最大中文搜索引擎</p>
+                        <a href="https://www.baidu.com" target="_blank">baidu.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://weibo.com', '_blank')">
+                        <h4>微博</h4>
+                        <p>社交媒体分享平台</p>
+                        <a href="https://weibo.com" target="_blank">weibo.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.bilibili.com', '_blank')">
+                        <h4>哔哩哔哩</h4>
+                        <p>年轻人的视频社区</p>
+                        <a href="https://www.bilibili.com" target="_blank">bilibili.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.zhihu.com', '_blank')">
+                        <h4>知乎</h4>
+                        <p>问答社区</p>
+                        <a href="https://www.zhihu.com" target="_blank">zhihu.com</a>
+                    </div>
+                </div>
+            </div>
+            <div id="gameContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">🎮 在线游戏</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://moyuyike.com', '_blank')">
+                        <h4>摸鱼一刻</h4>
+                        <p>轻松小游戏合集</p>
+                        <a href="https://moyuyike.com" target="_blank">moyuyike.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://movuvike.com', '_blank')">
+                        <h4>movuvike</h4>
+                        <p>有趣的小游戏平台</p>
+                        <a href="https://movuvike.com" target="_blank">movuvike.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://tix.tax', '_blank')">
+                        <h4>井字棋</h4>
+                        <p>经典井字棋游戏</p>
+                        <a href="https://tix.tax" target="_blank">tix.tax</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://sandspiel.club', '_blank')">
+                        <h4>沙盒物理</h4>
+                        <p>物理沙盒模拟</p>
+                        <a href="https://sandspiel.club" target="_blank">sandspiel.club</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://kiomet.com', '_blank')">
+                        <h4>军事战略</h4>
+                        <p>在线策略游戏</p>
+                        <a href="https://kiomet.com" target="_blank">kiomet.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://slowroads.io', '_blank')">
+                        <h4>随机公路驾驶</h4>
+                        <p>无尽公路驾驶</p>
+                        <a href="https://slowroads.io" target="_blank">slowroads.io</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://linerider.io', '_blank')">
+                        <h4>线条骑士</h4>
+                        <p>创意物理画线游戏</p>
+                        <a href="https://linerider.io" target="_blank">linerider.io</a>
+                    </div>
+                </div>
+            </div>
+            <div id="devContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">👨‍💻 程序员 / 技术站</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://juejin.cn', '_blank')">
+                        <h4>掘金</h4>
+                        <p>高质量技术社区</p>
+                        <a href="https://juejin.cn" target="_blank">juejin.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://leetcode.cn', '_blank')">
+                        <h4>力扣</h4>
+                        <p>算法刷题平台</p>
+                        <a href="https://leetcode.cn" target="_blank">leetcode.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://greasyfork.org', '_blank')">
+                        <h4>GreasyFork脚本</h4>
+                        <p>用户脚本库</p>
+                        <a href="https://greasyfork.org" target="_blank">greasyfork.org</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://github.com', '_blank')">
+                        <h4>GitHub</h4>
+                        <p>全球代码托管平台</p>
+                        <a href="https://github.com" target="_blank">github.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://gitee.com', '_blank')">
+                        <h4>码云Gitee</h4>
+                        <p>国内代码托管平台</p>
+                        <a href="https://gitee.com" target="_blank">gitee.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://gitlab.com', '_blank')">
+                        <h4>GitLab</h4>
+                        <p>开源代码平台</p>
+                        <a href="https://gitlab.com" target="_blank">gitlab.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.51cto.com', '_blank')">
+                        <h4>51CTO</h4>
+                        <p>IT技术社区</p>
+                        <a href="https://www.51cto.com" target="_blank">51cto.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://segmentfault.com', '_blank')">
+                        <h4>思否</h4>
+                        <p>技术问答社区</p>
+                        <a href="https://segmentfault.com" target="_blank">segmentfault.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.oschina.net', '_blank')">
+                        <h4>开源中国</h4>
+                        <p>开源技术社区</p>
+                        <a href="https://www.oschina.net" target="_blank">oschina.net</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://blog.csdn.net', '_blank')">
+                        <h4>CSDN</h4>
+                        <p>IT技术博客平台</p>
+                        <a href="https://blog.csdn.net" target="_blank">blog.csdn.net</a>
+                    </div>
+                </div>
+            </div>
+            <div id="searchContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">🔍 资源搜索</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://mijisou.com', '_blank')">
+                        <h4>秘迹搜索</h4>
+                        <p>无广告隐私搜索引擎</p>
+                        <a href="https://mijisou.com" target="_blank">mijisou.com</a>
+                    </div>
+                </div>
+            </div>
+            <div id="officeContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">📋 办公工具</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://wj.qq.com', '_blank')">
+                        <h4>腾讯问卷</h4>
+                        <p>在线问卷工具</p>
+                        <a href="https://wj.qq.com" target="_blank">wj.qq.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.pdfpai.com', '_blank')">
+                        <h4>PDF派</h4>
+                        <p>免费PDF处理工具</p>
+                        <a href="https://www.pdfpai.com" target="_blank">pdfpai.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.youpinppt.com', '_blank')">
+                        <h4>优品PPT</h4>
+                        <p>PPT模板下载</p>
+                        <a href="https://www.youpinppt.com" target="_blank">youpinppt.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.processon.com', '_blank')">
+                        <h4>ProcessOn绘图</h4>
+                        <p>在线思维导图工具</p>
+                        <a href="https://www.processon.com" target="_blank">processon.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.mikecrm.com', '_blank')">
+                        <h4>麦客CRM</h4>
+                        <p>表单和客户管理</p>
+                        <a href="https://www.mikecrm.com" target="_blank">mikecrm.com</a>
+                    </div>
+                </div>
+            </div>
+            <div id="studyContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">📚 学习类</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.bookstack.cn', '_blank')">
+                        <h4>书栈网</h4>
+                        <p>免费技术书籍阅读</p>
+                        <a href="https://www.bookstack.cn" target="_blank">bookstack.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.zjlib.cn', '_blank')">
+                        <h4>浙江图书馆</h4>
+                        <p>在线数字图书馆</p>
+                        <a href="https://www.zjlib.cn" target="_blank">zjlib.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://life-learning.edu.cn', '_blank')">
+                        <h4>终身教育平台</h4>
+                        <p>在线学习资源</p>
+                        <a href="https://life-learning.edu.cn" target="_blank">life-learning.edu.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://shturl.cc/5JrEtqyVUUsJ', '_blank')">
+                        <h4>字统网</h4>
+                        <p>中文字体查询</p>
+                        <a href="https://shturl.cc/5JrEtqyVUUsJ" target="_blank">shturl.cc</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.chsi.com.cn', '_blank')">
+                        <h4>学信网</h4>
+                        <p>中国高等教育学生信息网</p>
+                        <a href="https://www.chsi.com.cn" target="_blank">chsi.com.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://zh.wikihow.com', '_blank')">
+                        <h4>WikiHow</h4>
+                        <p>技能学习指南</p>
+                        <a href="https://zh.wikihow.com" target="_blank">wikihow.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://erya.mooc.chaoxing.com', '_blank')">
+                        <h4>超星尔雅</h4>
+                        <p>在线课程平台</p>
+                        <a href="https://erya.mooc.chaoxing.com" target="_blank">chaoxing.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://open.nlc.cn', '_blank')">
+                        <h4>国图公开课</h4>
+                        <p>国家图书馆公开课</p>
+                        <a href="https://open.nlc.cn" target="_blank">nlc.cn</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.yxgapp.com', '_blank')">
+                        <h4>译学馆</h4>
+                        <p>翻译学习平台</p>
+                        <a href="https://www.yxgapp.com" target="_blank">yxgapp.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.examcoo.com', '_blank')">
+                        <h4>考试酷</h4>
+                        <p>在线考试题库</p>
+                        <a href="https://www.examcoo.com" target="_blank">examcoo.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.mooc.cn', '_blank')">
+                        <h4>华文慕课</h4>
+                        <p>中文慕课平台</p>
+                        <a href="https://www.mooc.cn" target="_blank">mooc.cn</a>
+                    </div>
+                </div>
+            </div>
+            <div id="aiContent" class="huashuishui-tab-content">
+                <h3 class="huashuishui-section-title">🤖 AI工具</h3>
+                <div class="huashuishui-links-grid">
+                    <div class="huashuishui-link-card" onclick="window.open('https://qianwen.aliyun.com', '_blank')">
+                        <h4>通义千问</h4>
+                        <p>阿里巴巴AI大模型</p>
+                        <a href="https://qianwen.aliyun.com" target="_blank">qianwen.aliyun.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://grok.com', '_blank')">
+                        <h4>Grok</h4>
+                        <p>马斯克AI助手</p>
+                        <a href="https://grok.com" target="_blank">grok.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://claude.ai', '_blank')">
+                        <h4>Claude</h4>
+                        <p>Anthropic AI助手</p>
+                        <a href="https://claude.ai" target="_blank">claude.ai</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://lumaai.com', '_blank')">
+                        <h4>Luma AI</h4>
+                        <p>AI视频生成</p>
+                        <a href="https://lumaai.com" target="_blank">lumaai.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://kimi.ai', '_blank')">
+                        <h4>Kimi</h4>
+                        <p>月之暗面AI</p>
+                        <a href="https://kimi.ai" target="_blank">kimi.ai</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://stability.ai', '_blank')">
+                        <h4>Stability AI</h4>
+                        <p>Stable Diffusion官方</p>
+                        <a href="https://stability.ai" target="_blank">stability.ai</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://pika.art', '_blank')">
+                        <h4>Pika</h4>
+                        <p>AI视频创作工具</p>
+                        <a href="https://pika.art" target="_blank">pika.art</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://suno.ai', '_blank')">
+                        <h4>Suno AI</h4>
+                        <p>AI音乐生成</p>
+                        <a href="https://suno.ai" target="_blank">suno.ai</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://vegaai.art', '_blank')">
+                        <h4>Vega AI</h4>
+                        <p>AI艺术创作平台</p>
+                        <a href="https://vegaai.art" target="_blank">vegaai.art</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://runwayml.com', '_blank')">
+                        <h4>Runway</h4>
+                        <p>专业AI视频工具</p>
+                        <a href="https://runwayml.com" target="_blank">runwayml.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://leonardo.ai', '_blank')">
+                        <h4>Leonardo AI</h4>
+                        <p>AI图像生成平台</p>
+                        <a href="https://leonardo.ai" target="_blank">leonardo.ai</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://civitai.com', '_blank')">
+                        <h4>Civitai</h4>
+                        <p>AI模型分享社区</p>
+                        <a href="https://civitai.com" target="_blank">civitai.com</a>
+                    </div>
+                    <div class="huashuishui-link-card" onclick="window.open('https://www.midjourney.com', '_blank')">
+                        <h4>Midjourney</h4>
+                        <p>著名AI绘画工具</p>
+                        <a href="https://www.midjourney.com" target="_blank">midjourney.com</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -9607,6 +10079,44 @@
 
         function scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 划划水面板
+        function openHuashuishuiPanel() {
+            document.getElementById('huashuishuiPanel').classList.add('active');
+        }
+
+        function closeHuashuishuiPanel() {
+            document.getElementById('huashuishuiPanel').classList.remove('active');
+        }
+
+        function switchHuashuishuiTab(tabName) {
+            // 移除所有active类
+            document.querySelectorAll('.huashuishui-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.huashuishui-tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // 给当前点击的标签添加active类
+            const selectedTab = document.querySelector(`.huashuishui-tab[onclick="switchHuashuishuiTab('${tabName}')"]`);
+            if (selectedTab) selectedTab.classList.add('active');
+
+            // 显示对应的内容
+            const contentMap = {
+                hot: 'hotContent',
+                game: 'gameContent',
+                dev: 'devContent',
+                search: 'searchContent',
+                office: 'officeContent',
+                study: 'studyContent',
+                ai: 'aiContent'
+            };
+            const targetContent = contentMap[tabName];
+            if (targetContent) {
+                document.getElementById(targetContent).classList.add('active');
+            }
         }
 
         window.addEventListener('scroll', updateScroll);
