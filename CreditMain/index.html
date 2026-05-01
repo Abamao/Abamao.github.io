@@ -442,39 +442,10 @@
             color: white;
         }
 
-        /* Error 抖动动画（60%强度） */
-        @keyframes errorShake {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            10% { transform: translate(-12px, -12px) rotate(-3deg); }
-            20% { transform: translate(12px, 12px) rotate(3deg); }
-            30% { transform: translate(-12px, 12px) rotate(-1.8deg); }
-            40% { transform: translate(12px, -12px) rotate(1.8deg); }
-            50% { transform: translate(-9px, -9px) rotate(-2.4deg); }
-            60% { transform: translate(9px, 9px) rotate(2.4deg); }
-            70% { transform: translate(-9px, 9px) rotate(-1.2deg); }
-            80% { transform: translate(9px, -9px) rotate(1.2deg); }
-            90% { transform: translate(-6px, -6px) rotate(-0.6deg); }
-        }
-
-        .error-shake {
-            animation: errorShake 0.1s linear infinite;
-        }
-
-        /* 反色效果 */
-        .invert-mode {
-            filter: invert(100%) hue-rotate(180deg);
-        }
-
-        /* 彩虹猫反色动画 */
-        @keyframes rainbowInvert {
-            0%, 100% { filter: invert(100%) hue-rotate(0deg); }
-            25% { filter: invert(100%) hue-rotate(90deg); }
-            50% { filter: invert(100%) hue-rotate(180deg); }
-            75% { filter: invert(100%) hue-rotate(270deg); }
-        }
-
-        .rainbow-invert {
-            animation: rainbowInvert 2s linear infinite;
+        /* 屏幕黑白闪烁 */
+        @keyframes blackWhiteFlash {
+            0%, 100% { background: #000; }
+            50% { background: #fff; }
         }
 
         /* Error 屏幕 */
@@ -484,36 +455,43 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
             z-index: 99999;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ff0000;
+            flex-direction: column;
+            gap: 20px;
+            animation: blackWhiteFlash 0.1s linear infinite;
+        }
+
+        /* 错误文字（红色在黑背景，黑色在白背景） */
+        .error-text {
             font-family: 'Courier New', monospace;
             font-size: 3em;
             text-align: center;
-            flex-direction: column;
-            gap: 20px;
+            animation: errorTextBlink 0.1s linear infinite;
         }
 
-        .error-text {
-            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
-            animation: blink 0.5s ease-in-out infinite alternate;
+        @keyframes errorTextBlink {
+            0%, 100% { color: #ff0000; text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; }
+            50% { color: #000; text-shadow: 0 0 10px #000, 0 0 20px #000; }
         }
 
-        @keyframes blink {
-            0% { opacity: 1; }
-            100% { opacity: 0.3; }
-        }
-
-        /* 自定义鼠标 */
+        /* 自定义鼠标 X 抖动 */
         .custom-cursor {
             position: fixed;
             pointer-events: none;
             z-index: 999999;
-            font-size: 2em;
+            font-size: 3em;
             transform: translate(-50%, -50%);
+            animation: cursorShake 0.05s linear infinite;
+        }
+
+        @keyframes cursorShake {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-45%, -55%) rotate(-5deg); }
+            50% { transform: translate(-50%, -50%) rotate(0deg); }
+            75% { transform: translate(-55%, -45%) rotate(5deg); }
         }
     </style>
 </head>
@@ -687,7 +665,7 @@
             // 1. 隐藏原来的鼠标
             document.body.style.cursor = 'none';
 
-            // 2. 添加 X 错误鼠标图标
+            // 2. 添加 X 错误鼠标图标（抖动）
             const customCursor = document.createElement('div');
             customCursor.className = 'custom-cursor';
             customCursor.textContent = '❌';
@@ -700,33 +678,23 @@
             }
             document.addEventListener('mousemove', updateCursor);
 
-            // 4. 彩虹猫反色效果
-            document.body.classList.add('rainbow-invert');
-
-            // 5. 屏幕抖动（60%强度）
-            document.body.classList.add('error-shake');
-
-            // 6. 显示 Error 文本
+            // 4. 显示 Error 文本（黑白闪烁屏幕）
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-screen';
             errorDiv.innerHTML = `
                 <div class="error-text">Error:CI.sys</div>
-                <div style="font-size: 0.5em; color: #666;">System Failure</div>
+                <div class="error-text" style="font-size: 1em;">System Failure</div>
             `;
             document.body.appendChild(errorDiv);
 
-            // 7. 持续15秒然后跳转
+            // 5. 持续15秒然后跳转
             const duration = 15000; // 15秒
-            let elapsed = 0;
             const timerInterval = setInterval(() => {
-                elapsed += 50;
-                if (elapsed >= duration) {
-                    clearInterval(timerInterval);
-                    document.removeEventListener('mousemove', updateCursor);
-                    // 跳转
-                    window.location.href = 'https://abamao.github.io/Class';
-                }
-            }, 50);
+                clearInterval(timerInterval);
+                document.removeEventListener('mousemove', updateCursor);
+                // 跳转
+                window.location.href = 'https://abamao.github.io/Class';
+            }, duration);
         }
 
         // 全屏切换
