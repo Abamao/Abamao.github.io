@@ -1,0 +1,2161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>方块世界 - Minecraft Clone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; font-family: 'Microsoft YaHei', sans-serif; background: #1a1a2e; user-select: none; }
+        #game-container { width: 100vw; height: 100vh; position: relative; }
+        #crosshair { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20px; height: 20px; pointer-events: none; z-index: 100; }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255,255,255,0.9); box-shadow: 0 0 4px rgba(0,0,0,0.8); }
+        #crosshair::before { width: 2px; height: 20px; left: 50%; transform: translateX(-50%); }
+        #crosshair::after { width: 20px; height: 2px; top: 50%; transform: translateY(-50%); }
+        #ui { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+        #status-bars { position: fixed; top: 20px; left: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .bar-container { display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.7); padding: 8px 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); }
+        .bar-label { color: white; font-size: 14px; font-weight: bold; width: 50px; }
+        .bar { width: 150px; height: 16px; background: rgba(0,0,0,0.5); border-radius: 8px; overflow: hidden; border: 2px solid rgba(255,255,255,0.3); }
+        .bar-fill { height: 100%; transition: width 0.2s; }
+        .health-fill { background: linear-gradient(90deg, #ff3333, #ff6666); box-shadow: 0 0 10px rgba(255,51,51,0.5); }
+        .hunger-fill { background: linear-gradient(90deg, #ff8800, #ffaa00); box-shadow: 0 0 10px rgba(255,136,0,0.5); }
+        .bar-value { color: white; font-size: 12px; margin-left: 5px; font-weight: bold; }
+        #hotbar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.2); }
+        .hotbar-slot { width: 50px; height: 50px; background: rgba(139,69,19,0.3); border: 2px solid rgba(139,69,19,0.6); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; }
+        .hotbar-slot:hover { transform: scale(1.05); background: rgba(139,69,19,0.5); }
+        .hotbar-slot.active { border-color: #ffd700; box-shadow: 0 0 15px rgba(255,215,0,0.6); background: rgba(139,69,19,0.6); }
+        .hotbar-slot .item-icon { width: 38px; height: 38px; border-radius: 4px; }
+        .hotbar-slot .slot-number { position: absolute; top: 2px; left: 4px; font-size: 10px; color: rgba(255,255,255,0.7); }
+        .hotbar-slot .item-count { position: absolute; bottom: 2px; right: 4px; font-size: 12px; color: #fff; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.9); }
+        #inventory { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); padding: 30px; border-radius: 16px; z-index: 200; pointer-events: auto; border: 3px solid rgba(139,69,19,0.8); box-shadow: 0 0 30px rgba(0,0,0,0.8); }
+        #inventory.show { display: block; }
+        #inventory h2 { color: #fff; text-align: center; margin-bottom: 20px; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); }
+        .inventory-grid { display: grid; grid-template-columns: repeat(9, 52px); gap: 6px; margin-bottom: 20px; }
+        .inv-slot { width: 52px; height: 52px; background: rgba(139,69,19,0.3); border: 2px solid rgba(139,69,19,0.6); border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; transition: all 0.2s; }
+        .inv-slot:hover { background: rgba(139,69,19,0.5); transform: scale(1.05); }
+        .inv-slot.selected { border-color: #ffd700; box-shadow: 0 0 10px rgba(255,215,0,0.8); }
+        .inv-slot .item-icon { width: 40px; height: 40px; border-radius: 4px; }
+        .inv-slot .item-count { position: absolute; bottom: 2px; right: 4px; font-size: 12px; color: #fff; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.9); }
+        #info { position: fixed; top: 140px; left: 20px; color: white; background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; font-size: 14px; line-height: 1.8; border: 2px solid rgba(255,255,255,0.2); }
+        #info h3 { margin-bottom: 10px; color: #00d4ff; text-shadow: 0 0 10px rgba(0,212,255,0.5); }
+        #info span { color: #ffd700; font-weight: bold; }
+        #start-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; pointer-events: auto; }
+        #start-screen h1 { font-size: 4.5em; background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff006e); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; text-shadow: 0 0 40px rgba(0,212,255,0.5); animation: glow 2s ease-in-out infinite alternate; }
+        @keyframes glow { from { filter: drop-shadow(0 0 20px rgba(0,212,255,0.5)); } to { filter: drop-shadow(0 0 40px rgba(123,44,191,0.8)); } }
+        #start-screen p { color: rgba(255,255,255,0.8); font-size: 1.3em; margin-bottom: 40px; text-align: center; line-height: 1.6; }
+        #start-btn { padding: 20px 60px; font-size: 1.5em; background: linear-gradient(135deg, #00d4ff, #7b2cbf); color: white; border: none; border-radius: 50px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 30px rgba(0,212,255,0.4); }
+        #start-btn:hover { transform: scale(1.05); box-shadow: 0 15px 40px rgba(0,212,255,0.6); }
+        #fps-counter { position: fixed; top: 20px; right: 20px; color: #00ff00; font-family: monospace; font-size: 18px; background: rgba(0,0,0,0.7); padding: 10px 15px; border-radius: 5px; border: 1px solid rgba(0,255,0,0.3); }
+        #break-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; pointer-events: none; z-index: 90; display: none; }
+        #break-overlay.show { display: block; }
+        .break-stage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 3px solid rgba(0,0,0,0.8); border-radius: 8px; overflow: hidden; }
+        .break-stage::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="none" stroke="black" stroke-width="0.5"/><line x1="0" y1="0" x2="10" y2="10" stroke="black" stroke-width="0.5"/><line x1="10" y1="0" x2="0" y2="10" stroke="black" stroke-width="0.5"/></svg>'); opacity: 0; transition: opacity 0.1s; }
+        .break-stage.stage-1::after { opacity: 0.17; }
+        .break-stage.stage-2::after { opacity: 0.33; }
+        .break-stage.stage-3::after { opacity: 0.5; }
+        .break-stage.stage-4::after { opacity: 0.67; }
+        .break-stage.stage-5::after { opacity: 0.83; }
+        .break-stage.stage-6::after { opacity: 1; }
+        .break-progress-bar { position: absolute; bottom: -10px; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; }
+        .break-progress-bar .fill { height: 100%; background: #ff4444; width: 0%; transition: width 0.05s linear; }
+        #damage-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 30%, rgba(255,0,0,0.4) 100%); pointer-events: none; z-index: 80; opacity: 0; transition: opacity 0.2s; }
+        #damage-overlay.show { opacity: 1; }
+        #hand-item { position: fixed; bottom: 80px; right: 100px; width: 80px; height: 80px; pointer-events: none; z-index: 60; transform-origin: bottom right; transition: transform 0.1s; }
+        #hand-item.breaking { animation: handShake 0.1s infinite; }
+        @keyframes handShake { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+        #hand-item .item-render { width: 100%; height: 100%; border-radius: 8px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        #hand-item .item-count-display { position: absolute; bottom: 5px; right: 5px; color: #fff; font-size: 16px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        #hand-item-name { position: fixed; bottom: 170px; right: 110px; color: #fff; background: rgba(0,0,0,0.7); padding: 8px 12px; border-radius: 6px; font-size: 14px; pointer-events: none; z-index: 60; text-align: center; max-width: 150px; }
+        #item-tooltip { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); color: #fff; background: rgba(0,0,0,0.8); padding: 8px 16px; border-radius: 8px; font-size: 14px; pointer-events: none; z-index: 70; opacity: 0; transition: opacity 0.3s; border: 1px solid rgba(255,255,255,0.3); }
+        #item-tooltip.show { opacity: 1; }
+        /* 坐标显示 */
+        #coordinates { position: fixed; bottom: 20px; right: 20px; color: #fff; background: rgba(0,0,0,0.8); padding: 12px 18px; border-radius: 8px; font-size: 16px; font-family: monospace; z-index: 50; border: 2px solid rgba(0,212,255,0.5); box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+        #coordinates span { color: #00d4ff; font-weight: bold; }
+        /* 聊天栏 */
+        #chat-container { position: fixed; bottom: 250px; left: 20px; width: 400px; max-height: 200px; overflow: hidden; z-index: 75; pointer-events: none; }
+        #chat-messages { display: flex; flex-direction: column-reverse; max-height: 200px; overflow: hidden; }
+        .chat-message { color: #fff; font-size: 14px; padding: 4px 8px; background: rgba(0,0,0,0.7); margin: 2px 0; border-radius: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); pointer-events: none; animation: fadeIn 0.3s ease; }
+        .chat-message .username { color: #55ff55; font-weight: bold; }
+        .chat-message .system { color: #ffff55; }
+        #chat-input-container { position: fixed; bottom: 220px; left: 20px; width: 400px; z-index: 80; }
+        #chat-input { width: 100%; padding: 10px 15px; background: rgba(0,0,0,0.8); border: 2px solid #555; border-radius: 5px; color: #fff; font-size: 14px; outline: none; }
+        #chat-input:focus { border-color: #888; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* 外挂界面 */
+        #hack-menu { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.95); border: 2px solid #ff0000; border-radius: 10px; padding: 20px; z-index: 1000; display: none; width: 400px; max-height: 80vh; overflow-y: auto; }
+        #hack-menu.show { display: block; }
+        #hack-menu h2 { color: #ff0000; text-align: center; margin-bottom: 20px; text-shadow: 0 0 10px #ff0000; }
+        .hack-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; margin: 5px 0; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.3); border-radius: 5px; cursor: pointer; transition: all 0.2s; }
+        .hack-item:hover { background: rgba(255, 0, 0, 0.3); }
+        .hack-item.active { background: rgba(0, 255, 0, 0.3); border-color: #00ff00; }
+        .hack-name { color: #fff; font-weight: bold; }
+        .hack-status { color: #ff5555; font-weight: bold; }
+        .hack-item.active .hack-status { color: #55ff55; }
+        #hack-hint { position: fixed; top: 10px; right: 10px; color: #ff0000; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 5px; z-index: 999; display: none; border: 1px solid #ff0000; }
+        #hack-hint.show { display: block; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="start-screen">
+            <h1>🎮 方块世界</h1>
+            <p>WASD 移动 | 鼠标 视角 | 左键 破坏 | 右键 放置 | E 背包 | 空格 跳跃 | Q 疾跑 | Shift 潜行</p>
+            <button id="start-btn">开始游戏</button>
+        </div>
+        <div id="crosshair"></div>
+        <div id="fps-counter">FPS: 60</div>
+        <div id="break-overlay">
+            <div class="break-stage" id="break-stage"></div>
+            <div class="break-progress-bar"><div class="fill" id="break-fill"></div></div>
+        </div>
+        <div id="damage-overlay"></div>
+        <div id="hand-item">
+            <div class="item-render" id="hand-render"></div>
+            <div class="item-count-display" id="hand-count"></div>
+        </div>
+        <div id="hand-item-name"></div>
+        <div id="item-tooltip"></div>
+        <!-- 聊天栏 -->
+        <div id="chat-container">
+            <div id="chat-messages"></div>
+        </div>
+        <div id="chat-input-container" style="display: none;">
+            <input type="text" id="chat-input" placeholder="按 Enter 发送消息..." maxlength="100">
+        </div>
+        <!-- 外挂 -->
+        <div id="hack-hint">🔴 Avaon外挂已激活！按 P 打开菜单</div>
+        <div id="hack-menu">
+            <h2>🎮 Avaon 外挂</h2>
+            <div class="hack-item" data-hack="speed" onclick="toggleHack('speed')">
+                <span class="hack-name">🏃 加速</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="fly" onclick="toggleHack('fly')">
+                <span class="hack-name">🦅 飞行</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="killAura" onclick="toggleHack('killAura')">
+                <span class="hack-name">⚔️ 自动攻击</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="autoMine" onclick="toggleHack('autoMine')">
+                <span class="hack-name">⛏️ 自动挖矿</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="noFall" onclick="toggleHack('noFall')">
+                <span class="hack-name">☁️ 无掉落伤害</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="godMode" onclick="toggleHack('godMode')">
+                <span class="hack-name">👑 上帝模式</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="xray" onclick="toggleHack('xray')">
+                <span class="hack-name">👁️ X射线</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="reach" onclick="toggleHack('reach')">
+                <span class="hack-name">📏 远程攻击</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="fastBreak" onclick="toggleHack('fastBreak')">
+                <span class="hack-name">💨 快速破坏</span>
+                <span class="hack-status">OFF</span>
+            </div>
+            <div class="hack-item" data-hack="infiniteItems" onclick="toggleHack('infiniteItems')">
+                <span class="hack-name">📦 无限物品</span>
+                <span class="hack-status">OFF</span>
+            </div>
+        </div>
+        <div id="ui">
+            <div id="status-bars">
+                <div class="bar-container"><span class="bar-label">❤️ 生命</span><div class="bar"><div class="bar-fill health-fill" style="width: 100%"></div></div><span class="bar-value" id="health-value">20/20</span></div>
+                <div class="bar-container"><span class="bar-label">🍗 饥饿</span><div class="bar"><div class="bar-fill hunger-fill" style="width: 100%"></div></div><span class="bar-value" id="hunger-value">20/20</span></div>
+            </div>
+            <div id="coordinates">
+                <div>X: <span id="coord-x">0</span> Y: <span id="coord-y">0</span> Z: <span id="coord-z">0</span></div>
+            </div>
+            <div id="info">
+                <h3>🎯 操作说明</h3>
+                <div><span>WASD</span> - 移动</div>
+                <div><span>鼠标</span> - 视角控制</div>
+                <div><span>左键按住</span> - 破坏方块</div>
+                <div><span>右键</span> - 放置方块 (点击方块/点击地面)</div>
+                <div><span>空格</span> - 跳跃</div>
+                <div><span>Q</span> - 疾跑</div>
+                <div><span>Shift</span> - 潜行</div>
+                <div><span>数字键1-9</span> - 切换物品</div>
+                <div><span>E</span> - 打开/关闭背包</div>
+                <div><span>滚轮</span> - 切换快捷栏</div>
+            </div>
+            <div id="hotbar"></div>
+        </div>
+        <div id="inventory">
+            <h2>🎒 背包</h2>
+            <div class="inventory-grid" id="inv-grid"></div>
+            <p style="color: #aaa; text-align: center; font-size: 14px; margin-top: 10px;">点击物品选择，再次点击放置 | 可在背包和快捷栏之间交换 | 按 ESC 或 E 关闭</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ========== 游戏配置 ==========
+        const CONFIG = {
+            worldSize: 40, playerHeight: 1.8, playerWidth: 0.6, playerRadius: 0.3,
+            gravity: -0.028, jumpPower: 0.42, moveSpeed: 0.1, dayLength: 1200, maxHealth: 20, maxHunger: 20,
+            // 无限世界配置
+            chunkSize: 16,
+            chunkViewDistance: 2, // 视距（区块数）
+            // 性能优化配置
+            renderDistance: 32, // 渲染距离（方块数）
+            maxParticles: 30, 
+            zombieUpdateInterval: 8,
+            frustumCull: true, 
+            occlusionCull: true, 
+            cullInterval: 5, 
+            meshMergeEnabled: true, // 启用贪心网格合并
+            faceCullingEnabled: true, // 启用面剔除
+            instancedRendering: true, // 启用GPU实例化渲染
+        };
+
+        // ========== 噪声函数 ==========
+        class SimpleNoise {
+            constructor(seed = Math.random()) {
+                this.seed = seed;
+            }
+            
+            // 简单的 2D 噪声
+            noise(x, y) {
+                return this.hash(x + this.hash(y)) * 0.5 + 0.5;
+            }
+            
+            hash(n) {
+                return Math.sin(n * 12.9898 + 4.1414) * 43758.5453 % 1;
+            }
+            
+            // 平滑噪声
+            smoothNoise(x, y) {
+                const x0 = Math.floor(x);
+                const y0 = Math.floor(y);
+                const fx = x - x0;
+                const fy = y - y0;
+                
+                const v00 = this.noise(x0, y0);
+                const v10 = this.noise(x0 + 1, y0);
+                const v01 = this.noise(x0, y0 + 1);
+                const v11 = this.noise(x0 + 1, y0 + 1);
+                
+                const v0 = this.lerp(v00, v10, this.fade(fx));
+                const v1 = this.lerp(v01, v11, this.fade(fx));
+                return this.lerp(v0, v1, this.fade(fy));
+            }
+            
+            // 分形噪声（叠加多个八度）
+            fractalNoise(x, y, octaves = 4, persistence = 0.5, lacunarity = 2) {
+                let total = 0;
+                let frequency = 1;
+                let amplitude = 1;
+                let maxValue = 0;
+                
+                for (let i = 0; i < octaves; i++) {
+                    total += this.smoothNoise(x * frequency, y * frequency) * amplitude;
+                    maxValue += amplitude;
+                    amplitude *= persistence;
+                    frequency *= lacunarity;
+                }
+                return total / maxValue;
+            }
+            
+            lerp(a, b, t) {
+                return a + t * (b - a);
+            }
+            
+            fade(t) {
+                return t * t * t * (t * (t * 6 - 15) + 10);
+            }
+        }
+        
+        const worldNoise = new SimpleNoise(12345);
+
+        // ========== 高性能渲染系统 ==========
+        class ChunkRenderer {
+            constructor() {
+                this.chunks = new Map(); // 存储渲染的区块
+                this.materialCache = new Map();
+                this.lastRebuild = 0;
+                this.rebuildInterval = 10; // 帧
+            }
+
+            // 面方向定义
+            static FACE_TYPES = {
+                TOP: { dir: [0, 1, 0], uvOffset: [0, 0] },
+                BOTTOM: { dir: [0, -1, 0], uvOffset: [0, 0.5] },
+                LEFT: { dir: [-1, 0, 0], uvOffset: [0.5, 0] },
+                RIGHT: { dir: [1, 0, 0], uvOffset: [0.5, 0.25] },
+                FRONT: { dir: [0, 0, 1], uvOffset: [0.5, 0.5] },
+                BACK: { dir: [0, 0, -1], uvOffset: [0.5, 0.75] }
+            };
+
+            // 重建区块网格
+            rebuildChunk(chunkKey, worldData) {
+                const oldMesh = this.chunks.get(chunkKey);
+                if (oldMesh) {
+                    scene.remove(oldMesh);
+                    oldMesh.geometry.dispose();
+                }
+
+                const chunkX = Math.floor(parseInt(chunkKey.split(',')[0]) / CONFIG.chunkSize);
+                const chunkZ = Math.floor(parseInt(chunkKey.split(',')[1]) / CONFIG.chunkSize);
+                
+                const { positions, normals, colors, uvs, indices } = this.buildGreedyMesh(worldData, chunkX, chunkZ);
+                
+                if (positions.length === 0) {
+                    this.chunks.delete(chunkKey);
+                    return;
+                }
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+                geometry.setIndex(indices);
+                
+                geometry.computeBoundingBox();
+                geometry.computeBoundingSphere();
+
+                const material = new THREE.MeshLambertMaterial({
+                    vertexColors: true,
+                    side: THREE.FrontSide
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                
+                scene.add(mesh);
+                this.chunks.set(chunkKey, mesh);
+            }
+
+            // 贪心网格合并算法
+            buildGreedyMesh(worldData, chunkX, chunkZ) {
+                const positions = [];
+                const normals = [];
+                const colors = [];
+                const uvs = [];
+                const indices = [];
+                
+                const startX = chunkX * CONFIG.chunkSize;
+                const startZ = chunkZ * CONFIG.chunkSize;
+                
+                // 每个面单独处理
+                for (let dirName in ChunkRenderer.FACE_TYPES) {
+                    const faceData = ChunkRenderer.FACE_TYPES[dirName];
+                    const axisDir = faceData.dir;
+                    
+                    // 优化：只检查渲染距离内的方块
+                    const maxDist = CONFIG.renderDistance;
+                    
+                    for (let y = -5; y < 50; y++) {
+                        for (let x = 0; x < CONFIG.chunkSize; x++) {
+                            for (let z = 0; z < CONFIG.chunkSize; z++) {
+                                const worldX = startX + x;
+                                const worldZ = startZ + z;
+                                const key = `${worldX},${y},${worldZ}`;
+                                
+                                const block = worldData.get(key);
+                                if (!block) continue;
+
+                                // 检查邻居是否存在（用于面剔除）
+                                const neighborKey = `${worldX + axisDir[0]},${y + axisDir[1]},${worldZ + axisDir[2]}`;
+                                const neighborExists = worldData.has(neighborKey);
+
+                                if (CONFIG.faceCullingEnabled && neighborExists) {
+                                    continue;
+                                }
+
+                                // 添加这个面的顶点
+                                this.addFaceVertices(positions, normals, colors, uvs, indices, 
+                                    worldX, y, worldZ, dirName, block);
+                            }
+                        }
+                    }
+                }
+
+                return { positions, normals, colors, uvs, indices };
+            }
+
+            // 添加单个面的顶点
+            addFaceVertices(positions, normals, colors, uvs, indices, x, y, z, dirName, block) {
+                const faceVertices = this.getFaceVertices(x, y, z, dirName);
+                const normal = this.getFaceNormal(dirName);
+                const color = this.getBlockColor(block);
+                
+                const uv = [0, 0, 1, 0, 1, 1, 0, 1];
+                
+                const idxOffset = positions.length / 3;
+                
+                for (let i = 0; i < 4; i++) {
+                    positions.push(faceVertices[i * 3], faceVertices[i * 3 + 1], faceVertices[i * 3 + 2]);
+                    normals.push(normal[0], normal[1], normal[2]);
+                    colors.push(color[0], color[1], color[2]);
+                    uvs.push(uv[i * 2], uv[i * 2 + 1]);
+                }
+                
+                indices.push(
+                    idxOffset, idxOffset + 1, idxOffset + 2,
+                    idxOffset, idxOffset + 2, idxOffset + 3
+                );
+            }
+
+            getFaceVertices(x, y, z, dirName) {
+                const vertices = {
+                    TOP: [x, y + 1, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x, y + 1, z + 1],
+                    BOTTOM: [x, y, z + 1, x + 1, y, z + 1, x + 1, y, z, x, y, z],
+                    LEFT: [x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z],
+                    RIGHT: [x + 1, y, z + 1, x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1],
+                    FRONT: [x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1],
+                    BACK: [x + 1, y, z, x, y, z, x, y + 1, z, x + 1, y + 1, z]
+                };
+                return vertices[dirName];
+            }
+
+            getFaceNormal(dirName) {
+                const normals = {
+                    TOP: [0, 1, 0],
+                    BOTTOM: [0, -1, 0],
+                    LEFT: [-1, 0, 0],
+                    RIGHT: [1, 0, 0],
+                    FRONT: [0, 0, 1],
+                    BACK: [0, 0, -1]
+                };
+                return normals[dirName];
+            }
+
+            getBlockColor(block) {
+                const blockType = BLOCK_TYPES[block.userData.type];
+                if (!blockType) return [0.5, 0.5, 0.5];
+                const color = new THREE.Color(blockType.color);
+                return [color.r, color.g, color.b];
+            }
+
+            updateAll(worldData) {
+                this.lastRebuild++;
+                if (this.lastRebuild < this.rebuildInterval) return;
+                this.lastRebuild = 0;
+                
+                const p = gameState.player;
+                const playerChunkX = Math.floor(p.x / CONFIG.chunkSize);
+                const playerChunkZ = Math.floor(p.z / CONFIG.chunkSize);
+                
+                // 只处理玩家周围的区块
+                for (let dx = -CONFIG.chunkViewDistance; dx <= CONFIG.chunkViewDistance; dx++) {
+                    for (let dz = -CONFIG.chunkViewDistance; dz <= CONFIG.chunkViewDistance; dz++) {
+                        const cx = playerChunkX + dx;
+                        const cz = playerChunkZ + dz;
+                        const key = `${cx * CONFIG.chunkSize},${cz * CONFIG.chunkSize}`;
+                        
+                        if (!this.chunks.has(key)) {
+                            this.rebuildChunk(key, worldData);
+                        }
+                    }
+                }
+                
+                // 移除远处的区块
+                for (let [key, mesh] of this.chunks) {
+                    const parts = key.split(',').map(Number);
+                    const cx = parts[0] / CONFIG.chunkSize;
+                    const cz = parts[1] / CONFIG.chunkSize;
+                    const dx = cx - playerChunkX;
+                    const dz = cz - playerChunkZ;
+                    
+                    if (Math.abs(dx) > CONFIG.chunkViewDistance + 1 || 
+                        Math.abs(dz) > CONFIG.chunkViewDistance + 1) {
+                        scene.remove(mesh);
+                        mesh.geometry.dispose();
+                        if (mesh.material) mesh.material.dispose();
+                        this.chunks.delete(key);
+                    }
+                }
+            }
+
+            updateBlock(x, y, z, worldData) {
+                const cx = Math.floor(x / CONFIG.chunkSize);
+                const cz = Math.floor(z / CONFIG.chunkSize);
+                const key = `${cx * CONFIG.chunkSize},${cz * CONFIG.chunkSize}`;
+                this.rebuildChunk(key, worldData);
+            }
+        }
+
+        let chunkRenderer = null;
+
+        // ========== 性能优化：材质和几何体缓存 ==========
+        const MaterialCache = new Map();
+        const GeometryCache = new Map();
+        const TextureCache = new Map();
+        const sharedBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+        
+        // ========== 纹理生成（简化版以提高性能） ==========
+        function generateBlockTexture(type) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 16; // 更小的纹理尺寸
+            canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+
+            const blockType = BLOCK_TYPES[type];
+            if (!blockType) {
+                ctx.fillStyle = '#888888';
+                ctx.fillRect(0, 0, 16, 16);
+                return new THREE.CanvasTexture(canvas);
+            }
+
+            const baseColor = blockType.color ? new THREE.Color(blockType.color) : new THREE.Color(0x888888);
+
+            // 基础颜色填充
+            ctx.fillStyle = '#' + baseColor.getHexString();
+            ctx.fillRect(0, 0, 16, 16);
+
+            // 添加少量噪点（简化版）
+            for (let i = 0; i < 30; i++) {
+                const x = Math.floor(Math.random() * 16);
+                const y = Math.floor(Math.random() * 16);
+                const brightness = (Math.random() * 0.3 - 0.15);
+                const r = Math.max(0, Math.min(1, baseColor.r + brightness));
+                const g = Math.max(0, Math.min(1, baseColor.g + brightness));
+                const b = Math.max(0, Math.min(1, baseColor.b + brightness));
+                ctx.fillStyle = '#' + new THREE.Color(r, g, b).getHexString();
+                ctx.fillRect(x, y, 1, 1);
+            }
+
+            // 简化版不添加边框，提高性能
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.magFilter = THREE.NearestFilter;
+            texture.minFilter = THREE.NearestFilter;
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            return texture;
+        }
+
+        function getMaterial(color, options = {}) {
+            let key = `${color}-${options.emissive || ''}-${options.transparent || ''}-${options.opacity || ''}`;
+            if (options.map) key += `-${options.map}`;
+            
+            if (!MaterialCache.has(key)) {
+                const matOptions = { color: color };
+                if (options.emissive) { 
+                    matOptions.emissive = options.emissive; 
+                    matOptions.emissiveIntensity = 0.5; 
+                }
+                if (options.transparent) { 
+                    matOptions.transparent = true; 
+                    matOptions.opacity = options.opacity || 0.5; 
+                }
+                if (options.map) {
+                    matOptions.map = options.map;
+                }
+                MaterialCache.set(key, new THREE.MeshLambertMaterial(matOptions));
+            }
+            return MaterialCache.get(key);
+        }
+
+        function getTexturedMaterial(type, color, options = {}) {
+            if (!TextureCache.has(type)) {
+                const texture = generateBlockTexture(type);
+                TextureCache.set(type, texture);
+            }
+            const texture = TextureCache.get(type);
+            return getMaterial(color, { ...options, map: texture });
+        }
+
+        // ========== 性能优化：视锥剔除工具 ==========
+        const _frustum = new THREE.Frustum();
+        const _projScreenMatrix = new THREE.Matrix4();
+        const _blockPos = new THREE.Vector3();
+        
+        function isInRenderDistance(x, y, z, playerX, playerY, playerZ) {
+            const dx = x - playerX, dy = y - playerY, dz = z - playerZ;
+            return dx * dx + dy * dy + dz * dz <= CONFIG.renderDistance * CONFIG.renderDistance;
+        }
+        
+        function isBlockCompletelyOccluded(x, y, z) {
+            return gameState.blocks.has(`${x+1},${y},${z}`) &&
+                   gameState.blocks.has(`${x-1},${y},${z}`) &&
+                   gameState.blocks.has(`${x},${y+1},${z}`) &&
+                   gameState.blocks.has(`${x},${y-1},${z}`) &&
+                   gameState.blocks.has(`${x},${y},${z+1}`) &&
+                   gameState.blocks.has(`${x},${y},${z-1}`);
+        }
+
+        // ========== 性能优化：对象池 ==========
+        class ParticlePool {
+            constructor(maxSize) {
+                this.maxSize = maxSize;
+                this.particles = [];
+                this.activeCount = 0;
+                const geometry = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+                const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                for (let i = 0; i < maxSize; i++) {
+                    const p = new THREE.Mesh(geometry, material.clone());
+                    p.visible = false;
+                    scene.add(p);
+                    this.particles.push({ mesh: p, active: false, life: 0 });
+                }
+            }
+            
+            spawn(x, y, z, color) {
+                if (this.activeCount >= this.maxSize) return null;
+                for (let p of this.particles) {
+                    if (!p.active) {
+                        p.active = true;
+                        p.mesh.visible = true;
+                        p.mesh.position.set(x, y, z);
+                        p.mesh.material.color.setHex(color);
+                        p.life = 1.0;
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 0.1 + Math.random() * 0.1;
+                        p.vx = Math.cos(angle) * speed;
+                        p.vy = Math.random() * 0.15;
+                        p.vz = Math.sin(angle) * speed;
+                        p.rotSpeed = { x: (Math.random() - 0.5) * 0.2, y: (Math.random() - 0.5) * 0.2, z: (Math.random() - 0.5) * 0.2 };
+                        this.activeCount++;
+                        return p;
+                    }
+                }
+                return null;
+            }
+            
+            update() {
+                for (let p of this.particles) {
+                    if (p.active) {
+                        p.vy -= 0.015;
+                        p.mesh.position.x += p.vx;
+                        p.mesh.position.y += p.vy;
+                        p.mesh.position.z += p.vz;
+                        p.mesh.rotation.x += p.rotSpeed.x;
+                        p.mesh.rotation.y += p.rotSpeed.y;
+                        p.mesh.rotation.z += p.rotSpeed.z;
+                        p.life -= 0.02;
+                        p.mesh.scale.setScalar(p.life);
+                        if (p.life <= 0 || p.mesh.position.y < -10) {
+                            p.active = false;
+                            p.mesh.visible = false;
+                            this.activeCount--;
+                        }
+                    }
+                }
+            }
+        }
+
+        // ========== 方块类型定义 (70+种方块) ==========
+        const BLOCK_TYPES = {
+            grass: { name: '草方块', color: 0x5a8c5e, sideColor: 0x4a7c4e, bottomColor: 0x8b6914, hardness: 1, tool: 'shovel' },
+            dirt: { name: '泥土', color: 0x8b6914, hardness: 1, tool: 'shovel' },
+            coarse_dirt: { name: '砂土', color: 0x7a5a12, hardness: 1, tool: 'shovel' },
+            stone: { name: '石头', color: 0x7a7a7a, hardness: 3, tool: 'pickaxe' },
+            cobblestone: { name: '圆石', color: 0x686868, hardness: 3, tool: 'pickaxe' },
+            mossy_cobblestone: { name: '苔石', color: 0x5a7a5a, hardness: 3, tool: 'pickaxe' },
+            sand: { name: '沙子', color: 0xe6d690, hardness: 1, tool: 'shovel' },
+            red_sand: { name: '红沙', color: 0xc4915c, hardness: 1, tool: 'shovel' },
+            gravel: { name: '沙砾', color: 0x8a8a8a, hardness: 1, tool: 'shovel' },
+            bedrock: { name: '基岩', color: 0x333333, hardness: -1 },
+            clay: { name: '黏土', color: 0xa0a4b8, hardness: 1, tool: 'shovel' },
+            granite: { name: '花岗岩', color: 0x9e6b5e, hardness: 3, tool: 'pickaxe' },
+            diorite: { name: '闪长岩', color: 0xc0c0c0, hardness: 3, tool: 'pickaxe' },
+            andesite: { name: '安山岩', color: 0x7a7a7a, hardness: 3, tool: 'pickaxe' },
+            oak_log: { name: '橡木', color: 0x8b5a2b, topColor: 0x6b4423, hardness: 2, tool: 'axe' },
+            oak_planks: { name: '橡木木板', color: 0xc4a35a, hardness: 2, tool: 'axe' },
+            birch_log: { name: '白桦木', color: 0xd4d4d4, topColor: 0xc4c4c4, hardness: 2, tool: 'axe' },
+            birch_planks: { name: '白桦木板', color: 0xe8e0c5, hardness: 2, tool: 'axe' },
+            spruce_log: { name: '云杉木', color: 0x5c4033, topColor: 0x4a332a, hardness: 2, tool: 'axe' },
+            spruce_planks: { name: '云杉木板', color: 0x6b5637, hardness: 2, tool: 'axe' },
+            jungle_log: { name: '丛林木', color: 0x8b6914, topColor: 0x6b5010, hardness: 2, tool: 'axe' },
+            jungle_planks: { name: '丛林木板', color: 0xb8a858, hardness: 2, tool: 'axe' },
+            acacia_log: { name: '金合欢木', color: 0xa0522d, topColor: 0x8b4513, hardness: 2, tool: 'axe' },
+            acacia_planks: { name: '金合欢木板', color: 0xd4a574, hardness: 2, tool: 'axe' },
+            dark_oak_log: { name: '深色橡木', color: 0x3d2817, topColor: 0x2a1a0f, hardness: 2, tool: 'axe' },
+            dark_oak_planks: { name: '深色橡木木板', color: 0x4a3728, hardness: 2, tool: 'axe' },
+            coal_ore: { name: '煤矿石', color: 0x4a4a4a, oreColor: 0x1a1a1a, hardness: 4, tool: 'pickaxe' },
+            iron_ore: { name: '铁矿石', color: 0x8b7355, oreColor: 0xd4af37, hardness: 5, tool: 'pickaxe' },
+            gold_ore: { name: '金矿石', color: 0x8b7355, oreColor: 0xffd700, hardness: 5, tool: 'pickaxe' },
+            diamond_ore: { name: '钻石矿石', color: 0x4a8080, oreColor: 0x00ffff, hardness: 6, tool: 'pickaxe' },
+            emerald_ore: { name: '绿宝石矿石', color: 0x4a804a, oreColor: 0x00ff00, hardness: 6, tool: 'pickaxe' },
+            redstone_ore: { name: '红石矿石', color: 0x8b4545, oreColor: 0xff0000, hardness: 5, tool: 'pickaxe' },
+            lapis_ore: { name: '青金石矿石', color: 0x4a4a8b, oreColor: 0x0000ff, hardness: 5, tool: 'pickaxe' },
+            copper_ore: { name: '铜矿石', color: 0x8b7355, oreColor: 0xb87333, hardness: 5, tool: 'pickaxe' },
+            coal_block: { name: '煤炭块', color: 0x1a1a1a, hardness: 6, tool: 'pickaxe' },
+            iron_block: { name: '铁块', color: 0xd4d4d4, hardness: 6, tool: 'pickaxe' },
+            gold_block: { name: '金块', color: 0xffd700, hardness: 6, tool: 'pickaxe' },
+            diamond_block: { name: '钻石块', color: 0x00ffff, hardness: 6, tool: 'pickaxe' },
+            emerald_block: { name: '绿宝石块', color: 0x00ff00, hardness: 6, tool: 'pickaxe' },
+            lapis_block: { name: '青金石块', color: 0x0000ff, hardness: 6, tool: 'pickaxe' },
+            redstone_block: { name: '红石块', color: 0xff0000, hardness: 6, tool: 'pickaxe' },
+            glass: { name: '玻璃', color: 0xadd8e6, transparent: true, opacity: 0.3, hardness: 0.5 },
+            glowstone: { name: '荧石', color: 0xffffaa, emissive: 0xffffaa, hardness: 1 },
+            sea_lantern: { name: '海晶灯', color: 0xaaffff, emissive: 0xaaffff, hardness: 1 },
+            stone_bricks: { name: '石砖', color: 0x7a7a7a, hardness: 3, tool: 'pickaxe' },
+            cracked_stone_bricks: { name: '裂纹石砖', color: 0x6a6a6a, hardness: 3, tool: 'pickaxe' },
+            mossy_stone_bricks: { name: '苔石砖', color: 0x6a7a6a, hardness: 3, tool: 'pickaxe' },
+            chiseled_stone_bricks: { name: '雕纹石砖', color: 0x757575, hardness: 3, tool: 'pickaxe' },
+            bricks: { name: '红砖块', color: 0xb22222, hardness: 3, tool: 'pickaxe' },
+            nether_bricks: { name: '地狱砖块', color: 0x2d1a1a, hardness: 3, tool: 'pickaxe' },
+            prismarine: { name: '海晶石', color: 0x5a9e8a, hardness: 3, tool: 'pickaxe' },
+            prismarine_bricks: { name: '海晶石砖', color: 0x4a8e7a, hardness: 3, tool: 'pickaxe' },
+            wool_white: { name: '白色羊毛', color: 0xf5f5f5, hardness: 0.8 },
+            wool_red: { name: '红色羊毛', color: 0xb22222, hardness: 0.8 },
+            wool_blue: { name: '蓝色羊毛', color: 0x4169e1, hardness: 0.8 },
+            wool_green: { name: '绿色羊毛', color: 0x228b22, hardness: 0.8 },
+            wool_yellow: { name: '黄色羊毛', color: 0xffd700, hardness: 0.8 },
+            wool_black: { name: '黑色羊毛', color: 0x1a1a1a, hardness: 0.8 },
+            wool_pink: { name: '粉色羊毛', color: 0xff69b4, hardness: 0.8 },
+            wool_purple: { name: '紫色羊毛', color: 0x800080, hardness: 0.8 },
+            wool_orange: { name: '橙色羊毛', color: 0xff8c00, hardness: 0.8 },
+            wool_cyan: { name: '青色羊毛', color: 0x00ffff, hardness: 0.8 },
+            wool_light_blue: { name: '淡蓝色羊毛', color: 0x87ceeb, hardness: 0.8 },
+            wool_lime: { name: '黄绿色羊毛', color: 0x32cd32, hardness: 0.8 },
+            wool_magenta: { name: '品红色羊毛', color: 0xff00ff, hardness: 0.8 },
+            wool_brown: { name: '棕色羊毛', color: 0x8b4513, hardness: 0.8 },
+            wool_gray: { name: '灰色羊毛', color: 0x808080, hardness: 0.8 },
+            wool_light_gray: { name: '淡灰色羊毛', color: 0xd3d3d3, hardness: 0.8 },
+            obsidian: { name: '黑曜石', color: 0x1a0a2e, hardness: 50, tool: 'pickaxe' },
+            crying_obsidian: { name: '哭泣的黑曜石', color: 0x2a1a3e, hardness: 50, tool: 'pickaxe' },
+            netherrack: { name: '地狱岩', color: 0x4a2222, hardness: 2, tool: 'pickaxe' },
+            soul_sand: { name: '灵魂沙', color: 0x3d3630, hardness: 1, tool: 'shovel' },
+            soul_soil: { name: '灵魂土', color: 0x2d2620, hardness: 1, tool: 'shovel' },
+            bookshelf: { name: '书架', color: 0x8b5a2b, hardness: 2, tool: 'axe' },
+            tnt: { name: 'TNT', color: 0xff4444, hardness: 0 },
+            pumpkin: { name: '南瓜', color: 0xff8c00, topColor: 0x6b4423, hardness: 2, tool: 'axe' },
+            melon: { name: '西瓜', color: 0x8fbc8f, topColor: 0x228b22, hardness: 2, tool: 'axe' },
+            cactus: { name: '仙人掌', color: 0x2e8b57, hardness: 0.5 },
+            sponge: { name: '海绵', color: 0xf0e68c, hardness: 0.5 },
+            wet_sponge: { name: '湿海绵', color: 0xd4c85a, hardness: 0.5 },
+            hay_bale: { name: '干草捆', color: 0xe4d95a, hardness: 0.5 },
+            leaves_oak: { name: '橡树树叶', color: 0x4a7c4e, transparent: true, opacity: 0.8, hardness: 0.3 },
+            leaves_birch: { name: '白桦树叶', color: 0x6b8c5e, transparent: true, opacity: 0.8, hardness: 0.3 },
+            leaves_spruce: { name: '云杉树叶', color: 0x3a5c3e, transparent: true, opacity: 0.8, hardness: 0.3 },
+            leaves_jungle: { name: '丛林树叶', color: 0x5a8c4a, transparent: true, opacity: 0.8, hardness: 0.3 },
+        };
+
+        // ========== 工具定义 ==========
+        const TOOLS = {
+            wooden_sword: { name: '木剑', damage: 5, durability: 60, material: 'wooden', type: 'sword' },
+            stone_sword: { name: '石剑', damage: 6, durability: 132, material: 'stone', type: 'sword' },
+            iron_sword: { name: '铁剑', damage: 7, durability: 251, material: 'iron', type: 'sword' },
+            golden_sword: { name: '金剑', damage: 5, durability: 33, material: 'golden', type: 'sword' },
+            diamond_sword: { name: '钻石剑', damage: 8, durability: 1562, material: 'diamond', type: 'sword' },
+            netherite_sword: { name: '下界合金剑', damage: 9, durability: 2032, material: 'netherite', type: 'sword' },
+            wooden_pickaxe: { name: '木镐', efficiency: 2, durability: 60, material: 'wooden', type: 'pickaxe' },
+            stone_pickaxe: { name: '石镐', efficiency: 4, durability: 132, material: 'stone', type: 'pickaxe' },
+            iron_pickaxe: { name: '铁镐', efficiency: 6, durability: 251, material: 'iron', type: 'pickaxe' },
+            golden_pickaxe: { name: '金镐', efficiency: 12, durability: 33, material: 'golden', type: 'pickaxe' },
+            diamond_pickaxe: { name: '钻石镐', efficiency: 8, durability: 1562, material: 'diamond', type: 'pickaxe' },
+            netherite_pickaxe: { name: '下界合金镐', efficiency: 10, durability: 2032, material: 'netherite', type: 'pickaxe' },
+            wooden_axe: { name: '木斧', efficiency: 2, durability: 60, material: 'wooden', type: 'axe' },
+            stone_axe: { name: '石斧', efficiency: 4, durability: 132, material: 'stone', type: 'axe' },
+            iron_axe: { name: '铁斧', efficiency: 6, durability: 251, material: 'iron', type: 'axe' },
+            golden_axe: { name: '金斧', efficiency: 12, durability: 33, material: 'golden', type: 'axe' },
+            diamond_axe: { name: '钻石斧', efficiency: 8, durability: 1562, material: 'diamond', type: 'axe' },
+            netherite_axe: { name: '下界合金斧', efficiency: 10, durability: 2032, material: 'netherite', type: 'axe' },
+            wooden_shovel: { name: '木锹', efficiency: 2, durability: 60, material: 'wooden', type: 'shovel' },
+            stone_shovel: { name: '石锹', efficiency: 4, durability: 132, material: 'stone', type: 'shovel' },
+            iron_shovel: { name: '铁锹', efficiency: 6, durability: 251, material: 'iron', type: 'shovel' },
+            golden_shovel: { name: '金锹', efficiency: 12, durability: 33, material: 'golden', type: 'shovel' },
+            diamond_shovel: { name: '钻石锹', efficiency: 8, durability: 1562, material: 'diamond', type: 'shovel' },
+            netherite_shovel: { name: '下界合金锹', efficiency: 10, durability: 2032, material: 'netherite', type: 'shovel' },
+            wooden_hoe: { name: '木锄', efficiency: 2, durability: 60, material: 'wooden', type: 'hoe' },
+            stone_hoe: { name: '石锄', efficiency: 4, durability: 132, material: 'stone', type: 'hoe' },
+            iron_hoe: { name: '铁锄', efficiency: 6, durability: 251, material: 'iron', type: 'hoe' },
+            golden_hoe: { name: '金锄', efficiency: 12, durability: 33, material: 'golden', type: 'hoe' },
+            diamond_hoe: { name: '钻石锄', efficiency: 8, durability: 1562, material: 'diamond', type: 'hoe' },
+            netherite_hoe: { name: '下界合金锄', efficiency: 10, durability: 2032, material: 'netherite', type: 'hoe' },
+            zombie_spawn_egg: { name: '僵尸刷怪蛋', color: 0x2d5a27, isEgg: true },
+            skeleton_spawn_egg: { name: '骷髅刷怪蛋', color: 0xcccccc, isEgg: true },
+            creeper_spawn_egg: { name: '苦力怕刷怪蛋', color: 0x4a8c4a, isEgg: true },
+        };
+
+        // ========== 游戏状态 ==========
+        const gameState = {
+            isPlaying: false, blocks: new Map(), entities: new Map(), fps: 60,
+            lastTime: performance.now(), frameCount: 0, time: 0, dayTime: 0, isDay: true,
+            player: { x: 0, y: 20, z: 0, vx: 0, vy: 0, vz: 0, health: 20, maxHealth: 20, hunger: 20, maxHunger: 20, saturation: 5, selectedSlot: 0, canJump: false, isGrounded: false, breaking: null, breakProgress: 0, lastDamageTime: 0 },
+            inventory: new Array(36).fill(null), hotbar: new Array(9).fill(null), isInventoryOpen: false, selectedInventorySlot: null,
+        };
+
+        let scene, camera, renderer, raycaster, highlightBox, moveForward = false, moveBackward = false, moveLeft = false, moveRight = false, directionalLight, ambientLight, mouseDown = false, isSprinting = false, isSneaking = false;
+        let isChatOpen = false, chatHistory = [], playerName = '玩家';
+        
+        // ========== Avaon 外挂系统 ==========
+        let hackActivated = false, hackMenuOpen = false, hackInputBuffer = '';
+        const hacks = {
+            speed: false, fly: false, killAura: false, autoMine: false,
+            noFall: false, godMode: false, xray: false, reach: false,
+            fastBreak: false, infiniteItems: false
+        };
+        
+        function checkHackActivation(char) {
+            hackInputBuffer += char.toLowerCase();
+            // 只保留最近输入的5个字符
+            if (hackInputBuffer.length > 5) {
+                hackInputBuffer = hackInputBuffer.slice(-5);
+            }
+            if (hackInputBuffer === 'avaon' && !hackActivated) {
+                activateHack();
+                hackInputBuffer = '';
+            }
+            if (hackInputBuffer === 'diem') {
+                // 给玩家一组钻石
+                addItemToInventory('diamond', 64);
+                addChatMessage('💎 已获得一组钻石！', true);
+                hackInputBuffer = '';
+            }
+        }
+        
+        function activateHack() {
+            hackActivated = true;
+            document.getElementById('hack-hint').classList.add('show');
+            addChatMessage('🔴 Avaon外挂已激活！按 P 打开菜单', true);
+        }
+        
+        function toggleHack(hackName) {
+            hacks[hackName] = !hacks[hackName];
+            updateHackUI();
+            addChatMessage(`${hacks[hackName] ? '✅ 开启' : '❌ 关闭'}: ${getHackName(hackName)}`, true);
+        }
+        
+        function getHackName(hackName) {
+            const names = {
+                speed: '🏃 加速',
+                fly: '🦅 飞行',
+                killAura: '⚔️ 自动攻击',
+                autoMine: '⛏️ 自动挖矿',
+                noFall: '☁️ 无掉落伤害',
+                godMode: '👑 上帝模式',
+                xray: '👁️ X射线',
+                reach: '📏 远程攻击',
+                fastBreak: '💨 快速破坏',
+                infiniteItems: '📦 无限物品'
+            };
+            return names[hackName] || hackName;
+        }
+        
+        function updateHackUI() {
+            document.querySelectorAll('.hack-item').forEach(el => {
+                const hackName = el.dataset.hack;
+                if (hacks[hackName]) {
+                    el.classList.add('active');
+                    el.querySelector('.hack-status').textContent = 'ON';
+                } else {
+                    el.classList.remove('active');
+                    el.querySelector('.hack-status').textContent = 'OFF';
+                }
+            });
+        }
+        
+        // ========== 聊天系统 ==========
+        function addChatMessage(message, isSystem = false) {
+            const messagesEl = document.getElementById('chat-messages');
+            const msgEl = document.createElement('div');
+            msgEl.className = 'chat-message';
+            
+            if (isSystem) {
+                msgEl.innerHTML = `<span class="system">[系统]</span> ${message}`;
+            } else {
+                const usernameMatch = message.match(/^<([^>]+)>\s*(.*)$/);
+                if (usernameMatch) {
+                    msgEl.innerHTML = `<span class="username">&lt;${usernameMatch[1]}&gt;</span> ${usernameMatch[2]}`;
+                } else {
+                    msgEl.textContent = message;
+                }
+            }
+            
+            messagesEl.insertBefore(msgEl, messagesEl.firstChild);
+            
+            if (messagesEl.children.length > 50) {
+                messagesEl.removeChild(messagesEl.lastChild);
+            }
+            
+            chatHistory.push(message);
+        }
+        
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            const chatInput = document.getElementById('chat-input');
+            const chatInputContainer = document.getElementById('chat-input-container');
+            
+            if (isChatOpen) {
+                chatInputContainer.style.display = 'block';
+                chatInput.focus();
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+            } else {
+                chatInputContainer.style.display = 'none';
+                chatInput.blur();
+            }
+        }
+        
+        function sendChatMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                addChatMessage(`<${playerName}> ${message}`);
+            }
+            
+            chatInput.value = '';
+            toggleChat();
+        }
+
+        // ========== 初始化 ==========
+        function init() {
+            scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB); scene.fog = new THREE.Fog(0x87CEEB, 40, 100);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500); camera.position.set(0, 20, 0); camera.rotation.order = 'YXZ';
+            renderer = new THREE.WebGLRenderer({ antialias: false }); // 关闭抗锯齿提高性能
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+            renderer.shadowMap.enabled = false; // 关闭阴影提高性能
+            document.getElementById('game-container').appendChild(renderer.domElement);
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.7); scene.add(ambientLight);
+            directionalLight = new THREE.DirectionalLight(0xffffff, 0.7); 
+            directionalLight.position.set(100, 200, 100); 
+            directionalLight.castShadow = false;
+            scene.add(directionalLight);
+            raycaster = new THREE.Raycaster();
+            const highlightGeo = new THREE.BoxGeometry(1.005, 1.005, 1.005); const highlightMat = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true, linewidth: 2 });
+            highlightBox = new THREE.Mesh(highlightGeo, highlightMat); scene.add(highlightBox); highlightBox.visible = false;
+            
+            // 初始化粒子池
+            particlePool = new ParticlePool(CONFIG.maxParticles);
+            
+            // 暂时禁用高性能渲染系统的初始化
+            // chunkRenderer = new ChunkRenderer();
+            
+            initInventory();
+            giveStarterItems();
+            
+            // 生成初始的中心区块
+            for (let dx = -CONFIG.chunkViewDistance; dx <= CONFIG.chunkViewDistance; dx++) {
+                for (let dz = -CONFIG.chunkViewDistance; dz <= CONFIG.chunkViewDistance; dz++) {
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    if (dist <= CONFIG.chunkViewDistance) {
+                        generateChunk(dx, dz);
+                    }
+                }
+            }
+            
+            // 查找安全的起始位置
+            findSafeStartPosition();
+            
+            // 确保所有方块都是可见的
+            gameState.blocks.forEach((block) => {
+                block.visible = true;
+            });
+            window.addEventListener('resize', onWindowResize); document.addEventListener('keydown', onKeyDown); document.addEventListener('keyup', onKeyUp);
+            document.addEventListener('mousedown', onMouseDown); document.addEventListener('mouseup', onMouseUp); document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('wheel', onWheel); document.addEventListener('contextmenu', e => e.preventDefault());
+            document.getElementById('start-btn').addEventListener('click', startGame); document.addEventListener('pointerlockchange', onPointerLockChange);
+            animate();
+        }
+
+        // ========== 背包系统 ==========
+        function initInventory() {
+            const hotbarEl = document.getElementById('hotbar'); hotbarEl.innerHTML = '';
+            for (let i = 0; i < 9; i++) { const slot = document.createElement('div'); slot.className = 'hotbar-slot' + (i === 0 ? ' active' : ''); slot.dataset.index = i; slot.innerHTML = '<div class="item-icon"></div><span class="slot-number">' + (i + 1) + '</span><span class="item-count"></span>'; slot.addEventListener('click', () => selectHotbarSlot(i)); hotbarEl.appendChild(slot); }
+            const invGrid = document.getElementById('inv-grid'); invGrid.innerHTML = '';
+            for (let i = 0; i < 36; i++) { const slot = document.createElement('div'); slot.className = 'inv-slot'; slot.dataset.index = i; slot.innerHTML = '<div class="item-icon"></div><span class="item-count"></span>'; slot.addEventListener('click', () => onInventoryClick(i)); invGrid.appendChild(slot); }
+        }
+
+        function giveStarterItems() {
+            ['grass', 'dirt', 'stone', 'cobblestone', 'sand', 'gravel', 'oak_log', 'oak_planks'].forEach((item, i) => addItemToInventory(item, 64));
+            ['wooden_sword', 'stone_sword', 'iron_sword', 'diamond_sword', 'iron_pickaxe', 'iron_axe', 'iron_shovel'].forEach(item => addItemToInventory(item, 1));
+            ['glass', 'stone_bricks', 'bricks', 'wool_red', 'wool_blue', 'wool_green', 'wool_yellow', 'wool_white', 'glowstone', 'obsidian', 'zombie_spawn_egg'].forEach(item => addItemToInventory(item, 32));
+            updateHotbarUI(); updateInventoryUI(); updateHandItem();
+        }
+
+        function addItemToInventory(itemType, count) {
+            for (let i = 0; i < 36; i++) { const slot = i < 9 ? gameState.hotbar[i] : gameState.inventory[i - 9]; if (slot && slot.type === itemType && !TOOLS[itemType]) { slot.count += count; updateHotbarUI(); updateInventoryUI(); return true; } }
+            for (let i = 0; i < 36; i++) { const arr = i < 9 ? gameState.hotbar : gameState.inventory; const idx = i < 9 ? i : i - 9; if (!arr[idx]) { arr[idx] = { type: itemType, count: count }; updateHotbarUI(); updateInventoryUI(); return true; } }
+            return false;
+        }
+
+        function selectHotbarSlot(index) { gameState.player.selectedSlot = index; document.querySelectorAll('.hotbar-slot').forEach((el, i) => { el.classList.toggle('active', i === index); }); updateHandItem(); }
+
+        function onInventoryClick(index) {
+            if (!gameState.isInventoryOpen) return;
+            
+            // 前9个是快捷栏，后面是背包
+            const isHotbarSlot = index < 9;
+            const targetArray = isHotbarSlot ? gameState.hotbar : gameState.inventory;
+            const targetIndex = isHotbarSlot ? index : index - 9;
+            
+            if (gameState.selectedInventorySlot === null) {
+                // 没有选择物品时，选择当前位置的物品
+                if (targetArray[targetIndex]) {
+                    gameState.selectedInventorySlot = {
+                        arr: targetArray,
+                        idx: targetIndex,
+                        item: targetArray[targetIndex]
+                    };
+                    targetArray[targetIndex] = null;
+                }
+            } else {
+                // 已选择物品，与当前位置交换
+                const temp = targetArray[targetIndex];
+                targetArray[targetIndex] = gameState.selectedInventorySlot.item;
+                gameState.selectedInventorySlot.arr[gameState.selectedInventorySlot.idx] = temp;
+                gameState.selectedInventorySlot = null;
+            }
+            updateHotbarUI();
+            updateInventoryUI();
+        }
+
+        function toggleInventory() {
+            gameState.isInventoryOpen = !gameState.isInventoryOpen; 
+            document.getElementById('inventory').classList.toggle('show', gameState.isInventoryOpen);
+            if (gameState.isInventoryOpen) { 
+                try {
+                    document.exitPointerLock(); 
+                } catch (e) {
+                    console.warn('Pointer lock exit error:', e);
+                }
+            } else { 
+                try {
+                    document.body.requestPointerLock(); 
+                } catch (e) {
+                    console.warn('Pointer lock request error:', e);
+                }
+                gameState.selectedInventorySlot = null; 
+                updateInventoryUI(); 
+            }
+        }
+
+        function updateHotbarUI() {
+            document.querySelectorAll('.hotbar-slot').forEach((slot, i) => {
+                const item = gameState.hotbar[i], icon = slot.querySelector('.item-icon'), count = slot.querySelector('.item-count');
+                if (item) { const blockType = BLOCK_TYPES[item.type], toolType = TOOLS[item.type]; icon.style.background = blockType ? getBlockColorCSS(blockType) : getToolColorCSS(toolType); count.textContent = item.count > 1 ? item.count : ''; }
+                else { icon.style.background = ''; count.textContent = ''; }
+            });
+        }
+
+        function updateInventoryUI() {
+            document.querySelectorAll('.inv-slot').forEach((slot, i) => {
+                const arr = i < 9 ? gameState.hotbar : gameState.inventory, idx = i < 9 ? i : i - 9, item = arr[idx], icon = slot.querySelector('.item-icon'), count = slot.querySelector('.item-count');
+                slot.classList.toggle('selected', gameState.selectedInventorySlot && gameState.selectedInventorySlot.arr === arr && gameState.selectedInventorySlot.idx === idx);
+                if (item) { const blockType = BLOCK_TYPES[item.type], toolType = TOOLS[item.type]; icon.style.background = blockType ? getBlockColorCSS(blockType) : getToolColorCSS(toolType); count.textContent = item.count > 1 ? item.count : ''; }
+                else { icon.style.background = ''; count.textContent = ''; }
+            });
+        }
+
+        function updateHandItem() { 
+            const item = gameState.hotbar[gameState.player.selectedSlot]; 
+            const handRender = document.getElementById('hand-render');
+            const handCount = document.getElementById('hand-count');
+            const handName = document.getElementById('hand-item-name');
+            
+            if (item) { 
+                const blockType = BLOCK_TYPES[item.type]; 
+                const toolType = TOOLS[item.type]; 
+                handRender.style.background = blockType ? getBlockColorCSS(blockType) : getToolColorCSS(toolType); 
+                handCount.textContent = item.count > 1 ? item.count : '';
+                
+                // 显示物品名称
+                let itemName = '';
+                if (blockType) itemName = blockType.name;
+                else if (toolType) itemName = toolType.name;
+                handName.textContent = itemName;
+            } else { 
+                handRender.style.background = ''; 
+                handCount.textContent = '';
+                handName.textContent = '';
+            } 
+        }
+        function getBlockColorCSS(blockType) {
+            const r = (blockType.color >> 16) & 0xff;
+            const g = (blockType.color >> 8) & 0xff;
+            const b = blockType.color & 0xff;
+            const r2 = Math.floor(r * 0.8);
+            const g2 = Math.floor(g * 0.8);
+            const b2 = Math.floor(b * 0.8);
+            return `linear-gradient(135deg, #${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}, #${r2.toString(16).padStart(2, '0')}${g2.toString(16).padStart(2, '0')}${b2.toString(16).padStart(2, '0')})`;
+        }
+        function getToolColorCSS(toolType) { const colors = { wooden: '#8b5a2b', stone: '#7a7a7a', iron: '#d4d4d4', golden: '#ffd700', diamond: '#00ffff', netherite: '#4a4a4a' }; return `linear-gradient(135deg, ${colors[toolType.material]}, #444)`; }
+
+        // ========== 世界生成 ==========
+        // ========== 无限世界系统 ==========
+        const chunks = new Map(); // 已加载的区块
+        let lastChunkUpdatePos = { x: Infinity, z: Infinity };
+        
+        // 获取区块键
+        function getChunkKey(cx, cz) {
+            return `${cx},${cz}`;
+        }
+        
+        // 获取玩家所在的区块
+        function getPlayerChunk() {
+            return {
+                x: Math.floor(gameState.player.x / CONFIG.chunkSize),
+                z: Math.floor(gameState.player.z / CONFIG.chunkSize)
+            };
+        }
+        
+        // 生成单个区块的高度图
+        function getTerrainHeight(x, z) {
+            // 使用分形噪声生成自然的地形
+            const noise1 = worldNoise.fractalNoise(x * 0.03, z * 0.03, 4, 0.5, 2);
+            const noise2 = worldNoise.fractalNoise(x * 0.1, z * 0.1, 2, 0.7, 2);
+            const baseHeight = 5;
+            return Math.floor(baseHeight + noise1 * 8 + noise2 * 3);
+        }
+        
+        // 生成单个区块
+        function generateChunk(cx, cz) {
+            const key = getChunkKey(cx, cz);
+            if (chunks.has(key)) return; // 区块已加载
+            
+            const chunk = {
+                x: cx,
+                z: cz,
+                blocks: new Map() // 只记录这个区块里的玩家放置的方块
+            };
+            
+            chunks.set(key, chunk);
+            
+            // 生成地形
+            for (let localX = 0; localX < CONFIG.chunkSize; localX++) {
+                for (let localZ = 0; localZ < CONFIG.chunkSize; localZ++) {
+                    const worldX = cx * CONFIG.chunkSize + localX;
+                    const worldZ = cz * CONFIG.chunkSize + localZ;
+                    const height = getTerrainHeight(worldX, worldZ);
+                    
+                    // 生成基岩
+                    for (let y = -3; y <= -1; y++) {
+                        createBlock(worldX, y, worldZ, 'bedrock');
+                    }
+                    
+                    // 生成石头和矿石
+                    for (let y = 0; y <= height - 4; y++) {
+                        let blockType = 'stone';
+                        const rand = worldNoise.noise(worldX * 7 + y * 13, worldZ * 17);
+                        if (rand < 0.03) blockType = 'coal_ore';
+                        else if (rand < 0.042) blockType = 'iron_ore';
+                        else if (rand < 0.047) blockType = 'gold_ore';
+                        else if (rand < 0.050) blockType = 'diamond_ore';
+                        else if (rand < 0.052) blockType = 'emerald_ore';
+                        else if (rand < 0.060) blockType = 'redstone_ore';
+                        else if (rand < 0.066) blockType = 'lapis_ore';
+                        else if (rand < 0.070) blockType = 'copper_ore';
+                        
+                        createBlock(worldX, y, worldZ, blockType);
+                    }
+                    
+                    // 生成泥土
+                    for (let y = height - 3; y <= height - 1; y++) {
+                        createBlock(worldX, y, worldZ, 'dirt');
+                    }
+                    
+                    // 生成草地
+                    createBlock(worldX, height, worldZ, 'grass');
+                    
+                    // 随机生成树
+                    const treeChance = worldNoise.noise(worldX * 0.5 + 100, worldZ * 0.5 + 200);
+                    if (treeChance > 0.975 && Math.abs(worldX) > 3 && Math.abs(worldZ) > 3) {
+                        const treeTypes = ['oak', 'birch', 'spruce', 'jungle'];
+                        const treeType = treeTypes[Math.floor(treeChance * 20) % 4];
+                        createTree(worldX, height + 1, worldZ, treeType);
+                    }
+                }
+            }
+        }
+        
+        // 卸载单个区块
+        function unloadChunk(cx, cz) {
+            const key = getChunkKey(cx, cz);
+            if (!chunks.has(key)) return;
+            
+            const chunk = chunks.get(key);
+            
+            // 移除这个区块里的所有方块
+            for (let localX = 0; localX < CONFIG.chunkSize; localX++) {
+                for (let localZ = 0; localZ < CONFIG.chunkSize; localZ++) {
+                    const worldX = cx * CONFIG.chunkSize + localX;
+                    const worldZ = cz * CONFIG.chunkSize + localZ;
+                    
+                    // 检查这个位置的所有高度
+                    for (let y = -10; y < 50; y++) {
+                        const blockKey = `${worldX},${y},${worldZ}`;
+                        const block = gameState.blocks.get(blockKey);
+                        if (block) {
+                            scene.remove(block);
+                            gameState.blocks.delete(blockKey);
+                        }
+                    }
+                }
+            }
+            
+            chunks.delete(key);
+        }
+        
+        // 更新可见的区块
+        function updateChunks() {
+            const playerChunk = getPlayerChunk();
+            
+            // 如果玩家还没有移动到新的区块，就不更新
+            if (Math.abs(playerChunk.x - lastChunkUpdatePos.x) < 1 &&
+                Math.abs(playerChunk.z - lastChunkUpdatePos.z) < 1) {
+                return;
+            }
+            
+            lastChunkUpdatePos.x = playerChunk.x;
+            lastChunkUpdatePos.z = playerChunk.z;
+            
+            // 加载附近的区块
+            for (let dx = -CONFIG.chunkViewDistance; dx <= CONFIG.chunkViewDistance; dx++) {
+                for (let dz = -CONFIG.chunkViewDistance; dz <= CONFIG.chunkViewDistance; dz++) {
+                    const cx = playerChunk.x + dx;
+                    const cz = playerChunk.z + dz;
+                    const dist = Math.sqrt(dx * dx + dz * dz);
+                    if (dist <= CONFIG.chunkViewDistance) {
+                        generateChunk(cx, cz);
+                    }
+                }
+            }
+            
+            // 卸载远处的区块
+            const toUnload = [];
+            for (const [key, chunk] of chunks) {
+                const dx = chunk.x - playerChunk.x;
+                const dz = chunk.z - playerChunk.z;
+                const dist = Math.sqrt(dx * dx + dz * dz);
+                if (dist > CONFIG.chunkViewDistance + 1) {
+                    toUnload.push(chunk);
+                }
+            }
+            
+            for (const chunk of toUnload) {
+                unloadChunk(chunk.x, chunk.z);
+            }
+        }
+        
+        function createTree(x, y, z, type) {
+            const trunkHeight = type === 'spruce' ? 6 + Math.floor(Math.random() * 3) : 4 + Math.floor(Math.random() * 2), logType = type + '_log', leavesType = 'leaves_' + (type === 'spruce' ? 'spruce' : type === 'jungle' ? 'jungle' : type);
+            for (let i = 0; i < trunkHeight; i++) createBlock(x, y + i, z, logType);
+            if (type === 'spruce') { for (let ly = 1; ly <= trunkHeight; ly++) { const radius = Math.floor((trunkHeight - ly) / 3); if (radius > 0) { for (let lx = x - radius; lx <= x + radius; lx++) for (let lz = z - radius; lz <= z + radius; lz++) if ((lx !== x || lz !== z) && Math.abs(lx - x) + Math.abs(lz - z) <= radius + 1) if (Math.random() > 0.1) createBlock(lx, y + ly, lz, leavesType); } } createBlock(x, y + trunkHeight, z, leavesType); }
+            else { const leafStart = y + trunkHeight - 2; for (let ly = leafStart; ly <= y + trunkHeight + 2; ly++) { const radius = ly > y + trunkHeight ? 1 : 2; for (let lx = x - radius; lx <= x + radius; lx++) for (let lz = z - radius; lz <= z + radius; lz++) if (lx !== x || lz !== z || ly > y + trunkHeight) if (Math.abs(lx - x) + Math.abs(lz - z) <= radius + 1) if (Math.random() > 0.2) createBlock(lx, ly, lz, leavesType); } }
+        }
+
+        // ========== 优化：方块创建（材质缓存） ==========
+        function createBlock(x, y, z, type) {
+            const key = `${x},${y},${z}`;
+            if (gameState.blocks.has(key)) return null;
+            const blockType = BLOCK_TYPES[type];
+            if (!blockType) return null;
+            
+            let material;
+            if (type === 'grass' || type.includes('_log')) {
+                // 多材质方块（草方块、原木）- 仍然使用纯色，但更美观
+                const matTop = getTexturedMaterial(type, blockType.topColor || blockType.color, {});
+                const matSide = getTexturedMaterial(type, blockType.sideColor || blockType.color, {});
+                const matBottom = getTexturedMaterial(type, blockType.bottomColor || blockType.color, {});
+                material = [matSide, matSide, matTop, matBottom, matSide, matSide];
+            } else if (type.includes('_ore')) {
+                material = getTexturedMaterial(type, blockType.oreColor || blockType.color, {});
+            } else if (blockType.emissive) {
+                material = getTexturedMaterial(type, blockType.color, { emissive: blockType.emissive });
+            } else {
+                material = getTexturedMaterial(type, blockType.color, { 
+                    transparent: blockType.transparent, 
+                    opacity: blockType.opacity 
+                });
+            }
+            
+            const mesh = new THREE.Mesh(sharedBoxGeometry, material);
+            mesh.position.set(x + 0.5, y + 0.5, z + 0.5); // 调整位置，让方块从(x,y,z)到(x+1,y+1,z+1)
+            mesh.castShadow = !blockType.transparent;
+            mesh.receiveShadow = true;
+            mesh.visible = true; // 确保方块可见
+            mesh.userData = { type, x, y, z, hardness: blockType.hardness || 1 };
+            scene.add(mesh);
+            gameState.blocks.set(key, mesh);
+            
+            // 暂时禁用ChunkRenderer更新
+            // if (chunkRenderer) {
+            //     chunkRenderer.updateBlock(x, y, z, gameState.blocks);
+            // }
+            
+            return mesh;
+        }
+
+        function removeBlock(x, y, z) {
+            const key = `${x},${y},${z}`, block = gameState.blocks.get(key); if (block) { const blockType = BLOCK_TYPES[block.userData.type]; if (blockType) spawnBreakParticles(x, y, z, blockType.color); scene.remove(block); gameState.blocks.delete(key); 
+            
+            // 暂时禁用ChunkRenderer更新
+            // if (chunkRenderer) {
+            //     chunkRenderer.updateBlock(x, y, z, gameState.blocks);
+            // }
+            
+            return true; } return false;
+        }
+
+        function getBlock(x, y, z) { return gameState.blocks.get(`${Math.floor(x)},${Math.floor(y)},${Math.floor(z)}`); }
+
+        // ========== 优化：粒子系统（使用对象池） ==========
+        let particlePool;
+        
+        function spawnBreakParticles(x, y, z, color) {
+            // 限制粒子数量
+            const particleCount = Math.min(8, Math.floor((CONFIG.maxParticles - particlePool.activeCount) / 2));
+            for (let i = 0; i < particleCount; i++) {
+                const px = x + (Math.random() - 0.5) * 0.6;
+                const py = y + (Math.random() - 0.5) * 0.6;
+                const pz = z + (Math.random() - 0.5) * 0.6;
+                particlePool.spawn(px, py, pz, color);
+            }
+        }
+
+        function updateParticles() {
+            particlePool.update();
+        }
+
+        // ========== 游戏控制 ==========
+        function findSafeStartPosition() {
+            // 从多个位置查找安全的起始点
+            const testPositions = [
+                { x: 0, z: 0 },
+                { x: 5, z: 5 },
+                { x: -5, z: 5 },
+                { x: 5, z: -5 },
+                { x: -5, z: -5 },
+                { x: 10, z: 0 },
+                { x: 0, z: 10 },
+                { x: -10, z: 0 },
+                { x: 0, z: -10 },
+            ];
+            
+            for (const pos of testPositions) {
+                // 找到地面高度
+                let groundY = findGroundHeight(pos.x, 50, pos.z);
+                if (groundY !== null) {
+                    // 检查上方是否有足够空间
+                    const headY = groundY + CONFIG.playerHeight;
+                    let isSafe = true;
+                    
+                    // 检查玩家身体位置是否有方块
+                    for (let checkY = Math.floor(groundY); checkY <= Math.floor(headY); checkY++) {
+                        if (gameState.blocks.has(`${Math.floor(pos.x)},${checkY},${Math.floor(pos.z)}`)) {
+                            isSafe = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isSafe) {
+                        // 找到安全位置，设置玩家位置
+                        gameState.player.x = pos.x;
+                        gameState.player.y = groundY + CONFIG.playerHeight;
+                        gameState.player.z = pos.z;
+                        camera.position.set(pos.x, groundY + CONFIG.playerHeight, pos.z);
+                        return;
+                    }
+                }
+            }
+            
+            // 如果都没找到，从高空掉落
+            gameState.player.x = 0;
+            gameState.player.y = 50;
+            gameState.player.z = 0;
+            camera.position.set(0, 50, 0);
+        }
+        
+        function startGame() { 
+            gameState.isPlaying = true; 
+            document.getElementById('start-screen').style.display = 'none'; 
+            try {
+                document.body.requestPointerLock(); 
+            } catch (e) {
+                console.warn('Pointer lock request error:', e);
+            }
+            addChatMessage('欢迎来到方块世界！', true);
+            addChatMessage('按 Enter 打开聊天栏', true);
+        }
+        function onPointerLockChange() { if (document.pointerLockElement !== document.body && gameState.isPlaying && !gameState.isInventoryOpen) {} }
+        function onKeyDown(event) {
+            if (!gameState.isPlaying) return;
+            
+            if (hackActivated && !hackMenuOpen && !isChatOpen && !gameState.isInventoryOpen) {
+                checkHackActivation(event.key);
+            }
+            
+            if (hackActivated && event.code === 'KeyP') {
+                hackMenuOpen = !hackMenuOpen;
+                document.getElementById('hack-menu').classList.toggle('show', hackMenuOpen);
+                if (hackMenuOpen && document.pointerLockElement) {
+                    document.exitPointerLock();
+                }
+                return;
+            }
+            
+            if (hackMenuOpen) {
+                if (event.code === 'Escape') {
+                    hackMenuOpen = false;
+                    document.getElementById('hack-menu').classList.remove('show');
+                }
+                return;
+            }
+            
+            if (isChatOpen) {
+                if (event.code === 'Enter') {
+                    sendChatMessage();
+                } else if (event.code === 'Escape') {
+                    toggleChat();
+                }
+                return;
+            }
+            
+            switch (event.code) { 
+                case 'KeyW': moveForward = true; break; 
+                case 'KeyS': moveBackward = true; break; 
+                case 'KeyA': moveLeft = true; break; 
+                case 'KeyD': moveRight = true; break; 
+                case 'Space': 
+                    if (hacks.fly) {
+                        gameState.player.vy = 0.5;
+                    } else if (gameState.player.canJump && !gameState.isInventoryOpen) {
+                        gameState.player.vy = CONFIG.jumpPower; gameState.player.canJump = false; 
+                    } 
+                    break; 
+                case 'KeyE': event.preventDefault(); toggleInventory(); break; 
+                case 'KeyQ': isSprinting = true; break; 
+                case 'ShiftLeft': 
+                    isSneaking = true; 
+                    if (hacks.fly) {
+                        gameState.player.vy = -0.5;
+                    }
+                    break; 
+                case 'Digit1': selectHotbarSlot(0); break; 
+                case 'Digit2': selectHotbarSlot(1); break; 
+                case 'Digit3': selectHotbarSlot(2); break; 
+                case 'Digit4': selectHotbarSlot(3); break; 
+                case 'Digit5': selectHotbarSlot(4); break; 
+                case 'Digit6': selectHotbarSlot(5); break; 
+                case 'Digit7': selectHotbarSlot(6); break; 
+                case 'Digit8': selectHotbarSlot(7); break; 
+                case 'Digit9': selectHotbarSlot(8); break; 
+                case 'Enter': toggleChat(); break; 
+                case 'Escape': if (gameState.isInventoryOpen) toggleInventory(); else document.exitPointerLock(); break; 
+            }
+        }
+        function onKeyUp(event) { 
+            if (isChatOpen) return;
+            switch (event.code) { 
+                case 'KeyW': moveForward = false; break; 
+                case 'KeyS': moveBackward = false; break; 
+                case 'KeyA': moveLeft = false; break; 
+                case 'KeyD': moveRight = false; break; 
+                case 'KeyQ': isSprinting = false; break; 
+                case 'ShiftLeft': isSneaking = false; break; 
+            } 
+        }
+        function onMouseDown(event) {
+            if (!gameState.isPlaying || gameState.isInventoryOpen) return; if (document.pointerLockElement !== document.body) { document.body.requestPointerLock(); return; }
+            if (event.button === 0) { mouseDown = true; startBreaking(); } else if (event.button === 2) placeBlock();
+        }
+        function onMouseUp(event) { if (event.button === 0) { mouseDown = false; stopBreaking(); } }
+        function onMouseMove(event) { if (!gameState.isPlaying || gameState.isInventoryOpen) return; if (document.pointerLockElement !== document.body) return; const sensitivity = 0.002; camera.rotation.y -= event.movementX * sensitivity; camera.rotation.x -= event.movementY * sensitivity; camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x)); }
+        function onWheel(event) { if (!gameState.isPlaying || gameState.isInventoryOpen) return; const delta = Math.sign(event.deltaY); let newSlot = gameState.player.selectedSlot + delta; if (newSlot < 0) newSlot = 8; if (newSlot > 8) newSlot = 0; selectHotbarSlot(newSlot); }
+        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+
+        // ========== 方块交互 ==========
+        function getTargetBlock() { 
+            const maxDistance = hacks.reach ? 20 : 5;
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera); 
+            const intersects = raycaster.intersectObjects(Array.from(gameState.blocks.values())); 
+            if (intersects.length > 0 && intersects[0].distance < maxDistance) return intersects[0]; 
+            return null; 
+        }
+        function startBreaking() { 
+            const target = getTargetBlock(); 
+            if (!target) return; 
+            
+            // 检查目标方块类型
+            const targetBlockType = target.object.userData.type;
+            
+            // 如果是基岩，检查是否手持钻石矿石
+            if (targetBlockType === 'bedrock') {
+                const handItem = gameState.hotbar[gameState.player.selectedSlot];
+                if (!handItem || handItem.type !== 'diamond_ore') {
+                    return; // 不是钻石矿石，不能挖基岩
+                }
+            }
+            
+            gameState.player.breaking = { block: target.object, startTime: performance.now(), hardness: target.object.userData.hardness || 1 }; 
+            document.getElementById('hand-item').classList.add('breaking'); 
+            document.getElementById('break-overlay').classList.add('show'); 
+        }
+        function stopBreaking() { gameState.player.breaking = null; gameState.player.breakProgress = 0; document.getElementById('hand-item').classList.remove('breaking'); document.getElementById('break-overlay').classList.remove('show'); document.getElementById('break-stage').className = 'break-stage'; document.getElementById('break-fill').style.width = '0%'; }
+        function updateBreaking() {
+            if (!gameState.player.breaking) { if (mouseDown) startBreaking(); return; } const target = getTargetBlock(); if (!target || target.object !== gameState.player.breaking.block) { stopBreaking(); return; }
+            
+            // 检查是否手持钻石，如果是则秒挖
+            const handItem = gameState.hotbar[gameState.player.selectedSlot];
+            const isHoldingDiamond = handItem && handItem.type === 'diamond';
+            
+            const breakSpeed = hacks.fastBreak ? 10 : (isHoldingDiamond ? 100 : 0.4);
+            gameState.player.breakProgress = Math.min((performance.now() - gameState.player.breaking.startTime) / 1000 / (gameState.player.breaking.hardness * breakSpeed), 1);
+            document.getElementById('break-stage').className = 'break-stage' + (Math.floor(gameState.player.breakProgress * 6) > 0 ? ' stage-' + Math.floor(gameState.player.breakProgress * 6) : '');
+            document.getElementById('break-fill').style.width = (gameState.player.breakProgress * 100) + '%';
+            if (gameState.player.breakProgress >= 1) { const pos = gameState.player.breaking.block.userData; removeBlock(pos.x, pos.y, pos.z); addItemToInventory(pos.type, 1); stopBreaking(); if (mouseDown) startBreaking(); }
+        }
+        function placeBlock() {
+            const target = getTargetBlock();
+            if (target) {
+                const pos = target.object.userData;
+                const normal = target.face.normal;
+                const newX = pos.x + normal.x;
+                const newY = pos.y + normal.y;
+                const newZ = pos.z + normal.z;
+                
+                // 检查放置位置是否与玩家碰撞
+                const playerCenterX = gameState.player.x;
+                const playerCenterY = gameState.player.y - CONFIG.playerHeight / 2; // 玩家底部中心
+                const playerCenterZ = gameState.player.z;
+                
+                // 计算新方块位置与玩家的距离
+                const dx = Math.abs(newX - playerCenterX);
+                const dy = Math.abs(newY - (playerCenterY + CONFIG.playerHeight / 2)); // 比较到玩家中心
+                const dz = Math.abs(newZ - playerCenterZ);
+                
+                // 如果太靠近玩家，则不放置
+                if (dx < CONFIG.playerWidth && dz < CONFIG.playerWidth && 
+                    newY < playerCenterY + CONFIG.playerHeight && newY + 1 > playerCenterY) {
+                    return;
+                }
+                
+                // 检查放置位置是否已经有方块
+                if (gameState.blocks.has(`${newX},${newY},${newZ}`)) {
+                    return;
+                }
+                
+                const handItem = gameState.hotbar[gameState.player.selectedSlot];
+                if (!handItem) return;
+                
+                if (BLOCK_TYPES[handItem.type] && !TOOLS[handItem.type]) {
+                    if (createBlock(newX, newY, newZ, handItem.type)) {
+                        if (!hacks.infiniteItems) {
+                            handItem.count--;
+                            if (handItem.count <= 0) gameState.hotbar[gameState.player.selectedSlot] = null;
+                        }
+                        updateHotbarUI();
+                        updateHandItem();
+                    }
+                } else if (handItem.type === 'zombie_spawn_egg') {
+                    spawnZombie(newX, newY, newZ);
+                    if (!hacks.infiniteItems) {
+                        handItem.count--;
+                        if (handItem.count <= 0) gameState.hotbar[gameState.player.selectedSlot] = null;
+                    }
+                    updateHotbarUI();
+                    updateHandItem();
+                }
+            } else {
+                // 没有瞄准方块时，在脚下放置方块
+                placeBlockUnderFoot();
+            }
+        }
+        
+        function placeBlockUnderFoot() {
+            const handItem = gameState.hotbar[gameState.player.selectedSlot];
+            if (!handItem || !BLOCK_TYPES[handItem.type] || TOOLS[handItem.type]) {
+                return;
+            }
+            
+            // 计算脚下位置
+            const playerX = Math.floor(gameState.player.x);
+            const playerY = Math.floor(gameState.player.y - CONFIG.playerHeight - 0.5);
+            const playerZ = Math.floor(gameState.player.z);
+            
+            // 检查位置是否已有方块
+            if (gameState.blocks.has(`${playerX},${playerY},${playerZ}`)) {
+                return;
+            }
+            
+            if (createBlock(playerX, playerY, playerZ, handItem.type)) {
+                handItem.count--;
+                if (handItem.count <= 0) gameState.hotbar[gameState.player.selectedSlot] = null;
+                updateHotbarUI();
+                updateHandItem();
+            }
+        }
+
+        // ========== 物理系统（彻底重写，解决卡方块问题） ==========
+        function updatePhysics() {
+            const p = gameState.player;
+            
+            // 计算移动速度（疾跑时更快，潜行时更慢，外挂加速）
+            let currentSpeed = CONFIG.moveSpeed;
+            if (isSprinting) currentSpeed *= 1.8;
+            if (isSneaking) currentSpeed *= 0.5;
+            if (hacks.speed) currentSpeed *= 4; // 加速外挂
+            
+            // 计算移动方向
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+            forward.y = 0;
+            forward.normalize();
+            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+            right.y = 0;
+            right.normalize();
+            
+            // 应用移动输入
+            if (moveForward) { p.vx += forward.x * currentSpeed; p.vz += forward.z * currentSpeed; }
+            if (moveBackward) { p.vx -= forward.x * currentSpeed; p.vz -= forward.z * currentSpeed; }
+            if (moveLeft) { p.vx -= right.x * currentSpeed; p.vz -= right.z * currentSpeed; }
+            if (moveRight) { p.vx += right.x * currentSpeed; p.vz += right.z * currentSpeed; }
+            
+            // 重力（飞行模式取消重力）
+            if (!hacks.fly) {
+                p.vy += CONFIG.gravity;
+            }
+            
+            // 摩擦力
+            p.vx *= 0.85;
+            p.vz *= 0.85;
+            p.vx = Math.max(-0.5, Math.min(0.5, p.vx));
+            p.vz = Math.max(-0.5, Math.min(0.5, p.vz));
+            
+            // 分轴移动，每一步都进行碰撞检测（上帝模式或飞行模式跳过碰撞）
+            if (hacks.godMode || hacks.fly) {
+                // 上帝模式或飞行模式，直接移动
+                p.x += p.vx;
+                p.z += p.vz;
+                p.y += p.vy;
+                p.isGrounded = true;
+                p.canJump = true;
+            } else {
+                // X轴
+                const oldX = p.x;
+                const newX = p.x + p.vx;
+                if (!checkCollisionAt(newX, p.y - CONFIG.playerHeight, p.z)) {
+                    p.x = newX;
+                } else {
+                    p.vx = 0;
+                }
+                
+                // Z轴
+                const oldZ = p.z;
+                const newZ = p.z + p.vz;
+                if (!checkCollisionAt(p.x, p.y - CONFIG.playerHeight, newZ)) {
+                    p.z = newZ;
+                } else {
+                    p.vz = 0;
+                }
+                
+                // Y轴（重力）
+                const oldY = p.y;
+                const newY = p.y + p.vy;
+                p.isGrounded = false;
+                p.canJump = false;
+                
+                if (!checkCollisionAt(p.x, newY - CONFIG.playerHeight, p.z)) {
+                    p.y = newY;
+                } else {
+                    if (p.vy < 0) {
+                        // 向下碰撞，找到地面并站在上面
+                        p.isGrounded = true;
+                        p.canJump = true;
+                        // 找到准确的地面高度
+                        const groundY = findGroundHeight(p.x, p.y, p.z);
+                        if (groundY !== null) {
+                            p.y = groundY + CONFIG.playerHeight + 0.001; // 稍微高一点，避免卡在地面
+                        }
+                        p.vy = 0;
+                    } else {
+                        // 向上碰撞
+                        p.vy = 0;
+                    }
+                }
+                
+                // 安全检查：如果最终位置有碰撞，回退到上一个安全位置
+                if (checkCollisionAt(p.x, p.y - CONFIG.playerHeight, p.z)) {
+                    p.x = oldX;
+                    p.y = oldY;
+                    p.z = oldZ;
+                    p.vx = 0;
+                    p.vy = 0;
+                    p.vz = 0;
+                }
+            }
+            
+            // 摔落检测
+            if (p.y < -20) {
+                p.x = 0; p.y = 50; p.z = 0;
+                p.vx = p.vy = p.vz = 0;
+                takeDamage(10);
+            }
+            
+            camera.position.set(p.x, p.y, p.z);
+        }
+        
+        // 找到地面高度
+        function findGroundHeight(x, y, z) {
+            // 先检查已有的方块
+            for (let testY = Math.floor(y); testY >= -20; testY--) {
+                const key = `${Math.floor(x)},${testY},${Math.floor(z)}`;
+                const block = gameState.blocks.get(key);
+                if (block) {
+                    // 检查是否是透明方块（玻璃等），跳过它们
+                    const blockType = block.userData.type;
+                    if (blockType && blockType !== 'leaves_oak' && 
+                        blockType !== 'leaves_birch' && 
+                        blockType !== 'leaves_spruce' && 
+                        blockType !== 'leaves_jungle' &&
+                        BLOCK_TYPES[blockType]?.transparent
+                    ) {
+                        continue; // 只跳过真正的透明方块
+                    }
+                    return testY + 1; // 方块顶面（从testY到testY+1）
+                }
+            }
+            
+            // 如果找不到已有的方块，使用地形生成器估算
+            return getTerrainHeight(Math.floor(x), Math.floor(z)) + 1;
+        }
+
+        // ========== 优化：碰撞检测（修复水平移动） ==========
+        function checkCollisionAt(px, py, pz) {
+            // 玩家边界：px, py, pz是玩家中心在地面的位置
+            const playerMinX = px - CONFIG.playerWidth / 2;
+            const playerMaxX = px + CONFIG.playerWidth / 2;
+            const playerMinY = py;
+            const playerMaxY = py + CONFIG.playerHeight;
+            const playerMinZ = pz - CONFIG.playerWidth / 2;
+            const playerMaxZ = pz + CONFIG.playerWidth / 2;
+            
+            // 检查可能与玩家重叠的所有方块
+            const minBlockX = Math.floor(playerMinX);
+            const maxBlockX = Math.floor(playerMaxX);
+            const minBlockY = Math.floor(playerMinY);
+            const maxBlockY = Math.floor(playerMaxY);
+            const minBlockZ = Math.floor(playerMinZ);
+            const maxBlockZ = Math.floor(playerMaxZ);
+            
+            for (let bx = minBlockX; bx <= maxBlockX; bx++) {
+                for (let by = minBlockY; by <= maxBlockY; by++) {
+                    for (let bz = minBlockZ; bz <= maxBlockZ; bz++) {
+                        const key = `${bx},${by},${bz}`;
+                        const block = gameState.blocks.get(key);
+                        
+                        if (block) {
+                            // 检查是否是其他透明方块（玻璃等），树叶现在不透明了
+                            const blockType = block.userData.type;
+                            // 只有玻璃等透明方块可以穿过，树叶阻挡
+                            if (blockType && blockType !== 'leaves_oak' && 
+                                blockType !== 'leaves_birch' && 
+                                blockType !== 'leaves_spruce' && 
+                                blockType !== 'leaves_jungle' &&
+                                BLOCK_TYPES[blockType]?.transparent
+                            ) {
+                                continue; // 只跳过真正的透明方块
+                            }
+                            
+                            // 方块边界：方块从(bx, by, bz)到(bx+1, by+1, bz+1)
+                            const blockMinX = bx;
+                            const blockMaxX = bx + 1;
+                            const blockMinY = by;
+                            const blockMaxY = by + 1;
+                            const blockMinZ = bz;
+                            const blockMaxZ = bz + 1;
+                            
+                            // AABB碰撞检测
+                            if (playerMaxX > blockMinX && playerMinX < blockMaxX &&
+                                playerMaxY > blockMinY && playerMinY < blockMaxY &&
+                                playerMaxZ > blockMinZ && playerMinZ < blockMaxZ) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        // ========== 僵尸系统 ==========
+        function spawnZombie(x, y, z) {
+            const group = new THREE.Group(), bodyMat = new THREE.MeshLambertMaterial({ color: 0x2d5a27 });
+            const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.0, 0.3), bodyMat); body.position.y = 0.5; body.castShadow = true; group.add(body);
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), bodyMat); head.position.y = 1.3; head.castShadow = true; group.add(head);
+            const armGeo = new THREE.BoxGeometry(0.2, 0.8, 0.2), leftArm = new THREE.Mesh(armGeo, bodyMat), rightArm = new THREE.Mesh(armGeo, bodyMat);
+            leftArm.position.set(-0.4, 0.6, 0); rightArm.position.set(0.4, 0.6, 0); group.add(leftArm); group.add(rightArm);
+            const legGeo = new THREE.BoxGeometry(0.25, 0.8, 0.25), leftLeg = new THREE.Mesh(legGeo, bodyMat), rightLeg = new THREE.Mesh(legGeo, bodyMat);
+            leftLeg.position.set(-0.15, -0.4, 0); rightLeg.position.set(0.15, -0.4, 0); group.add(leftLeg); group.add(rightLeg);
+            group.position.set(x, y + 0.9, z); const id = 'zombie_' + Date.now() + '_' + Math.random();
+            group.userData = { type: 'zombie', id: id, health: 20, vx: 0, vy: 0, vz: 0, lastAttack: 0, walkCycle: 0, parts: { leftArm, rightArm, leftLeg, rightLeg } };
+            scene.add(group); gameState.entities.set(id, group);
+        }
+
+        // ========== 优化：僵尸AI（LOD和间隔更新） ==========
+        let zombieUpdateCounter = 0;
+        
+        function updateZombies() {
+            zombieUpdateCounter++;
+            const px = gameState.player.x, py = gameState.player.y, pz = gameState.player.z;
+            const px2 = px * px, py2 = py * py, pz2 = pz * pz;
+            
+            gameState.entities.forEach((entity, index) => {
+                if (entity.userData.type !== 'zombie') return;
+                const data = entity.userData;
+                const zx = entity.position.x, zy = entity.position.y, zz = entity.position.z;
+                const dx = px - zx, dy = py - zy, dz = pz - zz;
+                const distSq = dx * dx + dy * dy + dz * dz;
+                
+                // LOD：远距离僵尸简化更新
+                const updateInterval = distSq > 400 ? CONFIG.zombieUpdateInterval * 3 : 
+                                      distSq > 100 ? CONFIG.zombieUpdateInterval * 2 : 
+                                      CONFIG.zombieUpdateInterval;
+                
+                if ((zombieUpdateCounter + index) % updateInterval !== 0) {
+                    // 简化更新：只做物理
+                    data.vy -= 0.025;
+                    entity.position.y += data.vy;
+                    const groundY = getGroundHeight(zx, zz);
+                    if (entity.position.y - 0.9 <= groundY + 0.5) {
+                        entity.position.y = groundY + 0.5 + 0.9;
+                        data.vy = 0;
+                    }
+                    return;
+                }
+                
+                const dist = Math.sqrt(distSq);
+                
+                // 只在渲染距离内更新AI
+                if (dist > CONFIG.renderDistance + 10) {
+                    entity.visible = false;
+                    return;
+                }
+                entity.visible = true;
+                
+                if (dist < 25 && dist > 1.2) {
+                    const speed = 0.025;
+                    data.vx = (dx / dist) * speed;
+                    data.vz = (dz / dist) * speed;
+                    entity.rotation.y = Math.atan2(dx, dz);
+                    if (Math.abs(dy) > 0.8 && data.vy === 0) data.vy = 0.25;
+                    data.walkCycle += 0.15;
+                    data.parts.leftArm.rotation.x = Math.sin(data.walkCycle) * 0.5;
+                    data.parts.rightArm.rotation.x = -Math.sin(data.walkCycle) * 0.5;
+                    data.parts.leftLeg.rotation.x = -Math.sin(data.walkCycle) * 0.5;
+                    data.parts.rightLeg.rotation.x = Math.sin(data.walkCycle) * 0.5;
+                } else {
+                    data.vx *= 0.8;
+                    data.vz *= 0.8;
+                    data.parts.leftArm.rotation.x = 0;
+                    data.parts.rightArm.rotation.x = 0;
+                    data.parts.leftLeg.rotation.x = 0;
+                    data.parts.rightLeg.rotation.x = 0;
+                }
+                
+                data.vy -= 0.025;
+                entity.position.x += data.vx;
+                entity.position.z += data.vz;
+                entity.position.y += data.vy;
+                
+                const groundY = getGroundHeight(entity.position.x, entity.position.z);
+                if (entity.position.y - 0.9 <= groundY + 0.5) {
+                    entity.position.y = groundY + 0.5 + 0.9;
+                    data.vy = 0;
+                }
+                
+                if (dist < 1.5 && Date.now() - data.lastAttack > 1000) {
+                    takeDamage(4);
+                    data.lastAttack = Date.now();
+                }
+            });
+        }
+        
+        // 优化：缓存地面高度查询
+        const groundHeightCache = new Map();
+        const CACHE_CLEAR_INTERVAL = 60;
+        let groundCacheCounter = 0;
+
+        function getGroundHeight(x, z) {
+            groundCacheCounter++;
+            if (groundCacheCounter >= CACHE_CLEAR_INTERVAL) {
+                groundHeightCache.clear();
+                groundCacheCounter = 0;
+            }
+            
+            const key = `${Math.floor(x)},${Math.floor(z)}`;
+            if (groundHeightCache.has(key)) {
+                return groundHeightCache.get(key);
+            }
+            
+            // 先检查已有的方块
+            for (let y = 30; y >= -5; y--) {
+                if (gameState.blocks.get(`${Math.floor(x)},${y},${Math.floor(z)}`)) {
+                    groundHeightCache.set(key, y);
+                    return y;
+                }
+            }
+            
+            // 如果没有已有的方块，使用地形生成器估算
+            const terrainY = getTerrainHeight(Math.floor(x), Math.floor(z));
+            groundHeightCache.set(key, terrainY);
+            return terrainY;
+        }
+
+        // ========== 生命值和饥饿值系统 ==========
+        function takeDamage(amount) {
+            if (hacks.godMode) return; // 上帝模式不受伤害
+            if (hacks.noFall && amount < 10) return; // 无掉落伤害
+            const now = Date.now();
+            if (now - gameState.player.lastDamageTime < 500) return;
+            gameState.player.health = Math.max(0, gameState.player.health - amount);
+            gameState.player.lastDamageTime = now;
+            updateStatusBars();
+            const damageOverlay = document.getElementById('damage-overlay');
+            damageOverlay.classList.add('show');
+            setTimeout(() => { damageOverlay.classList.remove('show'); }, 200);
+            if (gameState.player.health <= 0) respawn();
+        }
+
+        function heal(amount) {
+            gameState.player.health = Math.min(gameState.player.maxHealth, gameState.player.health + amount);
+            updateStatusBars();
+        }
+
+        function updateHunger() {
+            if (gameState.frameCount % 180 === 0) {
+                gameState.player.hunger = Math.max(0, gameState.player.hunger - 0.05);
+                updateStatusBars();
+            }
+            if (gameState.player.hunger >= 18 && gameState.player.health < gameState.player.maxHealth) {
+                if (gameState.frameCount % 80 === 0) heal(0.5);
+            }
+        }
+
+        function updateStatusBars() {
+            const healthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
+            const hungerPercent = (gameState.player.hunger / gameState.player.maxHunger) * 100;
+            document.querySelector('.health-fill').style.width = healthPercent + '%';
+            document.querySelector('.hunger-fill').style.width = hungerPercent + '%';
+            document.getElementById('health-value').textContent = Math.ceil(gameState.player.health) + '/20';
+            document.getElementById('hunger-value').textContent = Math.ceil(gameState.player.hunger) + '/20';
+        }
+
+        function respawn() {
+            if (hacks.godMode) {
+                // 上帝模式下不掉血，恢复满血量
+                gameState.player.health = gameState.player.maxHealth;
+                gameState.player.hunger = gameState.player.maxHunger;
+                updateStatusBars();
+                return;
+            }
+            gameState.player.x = 0; gameState.player.y = 20; gameState.player.z = 0; gameState.player.vx = 0; gameState.player.vy = 0; gameState.player.vz = 0;
+            gameState.player.health = gameState.player.maxHealth;
+            gameState.player.hunger = gameState.player.maxHunger;
+            updateStatusBars();
+        }
+
+        function updateHighlight() {
+            if (!gameState.isPlaying || gameState.isInventoryOpen) { highlightBox.visible = false; document.getElementById('item-tooltip').classList.remove('show'); return; }
+            const target = getTargetBlock();
+            if (target) {
+                highlightBox.position.copy(target.object.position);
+                highlightBox.visible = true;
+                const blockType = BLOCK_TYPES[target.object.userData.type];
+                if (blockType) { const tooltip = document.getElementById('item-tooltip'); tooltip.textContent = blockType.name; tooltip.classList.add('show'); }
+            } else { highlightBox.visible = false; document.getElementById('item-tooltip').classList.remove('show'); }
+        }
+
+        function updateFPS() {
+            gameState.frameCount++;
+            const currentTime = performance.now();
+            const delta = currentTime - gameState.lastTime;
+            if (delta >= 1000) {
+                gameState.fps = Math.round((gameState.frameCount * 1000) / delta);
+                document.getElementById('fps-counter').textContent = 'FPS: ' + gameState.fps;
+                gameState.frameCount = 0;
+                gameState.lastTime = currentTime;
+            }
+        }
+        
+        // ========== Avaon外挂系统更新 ==========
+        let killAuraCooldown = 0;
+        let autoMineCooldown = 0;
+        
+        function updateHacks() {
+            if (!hackActivated) return;
+            
+            // 自动攻击
+            if (hacks.killAura) {
+                killAuraCooldown--;
+                if (killAuraCooldown <= 0) {
+                    const p = gameState.player;
+                    for (const [id, entity] of gameState.entities) {
+                        if (entity.userData.type === 'zombie') {
+                            const dx = entity.position.x - p.x;
+                            const dz = entity.position.z - p.z;
+                            const distance = Math.sqrt(dx * dx + dz * dz);
+                            if (distance < 10) {
+                                entity.userData.health -= 10;
+                                if (entity.userData.health <= 0) {
+                                    scene.remove(entity);
+                                    gameState.entities.delete(id);
+                                }
+                                killAuraCooldown = 10;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 自动挖矿
+            if (hacks.autoMine) {
+                autoMineCooldown--;
+                if (autoMineCooldown <= 0) {
+                    const target = getTargetBlock();
+                    if (target) {
+                        const pos = target.object.userData;
+                        removeBlock(pos.x, pos.y, pos.z);
+                        addItemToInventory(pos.type, 1);
+                    }
+                    autoMineCooldown = 5;
+                }
+            }
+            
+            // X射线
+            if (hacks.xray) {
+                gameState.blocks.forEach((block, key) => {
+                    const type = block.userData.type;
+                    const isOre = type.includes('_ore');
+                    block.visible = isOre || type === 'stone' || type === 'grass' || type === 'dirt';
+                });
+            } else {
+                gameState.blocks.forEach(block => {
+                    block.visible = true;
+                });
+            }
+        }
+        
+        // ========== 优化：渲染距离管理 ==========
+        let lastCullUpdate = 0;
+        
+        function updateBlockVisibility() {
+            const px = camera.position.x;
+            const py = camera.position.y;
+            const pz = camera.position.z;
+            const renderDistSq = CONFIG.renderDistance * CONFIG.renderDistance;
+            
+            // 更新视锥
+            _projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+            _frustum.setFromProjectionMatrix(_projScreenMatrix);
+            
+            let visibleCount = 0;
+            let culledCount = 0;
+            
+            // 获取相机朝向向量
+            const cameraDir = new THREE.Vector3();
+            camera.getWorldDirection(cameraDir);
+            cameraDir.y = 0; // 忽略Y轴
+            cameraDir.normalize();
+            
+            // 160度视角的余弦值（转换为弧度，取一半）
+            const viewAngleRad = (160 / 2) * Math.PI / 180;
+            const viewAngleCos = Math.cos(viewAngleRad);
+            
+            gameState.blocks.forEach((block, key) => {
+                const bx = block.position.x;
+                const by = block.position.y;
+                const bz = block.position.z;
+                
+                // 距离检查
+                const dx = bx - px;
+                const dy = by - py;
+                const dz = bz - pz;
+                const distSq = dx * dx + dy * dy + dz * dz;
+                
+                if (distSq > renderDistSq) {
+                    block.visible = false;
+                    culledCount++;
+                    return;
+                }
+                
+                // 近距离方块（8格内）总是可见，不管视角
+                const dist = Math.sqrt(distSq);
+                if (dist > 8) {
+                    // 只对远距离方块进行视角检查
+                    const dirToBlock = new THREE.Vector3(dx, 0, dz).normalize();
+                    if (cameraDir.lengthSq() > 0 && dirToBlock.lengthSq() > 0) {
+                        const dotProduct = cameraDir.dot(dirToBlock);
+                        if (dotProduct < viewAngleCos) {
+                            block.visible = false;
+                            culledCount++;
+                            return;
+                        }
+                    }
+                }
+                
+                // 遮挡检查（只检查完全封闭的方块）
+                if (CONFIG.occlusionCull && isBlockCompletelyOccluded(bx, by, bz)) {
+                    block.visible = false;
+                    culledCount++;
+                    return;
+                }
+                
+                // 视锥检查
+                _blockPos.set(bx, by, bz);
+                if (CONFIG.frustumCull && !_frustum.containsPoint(_blockPos)) {
+                    block.visible = false;
+                    culledCount++;
+                    return;
+                }
+                
+                block.visible = true;
+                visibleCount++;
+            });
+        }
+
+        // ========== 优化：游戏循环 ==========
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (gameState.isPlaying) {
+                updatePhysics();
+                updateZombies();
+                updateParticles();
+                updateBreaking();
+                updateHunger();
+                updateChunks();
+                updateHacks();
+                
+                // 暂时禁用高性能渲染系统，回退到旧系统
+                // if (chunkRenderer) {
+                //     chunkRenderer.updateAll(gameState.blocks);
+                // }
+            }
+            
+            // 恢复旧的可见性更新
+            lastCullUpdate++;
+            if (lastCullUpdate >= CONFIG.cullInterval) {
+                updateBlockVisibility();
+                lastCullUpdate = 0;
+            }
+            
+            updateHighlight();
+            updateFPS();
+            updateCoordinates();
+            renderer.render(scene, camera);
+        }
+
+        // 更新坐标显示
+        function updateCoordinates() {
+            if (!gameState.isPlaying) return;
+            const p = gameState.player;
+            document.getElementById('coord-x').textContent = Math.round(p.x);
+            document.getElementById('coord-y').textContent = Math.round(p.y);
+            document.getElementById('coord-z').textContent = Math.round(p.z);
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
