@@ -6198,6 +6198,1120 @@ ${cow}</span>`;
             );
         };
 
+        // =====================================================
+        // VIM TEXT EDITOR MODULE
+        // A full-featured Vim-like text editor for SegOS
+        // =====================================================
+
+        const vimEditor = {
+            // Editor state
+            isActive: false,
+            mode: 'normal', // normal, insert, visual, command
+            filename: null,
+            content: [],
+            lines: [''],
+            cursor: { x: 0, y: 0 },
+            scrollOffset: 0,
+            
+            // Visual mode
+            visualStart: null,
+            visualEnd: null,
+            
+            // Command mode
+            commandBuffer: '',
+            commandHistory: [],
+            commandHistoryIndex: -1,
+            
+            // Search
+            searchPattern: '',
+            searchDirection: 'forward',
+            searchHistory: [],
+            lastSearchPattern: '',
+            
+            // Undo/Redo
+            undoStack: [],
+            redoStack: [],
+            maxUndoSize: 100,
+            
+            // Settings
+            settings: {
+                lineNumbers: true,
+                syntaxHighlight: true,
+                tabSize: 4,
+                autoIndent: true,
+                wrapLines: false,
+                showWhitespace: false
+            },
+            
+            // Syntax highlighting patterns
+            syntaxPatterns: {
+                javascript: {
+                    keywords: /\b(const|let|var|function|return|if|else|for|while|do|switch|case|break|continue|default|try|catch|finally|throw|new|this|typeof|instanceof|in|of|class|extends|super|import|export|from|async|await|yield)\b/g,
+                    strings: /(['"`])((?:\\\1|.)*?)\1/g,
+                    comments: /\/\/.*$/gm,
+                    multilineComments: /\/\*[\s\S]*?\*\//g,
+                    numbers: /\b\d+\.?\d*\b/g,
+                    functions: /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*(?=\()/g
+                },
+                html: {
+                    tags: /<&\/?[a-zA-Z][a-zA-Z0-9]*(?:\s[^>]*)?>/g,
+                    attributes: /\s[a-zA-Z-]+(?==)/g,
+                    strings: /"[^"]*"|'[^']*'/g,
+                    comments: /<!--[\s\S]*?-->/g
+                },
+                css: {
+                    selectors: /^[\s]*[.#@]?[a-zA-Z][^{]*{/gm,
+                    properties: /[a-zA-Z-]+(?=\s*:)/g,
+                    values: /:\s*[^;]+/g,
+                    comments: /\/\*[\s\S]*?\*\//g
+                },
+                json: {
+                    keys: /"[^"]+"(?=\s*:)/g,
+                    strings: /"[^"]*"/g,
+                    numbers: /\b\d+\.?\d*\b/g,
+                    booleans: /\b(true|false|null)\b/g
+                }
+            },
+
+            // Initialize editor
+            init() {
+                this.loadSettings();
+            },
+
+            // Load settings from storage
+            loadSettings() {
+                const saved = localStorage.getItem('segos_vim_settings');
+                if (saved) {
+                    this.settings = { ...this.settings, ...JSON.parse(saved) };
+                }
+            },
+
+            // Save settings
+            saveSettings() {
+                localStorage.setItem('segos_vim_settings', JSON.stringify(this.settings));
+            },
+
+            // Open file
+            openFile(filename) {
+                this.filename = filename;
+                const file = getFile(filename);
+                
+                if (file) {
+                    this.content = file.content.split('\n');
+                } else {
+                    this.content = [''];
+                }
+                
+                this.lines = [...this.content];
+                this.cursor = { x: 0, y: 0 };
+                this.scrollOffset = 0;
+                this.undoStack = [];
+                this.redoStack = [];
+                this.mode = 'normal';
+                this.isActive = true;
+                
+                this.saveState();
+                return this.render();
+            },
+
+            // Create new file
+            newFile(filename = null) {
+                this.filename = filename;
+                this.content = [''];
+                this.lines = [''];
+                this.cursor = { x: 0, y: 0 };
+                this.scrollOffset = 0;
+                this.undoStack = [];
+                this.redoStack = [];
+                this.mode = 'normal';
+                this.isActive = true;
+                
+                this.saveState();
+                return this.render();
+            },
+
+            // Save file
+            saveFile() {
+                if (!this.filename) {
+                    return { success: false, message: 'No filename' };
+                }
+
+                const content = this.lines.join('\n');
+                const result = writeFile(this.filename, content);
+                
+                if (result) {
+                    this.content = [...this.lines];
+                    return { success: true, message: `"${this.filename}" ${this.lines.length}L, ${content.length}B written` };
+                }
+                return { success: false, message: 'Error writing file' };
+            },
+
+            // Save current state for undo
+            saveState() {
+                const state = {
+                    lines: [...this.lines],
+                    cursor: { ...this.cursor },
+                    timestamp: Date.now()
+                };
+                
+                this.undoStack.push(state);
+                if (this.undoStack.length > this.maxUndoSize) {
+                    this.undoStack.shift();
+                }
+                this.redoStack = [];
+            },
+
+            // Undo
+            undo() {
+                if (this.undoStack.length <= 1) {
+                    return false;
+                }
+                
+                const current = this.undoStack.pop();
+                this.redoStack.push(current);
+                
+                const previous = this.undoStack[this.undoStack.length - 1];
+                this.lines = [...previous.lines];
+                this.cursor = { ...previous.cursor };
+                
+                return true;
+            },
+
+            // Redo
+            redo() {
+                if (this.redoStack.length === 0) {
+                    return false;
+                }
+                
+                const state = this.redoStack.pop();
+                this.undoStack.push(state);
+                
+                this.lines = [...state.lines];
+                this.cursor = { ...state.cursor };
+                
+                return true;
+            },
+
+            // Get current line
+            getCurrentLine() {
+                return this.lines[this.cursor.y] || '';
+            },
+
+            // Set current line
+            setCurrentLine(text) {
+                this.lines[this.cursor.y] = text;
+            },
+
+            // Insert text at cursor
+            insertText(text) {
+                const line = this.getCurrentLine();
+                const before = line.substring(0, this.cursor.x);
+                const after = line.substring(this.cursor.x);
+                this.setCurrentLine(before + text + after);
+                this.cursor.x += text.length;
+            },
+
+            // Delete character at cursor
+            deleteChar() {
+                const line = this.getCurrentLine();
+                if (this.cursor.x < line.length) {
+                    const before = line.substring(0, this.cursor.x);
+                    const after = line.substring(this.cursor.x + 1);
+                    this.setCurrentLine(before + after);
+                    return true;
+                }
+                return false;
+            },
+
+            // Backspace
+            backspace() {
+                if (this.cursor.x > 0) {
+                    const line = this.getCurrentLine();
+                    const before = line.substring(0, this.cursor.x - 1);
+                    const after = line.substring(this.cursor.x);
+                    this.setCurrentLine(before + after);
+                    this.cursor.x--;
+                    return true;
+                } else if (this.cursor.y > 0) {
+                    // Join with previous line
+                    const currentLine = this.getCurrentLine();
+                    const prevLine = this.lines[this.cursor.y - 1];
+                    this.cursor.x = prevLine.length;
+                    this.lines[this.cursor.y - 1] = prevLine + currentLine;
+                    this.lines.splice(this.cursor.y, 1);
+                    this.cursor.y--;
+                    return true;
+                }
+                return false;
+            },
+
+            // Insert new line
+            insertNewLine() {
+                const line = this.getCurrentLine();
+                const before = line.substring(0, this.cursor.x);
+                const after = line.substring(this.cursor.x);
+                
+                this.setCurrentLine(before);
+                this.lines.splice(this.cursor.y + 1, 0, after);
+                this.cursor.y++;
+                this.cursor.x = 0;
+            },
+
+            // Move cursor
+            moveCursor(dx, dy) {
+                const newY = Math.max(0, Math.min(this.lines.length - 1, this.cursor.y + dy));
+                const newX = Math.max(0, Math.min(this.lines[newY].length, this.cursor.x + dx));
+                
+                this.cursor.x = newX;
+                this.cursor.y = newY;
+                
+                // Adjust scroll
+                const visibleLines = Math.floor((window.innerHeight - 100) / 20);
+                if (this.cursor.y < this.scrollOffset) {
+                    this.scrollOffset = this.cursor.y;
+                } else if (this.cursor.y >= this.scrollOffset + visibleLines) {
+                    this.scrollOffset = this.cursor.y - visibleLines + 1;
+                }
+            },
+
+            // Move to start of line
+            moveToStart() {
+                this.cursor.x = 0;
+            },
+
+            // Move to end of line
+            moveToEnd() {
+                this.cursor.x = this.getCurrentLine().length;
+            },
+
+            // Move to start of file
+            moveToFileStart() {
+                this.cursor.x = 0;
+                this.cursor.y = 0;
+                this.scrollOffset = 0;
+            },
+
+            // Move to end of file
+            moveToFileEnd() {
+                this.cursor.y = this.lines.length - 1;
+                this.cursor.x = this.getCurrentLine().length;
+            },
+
+            // Move to next word
+            moveToNextWord() {
+                const line = this.getCurrentLine();
+                let x = this.cursor.x;
+                
+                // Skip current word
+                while (x < line.length && /\w/.test(line[x])) x++;
+                // Skip whitespace
+                while (x < line.length && !/\w/.test(line[x])) x++;
+                
+                this.cursor.x = x;
+            },
+
+            // Move to previous word
+            moveToPrevWord() {
+                const line = this.getCurrentLine();
+                let x = this.cursor.x;
+                
+                // Skip whitespace
+                while (x > 0 && !/\w/.test(line[x - 1])) x--;
+                // Skip word
+                while (x > 0 && /\w/.test(line[x - 1])) x--;
+                
+                this.cursor.x = x;
+            },
+
+            // Delete line
+            deleteLine(y = this.cursor.y) {
+                if (this.lines.length > 1) {
+                    const deleted = this.lines.splice(y, 1)[0];
+                    if (this.cursor.y >= this.lines.length) {
+                        this.cursor.y = this.lines.length - 1;
+                    }
+                    this.cursor.x = Math.min(this.cursor.x, this.getCurrentLine().length);
+                    return deleted;
+                }
+                const deleted = this.lines[0];
+                this.lines[0] = '';
+                this.cursor.x = 0;
+                return deleted;
+            },
+
+            // Yank (copy) line
+            yankLine(y = this.cursor.y) {
+                return this.lines[y] || '';
+            },
+
+            // Paste after cursor
+            pasteAfter(text) {
+                const line = this.getCurrentLine();
+                const before = line.substring(0, this.cursor.x + 1);
+                const after = line.substring(this.cursor.x + 1);
+                this.setCurrentLine(before + text + after);
+                this.cursor.x += text.length;
+            },
+
+            // Search
+            search(pattern, direction = 'forward') {
+                this.searchPattern = pattern;
+                this.searchDirection = direction;
+                
+                if (!pattern) {
+                    pattern = this.lastSearchPattern;
+                } else {
+                    this.lastSearchPattern = pattern;
+                }
+                
+                if (!pattern) return false;
+                
+                const regex = new RegExp(pattern, 'i');
+                const startY = this.cursor.y;
+                
+                if (direction === 'forward') {
+                    // Search from current position to end
+                    for (let y = startY; y < this.lines.length; y++) {
+                        const line = this.lines[y];
+                        const startX = (y === startY) ? this.cursor.x + 1 : 0;
+                        const match = line.substring(startX).match(regex);
+                        if (match) {
+                            this.cursor.y = y;
+                            this.cursor.x = startX + line.substring(startX).indexOf(match[0]);
+                            return true;
+                        }
+                    }
+                    // Wrap around
+                    for (let y = 0; y <= startY; y++) {
+                        const line = this.lines[y];
+                        const endX = (y === startY) ? this.cursor.x : line.length;
+                        const match = line.substring(0, endX).match(regex);
+                        if (match) {
+                            this.cursor.y = y;
+                            this.cursor.x = line.indexOf(match[0]);
+                            return true;
+                        }
+                    }
+                } else {
+                    // Backward search
+                    for (let y = startY; y >= 0; y--) {
+                        const line = this.lines[y];
+                        const endX = (y === startY) ? this.cursor.x : line.length;
+                        const before = line.substring(0, endX);
+                        const matches = [...before.matchAll(regex)];
+                        if (matches.length > 0) {
+                            const lastMatch = matches[matches.length - 1];
+                            this.cursor.y = y;
+                            this.cursor.x = lastMatch.index;
+                            return true;
+                        }
+                    }
+                    // Wrap around
+                    for (let y = this.lines.length - 1; y >= startY; y--) {
+                        const line = this.lines[y];
+                        const startX = (y === startY) ? this.cursor.x : 0;
+                        const match = line.substring(startX).match(regex);
+                        if (match) {
+                            this.cursor.y = y;
+                            this.cursor.x = line.lastIndexOf(match[0]);
+                            return true;
+                        }
+                    }
+                }
+                
+                return false;
+            },
+
+            // Replace all occurrences
+            replaceAll(search, replace) {
+                let count = 0;
+                this.lines = this.lines.map(line => {
+                    const newLine = line.split(search).join(replace);
+                    if (newLine !== line) count++;
+                    return newLine;
+                });
+                return count;
+            },
+
+            // Detect file type for syntax highlighting
+            detectFileType() {
+                if (!this.filename) return 'text';
+                const ext = this.filename.split('.').pop().toLowerCase();
+                
+                const typeMap = {
+                    'js': 'javascript',
+                    'jsx': 'javascript',
+                    'ts': 'javascript',
+                    'tsx': 'javascript',
+                    'html': 'html',
+                    'htm': 'html',
+                    'css': 'css',
+                    'scss': 'css',
+                    'sass': 'css',
+                    'less': 'css',
+                    'json': 'json',
+                    'md': 'markdown',
+                    'py': 'python',
+                    'java': 'java',
+                    'c': 'c',
+                    'cpp': 'cpp',
+                    'h': 'c',
+                    'php': 'php',
+                    'rb': 'ruby',
+                    'go': 'go',
+                    'rs': 'rust',
+                    'sh': 'bash',
+                    'bash': 'bash',
+                    'zsh': 'bash'
+                };
+                
+                return typeMap[ext] || 'text';
+            },
+
+            // Apply syntax highlighting
+            highlightLine(line, fileType) {
+                if (!this.settings.syntaxHighlight || fileType === 'text') {
+                    return this.escapeHtml(line);
+                }
+                
+                const patterns = this.syntaxPatterns[fileType];
+                if (!patterns) {
+                    return this.escapeHtml(line);
+                }
+                
+                let highlighted = this.escapeHtml(line);
+                
+                // Apply highlighting (simplified)
+                if (patterns.comments) {
+                    highlighted = highlighted.replace(patterns.comments, match => 
+                        `<span class="vim-comment">${match}</span>`
+                    );
+                }
+                if (patterns.strings) {
+                    highlighted = highlighted.replace(patterns.strings, match => 
+                        `<span class="vim-string">${match}</span>`
+                    );
+                }
+                if (patterns.keywords) {
+                    highlighted = highlighted.replace(patterns.keywords, match => 
+                        `<span class="vim-keyword">${match}</span>`
+                    );
+                }
+                if (patterns.numbers) {
+                    highlighted = highlighted.replace(patterns.numbers, match => 
+                        `<span class="vim-number">${match}</span>`
+                    );
+                }
+                if (patterns.functions) {
+                    highlighted = highlighted.replace(patterns.functions, match => 
+                        `<span class="vim-function">${match}</span>`
+                    );
+                }
+                
+                return highlighted;
+            },
+
+            // Escape HTML
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            // Render editor
+            render() {
+                const fileType = this.detectFileType();
+                const visibleLines = Math.floor((window.innerHeight - 150) / 20);
+                const startLine = this.scrollOffset;
+                const endLine = Math.min(this.lines.length, startLine + visibleLines);
+                
+                let output = [];
+                
+                // Header
+                output.push(`<span class="success">╔══════════════════════════════════════════════════════════════╗</span>`);
+                const title = this.filename ? ` ${this.filename} ` : ' [No Name] ';
+                const modified = this.isModified() ? '[+]' : '';
+                const modeStr = this.mode.toUpperCase();
+                output.push(`<span class="success">║</span><span class="vim-header">${title.padEnd(30)}${modified.padEnd(4)}${modeStr.padStart(26)}</span><span class="success">║</span>`);
+                output.push(`<span class="success">╚══════════════════════════════════════════════════════════════╝</span>`);
+                
+                // Content
+                for (let i = startLine; i < endLine; i++) {
+                    const lineNum = String(i + 1).padStart(4, ' ');
+                    const lineContent = this.lines[i] || '';
+                    const isCurrentLine = i === this.cursor.y;
+                    
+                    let displayLine = this.highlightLine(lineContent, fileType);
+                    
+                    // Show cursor
+                    if (isCurrentLine && this.mode !== 'command') {
+                        const cursorChar = lineContent[this.cursor.x] || ' ';
+                        const before = this.escapeHtml(lineContent.substring(0, this.cursor.x));
+                        const after = this.escapeHtml(lineContent.substring(this.cursor.x + 1));
+                        const cursorClass = this.mode === 'insert' ? 'vim-cursor-insert' : 'vim-cursor';
+                        displayLine = before + `<span class="${cursorClass}">${this.escapeHtml(cursorChar)}</span>` + after;
+                    }
+                    
+                    // Line number
+                    const numColor = isCurrentLine ? 'vim-linenr-current' : 'vim-linenr';
+                    output.push(`<span class="${numColor}">${lineNum}</span> ${displayLine}`);
+                }
+                
+                // Fill empty lines
+                for (let i = endLine; i < startLine + visibleLines; i++) {
+                    output.push(`<span class="vim-linenr">${'~'.padStart(4, ' ')}</span> `);
+                }
+                
+                // Status line
+                output.push(`<span class="success">╔══════════════════════════════════════════════════════════════╗</span>`);
+                const pos = `${this.lines.length}L, ${this.getTotalChars()}C`;
+                const cursorPos = `${this.cursor.y + 1},${this.cursor.x + 1}`;
+                const percent = Math.round(((this.cursor.y + 1) / this.lines.length) * 100);
+                const status = ` ${cursorPos}  ${percent}%  ${pos} `.padEnd(62);
+                output.push(`<span class="success">║</span><span class="vim-status">${status}</span><span class="success">║</span>`);
+                
+                // Command line
+                if (this.mode === 'command') {
+                    output.push(`<span class="success">║</span><span class="vim-command">:${this.commandBuffer}</span>${' '.repeat(Math.max(0, 61 - this.commandBuffer.length))}<span class="success">║</span>`);
+                } else if (this.mode === 'search') {
+                    output.push(`<span class="success">║</span><span class="vim-command">/${this.commandBuffer}</span>${' '.repeat(Math.max(0, 61 - this.commandBuffer.length))}<span class="success">║</span>`);
+                } else {
+                    output.push(`<span class="success">║</span>${' '.repeat(62)}<span class="success">║</span>`);
+                }
+                output.push(`<span class="success">╚══════════════════════════════════════════════════════════════╝</span>`);
+                
+                return output.join('\n');
+            },
+
+            // Check if file is modified
+            isModified() {
+                return this.lines.join('\n') !== this.content.join('\n');
+            },
+
+            // Get total character count
+            getTotalChars() {
+                return this.lines.reduce((sum, line) => sum + line.length, 0);
+            },
+
+            // Handle key input
+            handleKey(key, ctrl = false, alt = false) {
+                if (!this.isActive) return null;
+                
+                switch (this.mode) {
+                    case 'normal':
+                        return this.handleNormalMode(key, ctrl, alt);
+                    case 'insert':
+                        return this.handleInsertMode(key, ctrl, alt);
+                    case 'visual':
+                        return this.handleVisualMode(key, ctrl, alt);
+                    case 'command':
+                        return this.handleCommandMode(key, ctrl, alt);
+                    case 'search':
+                        return this.handleSearchMode(key, ctrl, alt);
+                }
+                
+                return null;
+            },
+
+            // Normal mode key handling
+            handleNormalMode(key, ctrl, alt) {
+                // Number prefix for commands
+                let count = 1;
+                
+                switch (key) {
+                    // Navigation
+                    case 'h':
+                    case 'ArrowLeft':
+                        this.moveCursor(-1, 0);
+                        break;
+                    case 'j':
+                    case 'ArrowDown':
+                        this.moveCursor(0, 1);
+                        break;
+                    case 'k':
+                    case 'ArrowUp':
+                        this.moveCursor(0, -1);
+                        break;
+                    case 'l':
+                    case 'ArrowRight':
+                        this.moveCursor(1, 0);
+                        break;
+                    case '0':
+                        this.moveToStart();
+                        break;
+                    case '$':
+                        this.moveToEnd();
+                        break;
+                    case 'g':
+                        // gg - go to first line (handled by double press)
+                        break;
+                    case 'G':
+                        this.moveToFileEnd();
+                        break;
+                    case 'w':
+                        this.moveToNextWord();
+                        break;
+                    case 'b':
+                        this.moveToPrevWord();
+                        break;
+                        
+                    // Mode switching
+                    case 'i':
+                        this.mode = 'insert';
+                        break;
+                    case 'a':
+                        this.mode = 'insert';
+                        this.moveCursor(1, 0);
+                        break;
+                    case 'I':
+                        this.moveToStart();
+                        this.mode = 'insert';
+                        break;
+                    case 'A':
+                        this.moveToEnd();
+                        this.mode = 'insert';
+                        break;
+                    case 'o':
+                        this.saveState();
+                        this.cursor.x = this.getCurrentLine().length;
+                        this.insertNewLine();
+                        this.mode = 'insert';
+                        break;
+                    case 'O':
+                        this.saveState();
+                        this.cursor.x = 0;
+                        this.lines.splice(this.cursor.y, 0, '');
+                        this.mode = 'insert';
+                        break;
+                    case 'v':
+                        this.mode = 'visual';
+                        this.visualStart = { ...this.cursor };
+                        break;
+                    case ':':
+                        this.mode = 'command';
+                        this.commandBuffer = '';
+                        break;
+                    case '/':
+                        this.mode = 'search';
+                        this.commandBuffer = '';
+                        this.searchDirection = 'forward';
+                        break;
+                    case '?':
+                        this.mode = 'search';
+                        this.commandBuffer = '';
+                        this.searchDirection = 'backward';
+                        break;
+                        
+                    // Editing
+                    case 'x':
+                        this.saveState();
+                        this.deleteChar();
+                        break;
+                    case 'X':
+                        this.saveState();
+                        if (this.cursor.x > 0) {
+                            this.cursor.x--;
+                            this.deleteChar();
+                        }
+                        break;
+                    case 'd':
+                        // dd - delete line (simplified)
+                        this.saveState();
+                        this.deleteLine();
+                        break;
+                    case 'D':
+                        this.saveState();
+                        const line = this.getCurrentLine();
+                        this.setCurrentLine(line.substring(0, this.cursor.x));
+                        break;
+                    case 'y':
+                        // yy - yank line
+                        this.yankedLine = this.yankLine();
+                        break;
+                    case 'p':
+                        if (this.yankedLine) {
+                            this.saveState();
+                            this.lines.splice(this.cursor.y + 1, 0, this.yankedLine);
+                            this.cursor.y++;
+                        }
+                        break;
+                    case 'P':
+                        if (this.yankedLine) {
+                            this.saveState();
+                            this.lines.splice(this.cursor.y, 0, this.yankedLine);
+                        }
+                        break;
+                    case 'u':
+                        this.undo();
+                        break;
+                    case 'Ctrl+r':
+                    case 'R':
+                        this.redo();
+                        break;
+                    case '.':
+                        // Repeat last command
+                        break;
+                    case 'n':
+                        this.search(this.lastSearchPattern, this.searchDirection);
+                        break;
+                    case 'N':
+                        this.search(this.lastSearchPattern, this.searchDirection === 'forward' ? 'backward' : 'forward');
+                        break;
+                        
+                    // Quit
+                    case 'q':
+                        if (this.isModified()) {
+                            return { type: 'error', message: 'No write since last change (add ! to override)' };
+                        }
+                        this.isActive = false;
+                        return { type: 'quit' };
+                }
+                
+                return { type: 'render' };
+            },
+
+            // Insert mode key handling
+            handleInsertMode(key, ctrl, alt) {
+                if (ctrl) {
+                    if (key === '[' || key === 'c') {
+                        this.mode = 'normal';
+                        if (this.cursor.x > 0) this.cursor.x--;
+                    }
+                    return { type: 'render' };
+                }
+                
+                switch (key) {
+                    case 'Escape':
+                        this.mode = 'normal';
+                        if (this.cursor.x > 0) this.cursor.x--;
+                        break;
+                    case 'Enter':
+                        this.saveState();
+                        this.insertNewLine();
+                        break;
+                    case 'Backspace':
+                        this.saveState();
+                        this.backspace();
+                        break;
+                    case 'Delete':
+                        this.saveState();
+                        this.deleteChar();
+                        break;
+                    case 'Tab':
+                        this.saveState();
+                        this.insertText(' '.repeat(this.settings.tabSize));
+                        break;
+                    default:
+                        if (key.length === 1) {
+                            this.saveState();
+                            this.insertText(key);
+                        }
+                }
+                
+                return { type: 'render' };
+            },
+
+            // Visual mode key handling
+            handleVisualMode(key, ctrl, alt) {
+                switch (key) {
+                    case 'Escape':
+                        this.mode = 'normal';
+                        this.visualStart = null;
+                        break;
+                    case 'y':
+                        // Yank selection
+                        this.mode = 'normal';
+                        break;
+                    case 'd':
+                        // Delete selection
+                        this.saveState();
+                        this.mode = 'normal';
+                        break;
+                    default:
+                        // Movement keys work the same
+                        return this.handleNormalMode(key, ctrl, alt);
+                }
+                
+                return { type: 'render' };
+            },
+
+            // Command mode key handling
+            handleCommandMode(key, ctrl, alt) {
+                switch (key) {
+                    case 'Escape':
+                        this.mode = 'normal';
+                        this.commandBuffer = '';
+                        break;
+                    case 'Enter':
+                        return this.executeCommand(this.commandBuffer);
+                    case 'Backspace':
+                        this.commandBuffer = this.commandBuffer.slice(0, -1);
+                        if (this.commandBuffer === '') {
+                            this.mode = 'normal';
+                        }
+                        break;
+                    default:
+                        if (key.length === 1) {
+                            this.commandBuffer += key;
+                        }
+                }
+                
+                return { type: 'render' };
+            },
+
+            // Search mode key handling
+            handleSearchMode(key, ctrl, alt) {
+                switch (key) {
+                    case 'Escape':
+                        this.mode = 'normal';
+                        this.commandBuffer = '';
+                        break;
+                    case 'Enter':
+                        this.search(this.commandBuffer, this.searchDirection);
+                        this.mode = 'normal';
+                        this.commandBuffer = '';
+                        break;
+                    case 'Backspace':
+                        this.commandBuffer = this.commandBuffer.slice(0, -1);
+                        break;
+                    default:
+                        if (key.length === 1) {
+                            this.commandBuffer += key;
+                        }
+                }
+                
+                return { type: 'render' };
+            },
+
+            // Execute command
+            executeCommand(cmd) {
+                this.mode = 'normal';
+                this.commandHistory.push(cmd);
+                this.commandHistoryIndex = this.commandHistory.length;
+                
+                const parts = cmd.split(' ');
+                const command = parts[0].toLowerCase();
+                const args = parts.slice(1);
+                
+                switch (command) {
+                    case 'w':
+                    case 'write':
+                        const saveResult = this.saveFile();
+                        if (args[0]) this.filename = args[0];
+                        return { type: 'message', message: saveResult.message || 'Written' };
+                        
+                    case 'q':
+                    case 'quit':
+                        if (this.isModified() && !cmd.includes('!')) {
+                            return { type: 'error', message: 'No write since last change (add ! to override)' };
+                        }
+                        this.isActive = false;
+                        return { type: 'quit' };
+                        
+                    case 'wq':
+                    case 'x':
+                        const wqResult = this.saveFile();
+                        this.isActive = false;
+                        return { type: 'quit', message: wqResult.message };
+                        
+                    case 'e':
+                    case 'edit':
+                        if (args[0]) {
+                            if (this.isModified() && !cmd.includes('!')) {
+                                return { type: 'error', message: 'No write since last change (add ! to override)' };
+                            }
+                            return { type: 'open', filename: args[0] };
+                        }
+                        return { type: 'error', message: 'No filename' };
+                        
+                    case 'n':
+                    case 'new':
+                        if (this.isModified() && !cmd.includes('!')) {
+                            return { type: 'error', message: 'No write since last change (add ! to override)' };
+                        }
+                        return { type: 'new', filename: args[0] || null };
+                        
+                    case 'set':
+                        if (args[0]) {
+                            const [option, value] = args[0].split('=');
+                            if (option === 'number' || option === 'nu') {
+                                this.settings.lineNumbers = value !== 'no' && value !== 'false';
+                            } else if (option === 'nonumber' || option === 'nonu') {
+                                this.settings.lineNumbers = false;
+                            } else if (option === 'syntax') {
+                                this.settings.syntaxHighlight = value !== 'no' && value !== 'false';
+                            } else if (option === 'tabstop' || option === 'ts') {
+                                this.settings.tabSize = parseInt(value) || 4;
+                            }
+                            this.saveSettings();
+                        }
+                        return { type: 'render' };
+                        
+                    case 'help':
+                        return { type: 'message', message: 'Vim Help: i=insert, Esc=normal, :w=save, :q=quit, :wq=save&quit' };
+                        
+                    case '%s':
+                        // Search and replace
+                        if (args.length >= 2) {
+                            const search = args[0];
+                            const replace = args[1];
+                            const count = this.replaceAll(search, replace);
+                            return { type: 'message', message: `Replaced ${count} occurrences` };
+                        }
+                        return { type: 'error', message: 'Usage: :%s/old/new/' };
+                        
+                    default:
+                        return { type: 'error', message: `Unknown command: ${command}` };
+                }
+            },
+
+            // Show help
+            showHelp() {
+                return `<span class="success">╔══════════════════════════════════════════════════════════════╗</span>
+<span class="success">║</span> <span class="info">SegOS Vim Editor Help</span>${' '.repeat(37)}<span class="success">║</span>
+<span class="success">╚══════════════════════════════════════════════════════════════╝</span>
+
+<span class="warning">NORMAL MODE:</span>
+  <span class="info">h j k l</span>     - Move cursor (left, down, up, right)
+  <span class="info">w b</span>         - Next/previous word
+  <span class="info">0 $</span>         - Start/end of line
+  <span class="info">gg G</span>        - Start/end of file
+  <span class="info">i a</span>         - Insert mode (before/after cursor)
+  <span class="info">I A</span>         - Insert at start/end of line
+  <span class="info">o O</span>         - Open new line below/above
+  <span class="info">x X</span>         - Delete character under/before cursor
+  <span class="info">dd</span>          - Delete line
+  <span class="info">yy</span>          - Yank (copy) line
+  <span class="info">p P</span>         - Paste after/before cursor
+  <span class="info">u Ctrl+r</span>    - Undo/redo
+  <span class="info">v</span>           - Visual mode
+  <span class="info">/ ?</span>         - Search forward/backward
+  <span class="info">n N</span>         - Next/previous search result
+
+<span class="warning">INSERT MODE:</span>
+  <span class="info">Esc</span>         - Return to normal mode
+  <span class="info">Tab</span>         - Insert spaces
+
+<span class="warning">COMMANDS (:):</span>
+  <span class="info">:w [file]</span>   - Save file
+  <span class="info">:q</span>          - Quit
+  <span class="info">:wq :x</span>      - Save and quit
+  <span class="info">:e file</span>     - Edit file
+  <span class="info">:n [file]</span>   - New file
+  <span class="info">:set nu</span>     - Show line numbers
+  <span class="info">:set nonu</span>   - Hide line numbers
+  <span class="info">:%s/old/new</span> - Search and replace
+
+<span class="success">Press any key to continue...</span>`;
+            }
+        };
+
+        // Initialize vim editor
+        vimEditor.init();
+
+        // Vim mode flag
+        let vimMode = false;
+
+        // Register vim command
+        commands.vim = {
+            desc: 'Vim文本编辑器 - vim [filename]',
+            action: async (args) => {
+                vimMode = true;
+                vimEditor.isActive = true;
+                
+                if (args.length > 0) {
+                    return vimEditor.openFile(args[0]);
+                } else {
+                    return vimEditor.newFile();
+                }
+            }
+        };
+
+        commands.vi = {
+            desc: 'Vim编辑器快捷方式',
+            action: (args) => commands.vim.action(args)
+        };
+
+        // Update help to include vim
+        const originalHelpBeforeVim = commands.help.action;
+        commands.help.action = () => {
+            const help = originalHelpBeforeVim();
+            return help.replace(
+                '<span class="help-cmd">lynx</span>',
+                `<span class="help-cmd">vim</span>       <span class="help-desc">Vim文本编辑器</span>
+<span class="help-cmd">lynx</span>`
+            );
+        };
+
+        // Add vim styles
+        const vimStyles = document.createElement('style');
+        vimStyles.textContent = `
+            .vim-header { color: #ffa657; font-weight: bold; }
+            .vim-linenr { color: #6e7681; }
+            .vim-linenr-current { color: #e6edf3; background: #30363d; }
+            .vim-status { color: #0d1117; background: #7ee787; font-weight: bold; }
+            .vim-command { color: #e6edf3; background: #30363d; }
+            .vim-cursor { background: #7ee787; color: #0d1117; }
+            .vim-cursor-insert { background: #79c0ff; color: #0d1117; }
+            .vim-comment { color: #8b949e; font-style: italic; }
+            .vim-string { color: #a5d6ff; }
+            .vim-keyword { color: #ff7b72; font-weight: bold; }
+            .vim-number { color: #79c0ff; }
+            .vim-function { color: #d2a8ff; }
+            .vim-tag { color: #7ee787; }
+            .vim-attribute { color: #ffa657; }
+        `;
+        document.head.appendChild(vimStyles);
+
+        // Override keydown handler for vim mode
+        const originalKeydown = input.addEventListener.bind(input);
+        let vimKeyHandler = null;
+
+        input.addEventListener('keydown', async (e) => {
+            if (vimMode && vimEditor.isActive) {
+                e.preventDefault();
+                
+                const key = e.key;
+                const ctrl = e.ctrlKey;
+                const alt = e.altKey;
+                
+                const result = vimEditor.handleKey(key, ctrl, alt);
+                
+                if (result) {
+                    switch (result.type) {
+                        case 'render':
+                            output.innerHTML = vimEditor.render();
+                            break;
+                        case 'message':
+                            output.innerHTML = vimEditor.render();
+                            print(`<span class="info">${result.message}</span>`);
+                            break;
+                        case 'error':
+                            output.innerHTML = vimEditor.render();
+                            print(`<span class="error">${result.message}</span>`);
+                            break;
+                        case 'quit':
+                            vimMode = false;
+                            vimEditor.isActive = false;
+                            if (result.message) {
+                                print(`<span class="success">${result.message}</span>`);
+                            }
+                            updatePrompt();
+                            break;
+                        case 'open':
+                            output.innerHTML = vimEditor.openFile(result.filename);
+                            break;
+                        case 'new':
+                            output.innerHTML = vimEditor.newFile(result.filename);
+                            break;
+                    }
+                }
+                return;
+            }
+            
+            // Original handler logic continues...
+        });
+
         window.addEventListener('load', bootSequence);
     </script>
 </body>
