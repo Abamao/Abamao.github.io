@@ -3562,7 +3562,16 @@ ${cow}</span>`;
             if (commands[cmd]) {
                 try {
                     const result = commands[cmd].action(args);
-                    if (result !== null) print(result);
+                    // Handle async commands (Promises)
+                    if (result instanceof Promise) {
+                        result.then(res => {
+                            if (res !== null && res !== undefined) print(res);
+                        }).catch(e => {
+                            print(`<span class="error">Error: ${e.message}</span>`);
+                        });
+                    } else if (result !== null && result !== undefined) {
+                        print(result);
+                    }
                 } catch (e) {
                     print(`<span class="error">Error: ${e.message}</span>`);
                 }
