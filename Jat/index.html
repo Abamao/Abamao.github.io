@@ -1,0 +1,5107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jet Thaught</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 全局性能优化 */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 减少动画对性能的影响 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 50%, #d1d8e0 100%);
+            color: #1a1a1a;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 背景动态效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 30%, rgba(120, 160, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(180, 120, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(100, 200, 255, 0.08) 0%, transparent 60%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(2%, 2%) rotate(1deg); }
+            66% { transform: translate(-1%, 1%) rotate(-1deg); }
+        }
+
+        /* 液态玻璃效果基础类 */
+        .liquid-glass {
+            position: relative;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            animation: liquidShine 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes liquidShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .liquid-glass-strong {
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .liquid-glass-subtle {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        /* 全局过渡动画 */
+        .sidebar, .main, .chat-container, .input-area {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-right: 1px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(0);
+            will-change: transform;
+            position: relative;
+            z-index: 1;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.1),
+                inset -1px 0 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .sidebar {
+                width: 300px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .sidebar {
+                width: 340px;
+            }
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .new-chat-btn:hover {
+            border-color: #4b70e2;
+            color: #4b70e2;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(75, 112, 226, 0.15);
+        }
+
+        .new-chat-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .chat-item {
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform: translateX(0);
+            opacity: 1;
+            animation: slideInLeft 0.3s ease backwards;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid transparent;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(2px);
+            box-shadow: 0 4px 12px rgba(31, 38, 135, 0.08);
+        }
+
+        .chat-item.active {
+            background: rgba(255, 255, 255, 0.45);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateX(4px);
+            box-shadow: 
+                0 4px 16px rgba(31, 38, 135, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .chat-item-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .chat-item-title {
+            flex: 1;
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-item-delete {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+            border-radius: 4px;
+        }
+
+        .chat-item:hover .chat-item-delete {
+            opacity: 1;
+        }
+
+        .chat-item-delete:hover {
+            background: #ddd;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .sidebar-menu-btn {
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: rgba(102, 102, 102, 0.7);
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: rgba(102, 102, 102, 0.9);
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 60px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .header-actions {
+            position: absolute;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* 页面加载进度条样式 */
+        .page-loader {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            z-index: 10000;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .page-loader.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+
+        .page-loader-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 16px;
+            border-radius: 24px;
+            box-shadow: 
+                0 4px 20px rgba(31, 38, 135, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .page-loader-spinner {
+            width: 24px;
+            height: 24px;
+            color: #4b70e2;
+        }
+
+        .page-loader-text {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .page-loader-progress {
+            width: 100px;
+            height: 4px;
+            background: rgba(75, 112, 226, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page-loader-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4b70e2, #8b5cf6);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(75, 112, 226, 0.4);
+        }
+
+        .page-loader-percent {
+            font-size: 12px;
+            color: #4b70e2;
+            font-weight: 600;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .save-indicator {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .save-progress-bar {
+            width: 60px;
+            height: 3px;
+            background: #e5e5e5;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .save-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4b70e2, #6b8cff);
+            width: 0%;
+            transition: width 0.1s linear;
+            border-radius: 2px;
+        }
+
+        .save-progress-fill.animating {
+            animation: saveProgress 1s ease-in-out forwards;
+        }
+
+        @keyframes saveProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .save-status-text {
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .header-btn {
+            padding: 8px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            contain: layout style paint;
+        }
+
+        /* 自定义滚动条样式 */
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(75, 112, 226, 0.2);
+            border-radius: 3px;
+            transition: background 0.2s ease;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 112, 226, 0.4);
+        }
+
+        /* Firefox 滚动条 */
+        .chat-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(75, 112, 226, 0.2) transparent;
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .chat-container {
+                max-width: 1000px;
+                padding: 30px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .chat-container {
+                max-width: 1200px;
+                padding: 40px;
+            }
+        }
+
+        .welcome {
+            text-align: center;
+            padding: 80px 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        /* 大屏幕字体优化 */
+        @media (min-width: 1920px) {
+            .welcome h1 {
+                font-size: 36px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .welcome h1 {
+                font-size: 42px;
+            }
+        }
+
+        .welcome p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        @media (min-width: 1920px) {
+            .welcome p {
+                font-size: 18px;
+            }
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            animation: messageSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
+            contain: layout style;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+            animation: messageSlideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes messageSlideInRight {
+            from {
+                opacity: 0;
+                transform: translateY(10px) translateX(10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateX(0) scale(1);
+            }
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .message:hover .avatar {
+            transform: scale(1.05);
+        }
+
+        .message.user .avatar {
+            background: #4b70e2;
+            color: #fff;
+        }
+
+        .message.ai .avatar {
+            background: #f0f0f0;
+            color: #1a1a1a;
+        }
+
+        .message-content {
+            max-width: 100%;
+            width: auto;
+            line-height: 1.7;
+            font-size: 15px;
+            padding: 12px 16px;
+            position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 
+                0 4px 16px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .message-content:hover {
+            box-shadow: 
+                0 8px 24px rgba(31, 38, 135, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .message.user .message-content {
+            background: rgba(75, 112, 226, 0.85);
+            color: #fff;
+            border-bottom-right-radius: 6px;
+            width: auto;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 4px 16px rgba(75, 112, 226, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .message.user .message-content:hover {
+            box-shadow: 
+                0 8px 24px rgba(75, 112, 226, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .message.ai .message-content {
+            background: rgba(255, 255, 255, 0.35);
+            color: #1a1a1a;
+            border-bottom-left-radius: 6px;
+            width: 100%;
+        }
+
+        /* 大屏幕字体优化 */
+        @media (min-width: 1920px) {
+            .message-content {
+                font-size: 16px;
+                padding: 14px 18px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .message-content {
+                font-size: 17px;
+                padding: 16px 20px;
+            }
+        }
+
+        .message-actions {
+            position: absolute;
+            bottom: -44px;
+            left: 0;
+            display: none;
+            gap: 4px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        .message.user .message-actions {
+            left: auto;
+            right: 0;
+        }
+
+        .message-content:hover .message-actions {
+            display: flex;
+        }
+
+        .message-action-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .message-action-btn:hover {
+            background: #f0f0f0;
+            color: #4b70e2;
+        }
+
+        .message-action-btn.delete:hover {
+            color: #ff4d4f;
+        }
+
+        .input-area {
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 16px 20px 20px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            box-shadow: 
+                0 -4px 32px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .input-area {
+                padding: 20px 30px 24px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .input-area {
+                padding: 24px 40px 28px;
+            }
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        @media (min-width: 1920px) {
+            .input-wrapper {
+                max-width: 1000px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .input-wrapper {
+                max-width: 1200px;
+            }
+        }
+
+        .input-toolbar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tool-btn {
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 8px rgba(31, 38, 135, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .tool-btn:hover {
+            border-color: rgba(75, 112, 226, 0.4);
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 4px 12px rgba(75, 112, 226, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .tool-btn:active {
+            transform: translateY(0);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .tool-btn.active {
+            background: rgba(75, 112, 226, 0.15);
+            border-color: rgba(75, 112, 226, 0.5);
+            color: #4b70e2;
+            box-shadow:
+                0 4px 12px rgba(75, 112, 226, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .beta-badge {
+            font-size: 9px;
+            padding: 1px 4px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            border-radius: 4px;
+            margin-left: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* CSE 模式内联联想词样式 */
+        .input-wrapper-cse {
+            position: relative;
+        }
+
+        .cse-suggestion-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: transparent;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            z-index: 1;
+        }
+
+        .cse-suggestion-ghost {
+            color: rgba(150, 150, 150, 0.5);
+            pointer-events: none;
+        }
+
+        #userInput.cse-mode {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+        }
+
+        .cse-hint {
+            position: absolute;
+            right: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #999;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .cse-hint.show {
+            opacity: 1;
+        }
+
+        .search-result-modal .modal {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .header-btn:hover {
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .search-result-container {
+            margin-top: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+
+        .search-result-container.expanded {
+            max-height: 70vh;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .search-result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e5e5e5;
+            height: 56px;
+            width: auto;
+        }
+
+        .search-result-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .search-result-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-result-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+
+        .search-result-btn:hover {
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .search-result-iframe {
+            width: 100%;
+            height: calc(70vh - 60px);
+            border: none;
+            opacity: 0;
+            transition: opacity 0.3s ease 0.2s;
+        }
+
+        .search-result-container.expanded .search-result-iframe {
+            opacity: 1;
+        }
+
+        .search-preview-card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e5e5e5;
+            margin-top: 8px;
+        }
+
+        .search-preview-card:hover {
+            border-color: #4b70e2;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(75, 112, 226, 0.15);
+        }
+
+        .search-preview-card.expanded {
+            background: #eef2ff;
+            border-color: #4b70e2;
+        }
+
+        .search-preview-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-preview-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .search-preview-text {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .search-preview-query {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .search-preview-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .search-preview-arrow {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-preview-card.expanded .search-preview-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 14px;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            min-width: 240px;
+            display: none;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: dropdownFadeIn 0.2s ease;
+        }
+
+        @keyframes dropdownFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(75, 112, 226, 0.1);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 14px 14px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 14px 14px;
+        }
+
+        .dropdown-item-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .dropdown-item-content {
+            flex: 1;
+        }
+
+        .dropdown-item-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .dropdown-item-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .dropdown-item-check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d9d9d9;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item-check.checked {
+            background: #4b70e2;
+            border-color: #4b70e2;
+        }
+
+        .dropdown-item-check.checked::after {
+            content: '';
+            width: 5px;
+            height: 9px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-bottom: 2px;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background: #333;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+            z-index: 101;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #333;
+        }
+
+        .dropdown-item:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .input-box-wrapper {
+            position: relative;
+        }
+
+        /* 搜索联想词下拉框 */
+        .search-suggestions {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            box-shadow: 
+                0 -8px 32px rgba(31, 38, 135, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            max-height: 280px;
+            overflow-y: auto;
+            display: none;
+            z-index: 100;
+            animation: suggestionsSlideUp 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .search-suggestions.show {
+            display: block;
+        }
+
+        @keyframes suggestionsSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .search-suggestions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-size: 12px;
+            color: #999;
+        }
+
+        .search-suggestions-source {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .search-suggestions-list {
+            padding: 4px;
+        }
+
+        .search-suggestion-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .search-suggestion-item:hover,
+        .search-suggestion-item.active {
+            background: rgba(75, 112, 226, 0.1);
+            color: #4b70e2;
+        }
+
+        .search-suggestion-icon {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .search-suggestion-item:hover .search-suggestion-icon,
+        .search-suggestion-item.active .search-suggestion-icon {
+            color: #4b70e2;
+        }
+
+        .search-suggestion-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .search-suggestion-highlight {
+            color: #4b70e2;
+            font-weight: 500;
+        }
+
+        .input-box {
+            width: 100%;
+            min-height: 52px;
+            max-height: 200px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 14px 52px 14px 16px;
+            font-size: 15px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            box-shadow:
+                0 4px 16px rgba(31, 38, 135, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        /* 输入框自定义滚动条 - 极细设计 */
+        .input-box::-webkit-scrollbar {
+            width: 1px;
+        }
+
+        .input-box::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .input-box::-webkit-scrollbar-thumb {
+            background: rgba(75, 112, 226, 0.3);
+            border-radius: 1px;
+        }
+
+        .input-box::-webkit-scrollbar-thumb:hover {
+            background: rgba(75, 112, 226, 0.5);
+        }
+
+        /* Firefox 滚动条 */
+        .input-box {
+            scrollbar-width: none;
+        }
+
+        .input-box:focus {
+            border-color: rgba(75, 112, 226, 0.5);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 
+                0 0 0 3px rgba(75, 112, 226, 0.15), 
+                0 8px 24px rgba(75, 112, 226, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .input-box {
+                min-height: 56px;
+                font-size: 16px;
+                padding: 16px 56px 16px 18px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .input-box {
+                min-height: 60px;
+                font-size: 17px;
+                padding: 18px 60px 18px 20px;
+            }
+        }
+
+        .send-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(75, 112, 226, 0.9);
+            backdrop-filter: blur(10px) saturate(150%);
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            color: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 12px rgba(75, 112, 226, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .send-btn:hover {
+            background: rgba(75, 112, 226, 1);
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 
+                0 6px 20px rgba(75, 112, 226, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .send-btn:active {
+            transform: translateY(-50%) scale(0.95);
+            background: rgba(75, 112, 226, 0.8);
+        }
+
+        .send-btn:disabled {
+            background: rgba(200, 200, 200, 0.7);
+            border-color: rgba(255, 255, 255, 0.2);
+            cursor: not-allowed;
+            transform: translateY(-50%);
+            box-shadow: none;
+            backdrop-filter: blur(5px);
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .send-btn {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .send-btn {
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 8px 0;
+            align-items: center;
+        }
+
+        .typing span {
+            width: 6px;
+            height: 6px;
+            background: #999;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+            will-change: transform;
+        }
+
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typingBounce {
+            0%, 60%, 100% { 
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+            30% { 
+                transform: translateY(-6px) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .typing span {
+                width: 7px;
+                height: 7px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .typing span {
+                width: 8px;
+                height: 8px;
+            }
+        }
+
+        .footer-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(0px);
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(31, 38, 135, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transform: scale(0.9) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1920px) {
+            .modal {
+                max-width: 700px;
+            }
+        }
+
+        @media (min-width: 2560px) {
+            .modal {
+                max-width: 800px;
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(80vh - 140px);
+        }
+
+        .info-section {
+            margin-bottom: 24px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-item-label {
+            width: 80px;
+            font-size: 14px;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .info-item-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .protocol-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .protocol-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .protocol-item:hover {
+            background: #f0f0f0;
+        }
+
+        .protocol-item.active {
+            background: #eef2ff;
+            border: 1px solid #4b70e2;
+        }
+
+        .protocol-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d9d9d9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .protocol-item.active .protocol-radio {
+            border-color: #4b70e2;
+        }
+
+        .protocol-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #4b70e2;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .protocol-item.active .protocol-radio::after {
+            display: block;
+        }
+
+        .protocol-item:hover {
+            background: #f0f0f0;
+        }
+
+        .protocol-info {
+            flex: 1;
+        }
+
+        .protocol-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .protocol-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            border: 1px solid #d9d9d9;
+            background: #fff;
+        }
+
+        .btn-secondary:hover {
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .btn-primary {
+            border: none;
+            background: #4b70e2;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #eef2ff;
+            color: #4b70e2;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+
+        .image-gen-modal .modal {
+            max-width: 500px;
+        }
+
+        .select-group {
+            margin-bottom: 20px;
+        }
+
+        .select-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .select-box:focus {
+            border-color: #4b70e2;
+        }
+
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .style-option {
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .style-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .style-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .ratio-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .ratio-option {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ratio-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .ratio-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .ratio-icon {
+            width: 24px;
+            height: 20px;
+            border: 2px solid currentColor;
+            margin: 0 auto 4px;
+            border-radius: 2px;
+        }
+
+        .ratio-icon.portrait {
+            height: 28px;
+            width: 18px;
+        }
+
+        .ratio-icon.landscape {
+            width: 28px;
+            height: 18px;
+        }
+
+        .ratio-icon.square {
+            width: 22px;
+            height: 22px;
+        }
+
+        .model-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .model-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .model-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .model-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+        }
+
+        .model-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #d9d9d9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .model-option.selected .model-radio {
+            border-color: #4b70e2;
+        }
+
+        .model-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #4b70e2;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .model-option.selected .model-radio::after {
+            display: block;
+        }
+
+        .model-info {
+            flex: 1;
+        }
+
+        .model-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .model-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .model-tag {
+            padding: 2px 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .model-option.selected .model-tag {
+            background: #4b70e2;
+            color: #fff;
+        }
+
+        .audio-gen-modal .modal {
+            max-width: 480px;
+        }
+
+        .format-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .format-option {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .format-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .format-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .audio-style-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .audio-style-option {
+            padding: 10px 6px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .audio-style-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .audio-style-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .code-gen-modal .modal {
+            max-width: 500px;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .language-option {
+            padding: 10px 4px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .language-option:hover {
+            border-color: #4b70e2;
+        }
+
+        .language-option.selected {
+            background: #eef2ff;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .gen-desc-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .gen-desc-input:focus {
+            outline: none;
+            border-color: #4b70e2;
+        }
+
+        .gen-desc-input::placeholder {
+            color: #999;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .jet-model {
+            display: inline-block;
+            color: #4b70e2;
+            position: relative;
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity, transform;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .jet-model::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #4b70e2, #6b8cff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .jet-model:hover::after {
+            transform: scaleX(1);
+        }
+
+        .model-tooltip {
+            position: fixed;
+            background: #333;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            max-width: 300px;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            line-height: 1.6;
+        }
+
+        .model-tooltip.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .model-tooltip-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .model-tooltip-desc {
+            color: #ccc;
+        }
+
+        .legacy-models-modal .modal {
+            max-width: 650px;
+        }
+
+        .beta-agreement-modal .modal {
+            max-width: 700px;
+        }
+
+        .beta-models-modal .modal {
+            max-width: 550px;
+        }
+
+        /* CSE 模式简介弹窗样式 */
+        .cse-info-modal .modal {
+            max-width: 700px;
+        }
+
+        .cse-info-content {
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .cse-info-section {
+            margin-bottom: 28px;
+        }
+
+        .cse-info-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4b70e2;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cse-info-section p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        .cse-info-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .cse-info-section li {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        .cse-info-section li strong {
+            color: #4b70e2;
+            font-weight: 600;
+        }
+
+        .cse-info-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .beta-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            color: white;
+            border-radius: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .version-tag {
+            font-size: 11px;
+            padding: 4px 10px;
+            background: rgba(75, 112, 226, 0.1);
+            color: #4b70e2;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        /* 倒计时对话框样式 */
+        .countdown-modal .modal {
+            max-width: 420px;
+            animation: countdownModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes countdownModalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .countdown-display {
+            font-size: 64px;
+            font-weight: 200;
+            text-align: center;
+            color: #4b70e2;
+            margin: 20px 0 30px;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 4px;
+            text-shadow: 0 2px 20px rgba(75, 112, 226, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .countdown-display.active {
+            transform: scale(1.05);
+            text-shadow: 0 4px 30px rgba(75, 112, 226, 0.5);
+        }
+
+        .countdown-presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .countdown-preset-btn {
+            padding: 12px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(31, 38, 135, 0.06);
+        }
+
+        .countdown-preset-btn:hover {
+            background: rgba(75, 112, 226, 0.15);
+            border-color: rgba(75, 112, 226, 0.3);
+            color: #4b70e2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(75, 112, 226, 0.15);
+        }
+
+        .countdown-preset-btn.active {
+            background: rgba(75, 112, 226, 0.25);
+            border-color: rgba(75, 112, 226, 0.5);
+            color: #4b70e2;
+            box-shadow: 
+                0 4px 16px rgba(75, 112, 226, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .countdown-custom {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .countdown-custom label {
+            display: block;
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        .countdown-custom-input {
+            position: relative;
+        }
+
+        .countdown-custom-input input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            outline: none;
+            transition: all 0.25s ease;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .countdown-custom-input input:focus {
+            border-color: rgba(75, 112, 226, 0.4);
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 0 0 3px rgba(75, 112, 226, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .countdown-custom-input input::placeholder {
+            color: #aaa;
+        }
+
+        /* 倒计时运行中的浮动显示 */
+        .countdown-float {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: rgba(75, 112, 226, 0.9);
+            backdrop-filter: blur(20px) saturate(180%);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-size: 28px;
+            font-weight: 300;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            box-shadow: 
+                0 8px 32px rgba(75, 112, 226, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            z-index: 1000;
+            animation: countdownFloatIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes countdownFloatIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .countdown-float.hide {
+            animation: countdownFloatOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes countdownFloatOut {
+            to {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
+        }
+
+        .countdown-float-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .countdown-float-close {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            color: #4b70e2;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .countdown-float-close:hover {
+            transform: scale(1.1);
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 页面加载进度条 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="page-loader-content">
+            <div class="page-loader-spinner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="rgba(75, 112, 226, 0.2)"></circle>
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="url(#loaderGradient)" stroke-linecap="round">
+                        <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                    </path>
+                    <defs>
+                        <linearGradient id="loaderGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:#4b70e2"/>
+                            <stop offset="100%" style="stop-color:#8b5cf6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="page-loader-text">正在加载提示词API服务</div>
+            <div class="page-loader-progress">
+                <div class="page-loader-progress-bar" id="pageLoaderProgressBar"></div>
+            </div>
+            <div class="page-loader-percent" id="pageLoaderPercent">0%</div>
+        </div>
+    </div>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="createNewChat()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                新建对话
+            </button>
+        </div>
+        <div class="chat-list" id="chatList"></div>
+        <div class="sidebar-footer">
+            <button class="sidebar-menu-btn" onclick="showAbout()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                关于 Jet Thaught
+            </button>
+            <button class="sidebar-menu-btn" onclick="showProtocols()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                训练协议
+            </button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <div class="logo" id="currentChatTitle">Jet Thaught</div>
+            <div class="save-indicator" id="saveIndicator">
+                <div class="save-progress-bar">
+                    <div class="save-progress-fill" id="saveProgressFill"></div>
+                </div>
+                <span class="save-status-text" id="saveStatusText">保存中</span>
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="welcome" id="welcome">
+                <h1 class="welcome-title">与 <span class="jet-model" id="jetModelName">Jet Spus 1.0</span> 聊天</h1>
+                <p>我是 Jet Spus 1.0，由 YziStudio 全程自主研发、自主训练的初代基础版 AI，可进行日常交流与基础专业内容输出。</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <div class="input-toolbar">
+                    <div class="dropdown">
+                        <button class="tool-btn" id="thinkModeBtn" onclick="toggleThinkDropdown()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                            </svg>
+                            <span id="thinkModeText">快速</span>
+                        </button>
+                        <div class="dropdown-menu" id="thinkDropdownMenu">
+                            <div class="dropdown-item" onclick="selectThinkMode('fast')">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">快速</div>
+                                    <div class="dropdown-item-desc">Jet Fast - 快速响应</div>
+                                </div>
+                                <div class="dropdown-item-check" id="fastCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="selectThinkMode('think')">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">思考</div>
+                                    <div class="dropdown-item-desc">Jet Thaught - 深度思考</div>
+                                </div>
+                                <div class="dropdown-item-check" id="thinkCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="selectThinkMode('expert')">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">专家</div>
+                                    <div class="dropdown-item-desc">Jet Expert - 专家级分析</div>
+                                </div>
+                                <div class="dropdown-item-check" id="expertCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="selectThinkMode('research')">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">研究</div>
+                                    <div class="dropdown-item-desc">Jet X - 研究级推理</div>
+                                </div>
+                                <div class="dropdown-item-check" id="researchCheck"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="tool-btn" id="searchBtn" onclick="toggleSearchDropdown()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                            <span id="searchBtnText">联网搜索</span>
+                        </button>
+                        <div class="dropdown-menu" id="searchDropdownMenu">
+                            <div class="dropdown-item" onclick="toggleSearchMode(true, 'bing')">
+                                <div class="dropdown-item-icon">🔍</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">Bing 搜索</div>
+                                    <div class="dropdown-item-desc">使用 Bing 搜索引擎</div>
+                                </div>
+                                <div class="dropdown-item-check" id="bingSearchCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="toggleSearchMode(true, 'bilibili')">
+                                <div class="dropdown-item-icon">📺</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">Bilibili 搜索</div>
+                                    <div class="dropdown-item-desc">在 Bilibili 搜索视频</div>
+                                </div>
+                                <div class="dropdown-item-check" id="bilibiliSearchCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="toggleSearchMode(false)">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">关闭搜索</div>
+                                    <div class="dropdown-item-desc">禁用联网搜索功能</div>
+                                </div>
+                                <div class="dropdown-item-check" id="searchOffCheck"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="tool-btn" id="cseModeBtn" onclick="toggleCSEMode()" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                        <span id="cseModeText">CSE 模式</span>
+                        <span class="beta-badge">Beta</span>
+                    </button>
+                    <div class="dropdown">
+                        <button class="tool-btn" id="moreFeaturesBtn" onclick="toggleDropdown()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="19" cy="12" r="1"></circle>
+                                <circle cx="5" cy="12" r="1"></circle>
+                            </svg>
+                            更多功能
+                        </button>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <div class="dropdown-item" onclick="showImageGen()">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">图像生成</div>
+                                    <div class="dropdown-item-desc">AI 生成图片</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="showAudioGen()">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">音频生成</div>
+                                    <div class="dropdown-item-desc">AI 生成音频</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="showCodeGen()">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="16 18 22 12 16 6"></polyline>
+                                        <polyline points="8 6 2 12 8 18"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">代码编写</div>
+                                    <div class="dropdown-item-desc">AI 辅助编程</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="showLegacyModels()">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                                        <path d="M2 17l10 5 10-5"></path>
+                                        <path d="M2 12l10 5 10-5"></path>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">老旧模型</div>
+                                    <div class="dropdown-item-desc">查看历史模型版本</div>
+                                </div>
+                            </div>
+                            <div class="dropdown-item" onclick="showBetaModels()">
+                                <div class="dropdown-item-icon">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">测试模型</div>
+                                    <div class="dropdown-item-desc">Beta 版本测试通道</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-box-wrapper" id="inputBoxWrapper">
+                    <!-- CSE 模式联想词覆盖层 -->
+                    <div class="cse-suggestion-overlay" id="cseSuggestionOverlay">
+                        <span id="cseUserText"></span><span class="cse-suggestion-ghost" id="cseGhostText"></span>
+                    </div>
+                    <textarea
+                        class="input-box"
+                        id="userInput"
+                        placeholder="发送消息..."
+                        rows="1"
+                        autocomplete="off"
+                    ></textarea>
+                    <div class="cse-hint" id="cseHint">按 Tab 补全</div>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                    <!-- 搜索联想词下拉框 -->
+                    <div class="search-suggestions" id="searchSuggestions">
+                        <div class="search-suggestions-header">
+                            <span>🔍 搜索建议</span>
+                            <span class="search-suggestions-source">来自 Google</span>
+                        </div>
+                        <div class="search-suggestions-list" id="searchSuggestionsList"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-hint">内容由 AI 生成，请仔细甄别</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="aboutModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">关于 Jet Thaught</div>
+                <button class="modal-close" onclick="closeModal('aboutModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-section-title">模型信息</div>
+                    <div class="info-card">
+                        <div class="info-item">
+                            <span class="info-item-label">模型名称</span>
+                            <span class="info-item-value">Jet Thaught v1.0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">开发团队</span>
+                            <span class="info-item-value">YziStudio</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">模型类型</span>
+                            <span class="info-item-value">大规模语言模型 (LLM)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-item-label">知识截止</span>
+                            <span class="info-item-value">2026年5月</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <div class="info-section-title">能力介绍</div>
+                    <div class="info-card">
+                        <p>
+                            <span class="tag">多轮对话</span>
+                            <span class="tag">文本生成</span>
+                            <span class="tag">代码编写</span>
+                            <span class="tag">逻辑推理</span>
+                            <span class="tag">知识问答</span>
+                        </p>
+                        <p style="margin-top: 12px;">
+                            Jet Thaught 是由 YziStudio 开发的先进 AI 助手，基于深度学习技术训练而成。
+                            我能够理解和生成自然语言，帮助用户完成写作、分析、编程、翻译等多种任务。
+                        </p>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <div class="info-section-title">使用说明</div>
+                    <div class="info-card">
+                        <p>
+                            • 在输入框中输入您的问题或需求，按 Enter 发送<br>
+                            • 使用 Shift + Enter 可以换行<br>
+                            • 开启"深度思考"模式可获得更深入的分析<br>
+                            • 开启"联网搜索"可获取最新信息<br>
+                            • 左侧边栏可管理多个对话
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('aboutModal')">知道了</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="protocolModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">训练协议设置</div>
+                <button class="modal-close" onclick="closeModal('protocolModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-section-title">选择训练协议</div>
+                    <div class="protocol-list">
+                        <div class="protocol-item active" data-protocol="standard" onclick="selectProtocol('standard')">
+                            <div class="protocol-radio"></div>
+                            <div class="protocol-info">
+                                <div class="protocol-name">标准协议</div>
+                                <div class="protocol-desc">平衡的回答风格，适合日常对话和一般性任务</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" data-protocol="creative" onclick="selectProtocol('creative')">
+                            <div class="protocol-radio"></div>
+                            <div class="protocol-info">
+                                <div class="protocol-name">创意协议</div>
+                                <div class="protocol-desc">更具创造力的回答，适合写作、头脑风暴等创意任务</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" data-protocol="precise" onclick="selectProtocol('precise')">
+                            <div class="protocol-radio"></div>
+                            <div class="protocol-info">
+                                <div class="protocol-name">精确协议</div>
+                                <div class="protocol-desc">更加严谨准确的回答，适合编程、数学等技术任务</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" data-protocol="concise" onclick="selectProtocol('concise')">
+                            <div class="protocol-radio"></div>
+                            <div class="protocol-info">
+                                <div class="protocol-name">简洁协议</div>
+                                <div class="protocol-desc">简明扼要的回答，快速获取核心信息</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <div class="info-section-title">当前协议说明</div>
+                    <div class="info-card" id="protocolDesc">
+                        <p>标准协议提供平衡的回答风格，在准确性和创造性之间取得良好平衡，适合大多数日常对话场景。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('protocolModal')">取消</button>
+                <button class="btn btn-primary" onclick="applyProtocol()">应用</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay image-gen-modal" id="imageGenModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">图像生成</div>
+                <button class="modal-close" onclick="closeModal('imageGenModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="select-group">
+                    <label class="select-label">图片描述</label>
+                    <textarea class="gen-desc-input" id="imageDescInput" placeholder="描述你想要生成的图片内容，例如：一只可爱的猫咪在草地上玩耍..."></textarea>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">图片比例</label>
+                    <div class="ratio-options">
+                        <div class="ratio-option selected" data-ratio="1:1" onclick="selectRatio('1:1')">
+                            <div class="ratio-icon square"></div>
+                            <div>1:1</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="4:3" onclick="selectRatio('4:3')">
+                            <div class="ratio-icon landscape"></div>
+                            <div>4:3</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="16:9" onclick="selectRatio('16:9')">
+                            <div class="ratio-icon landscape" style="width:32px;height:18px;"></div>
+                            <div>16:9</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="3:4" onclick="selectRatio('3:4')">
+                            <div class="ratio-icon portrait"></div>
+                            <div>3:4</div>
+                        </div>
+                        <div class="ratio-option" data-ratio="9:16" onclick="selectRatio('9:16')">
+                            <div class="ratio-icon portrait" style="height:32px;width:18px;"></div>
+                            <div>9:16</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">图片风格</label>
+                    <div class="style-grid">
+                        <div class="style-option selected" data-style="写实" onclick="selectStyle('写实')">写实</div>
+                        <div class="style-option" data-style="动漫" onclick="selectStyle('动漫')">动漫</div>
+                        <div class="style-option" data-style="油画" onclick="selectStyle('油画')">油画</div>
+                        <div class="style-option" data-style="水彩" onclick="selectStyle('水彩')">水彩</div>
+                        <div class="style-option" data-style="素描" onclick="selectStyle('素描')">素描</div>
+                        <div class="style-option" data-style="像素" onclick="selectStyle('像素')">像素</div>
+                        <div class="style-option" data-style="赛博朋克" onclick="selectStyle('赛博朋克')">赛博朋克</div>
+                        <div class="style-option" data-style="复古" onclick="selectStyle('复古')">复古</div>
+                        <div class="style-option" data-style="未来主义" onclick="selectStyle('未来主义')">未来主义</div>
+                        <div class="style-option" data-style="水墨" onclick="selectStyle('水墨')">水墨</div>
+                        <div class="style-option" data-style="3D渲染" onclick="selectStyle('3D渲染')">3D渲染</div>
+                        <div class="style-option" data-style="极简" onclick="selectStyle('极简')">极简</div>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">选择模型</label>
+                    <div class="model-options">
+                        <div class="model-option selected" data-model="jetream-1.0-fast" onclick="selectModel('jetream-1.0-fast')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetream 1.0 Fast</div>
+                                <div class="model-desc">快速生成，适合简单图像</div>
+                            </div>
+                            <span class="model-tag">快速</span>
+                        </div>
+                        <div class="model-option" data-model="jetream-1.5-fast" onclick="selectModel('jetream-1.5-fast')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetream 1.5 Fast</div>
+                                <div class="model-desc">平衡速度和质量</div>
+                            </div>
+                            <span class="model-tag">推荐</span>
+                        </div>
+                        <div class="model-option" data-model="jetream-1.5-nov" onclick="selectModel('jetream-1.5-nov')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetream 1.5 Nov</div>
+                                <div class="model-desc">高质量生成，细节丰富</div>
+                            </div>
+                            <span class="model-tag">高质量</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('imageGenModal')">取消</button>
+                <button class="btn btn-primary" onclick="generateImage()">生成图片</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay audio-gen-modal" id="audioGenModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">音频生成</div>
+                <button class="modal-close" onclick="closeModal('audioGenModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="select-group">
+                    <label class="select-label">音频描述</label>
+                    <textarea class="gen-desc-input" id="audioDescInput" placeholder="描述你想要生成的音频内容，例如：一段轻快的背景音乐，适合用于产品介绍视频..."></textarea>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">选择模型</label>
+                    <div class="model-options">
+                        <div class="model-option selected" data-audio-model="jetice-1.0" onclick="selectAudioModel('jetice-1.0')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetice 1.0</div>
+                                <div class="model-desc">标准音质，快速生成</div>
+                            </div>
+                            <span class="model-tag">标准</span>
+                        </div>
+                        <div class="model-option" data-audio-model="jetice-1.0-pro" onclick="selectAudioModel('jetice-1.0-pro')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetice 1.0 Pro</div>
+                                <div class="model-desc">专业音质，适合音乐制作</div>
+                            </div>
+                            <span class="model-tag">专业</span>
+                        </div>
+                        <div class="model-option" data-audio-model="jetice-flash" onclick="selectAudioModel('jetice-flash')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetice Flash</div>
+                                <div class="model-desc">超快生成，实时预览</div>
+                            </div>
+                            <span class="model-tag">极速</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">音频风格</label>
+                    <div class="audio-style-grid">
+                        <div class="audio-style-option selected" data-audio-style="自然" onclick="selectAudioStyle('自然')">自然</div>
+                        <div class="audio-style-option" data-audio-style="温柔" onclick="selectAudioStyle('温柔')">温柔</div>
+                        <div class="audio-style-option" data-audio-style="活泼" onclick="selectAudioStyle('活泼')">活泼</div>
+                        <div class="audio-style-option" data-audio-style="沉稳" onclick="selectAudioStyle('沉稳')">沉稳</div>
+                        <div class="audio-style-option" data-audio-style="欢快" onclick="selectAudioStyle('欢快')">欢快</div>
+                        <div class="audio-style-option" data-audio-style="悲伤" onclick="selectAudioStyle('悲伤')">悲伤</div>
+                        <div class="audio-style-option" data-audio-style="激昂" onclick="selectAudioStyle('激昂')">激昂</div>
+                        <div class="audio-style-option" data-audio-style="神秘" onclick="selectAudioStyle('神秘')">神秘</div>
+                        <div class="audio-style-option" data-audio-style="浪漫" onclick="selectAudioStyle('浪漫')">浪漫</div>
+                        <div class="audio-style-option" data-audio-style="史诗" onclick="selectAudioStyle('史诗')">史诗</div>
+                        <div class="audio-style-option" data-audio-style="电子" onclick="selectAudioStyle('电子')">电子</div>
+                        <div class="audio-style-option" data-audio-style="古典" onclick="selectAudioStyle('古典')">古典</div>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">输出格式</label>
+                    <div class="format-options">
+                        <div class="format-option selected" data-format="mp3" onclick="selectFormat('mp3')">MP3</div>
+                        <div class="format-option" data-format="wav" onclick="selectFormat('wav')">WAV</div>
+                        <div class="format-option" data-format="flac" onclick="selectFormat('flac')">FLAC</div>
+                        <div class="format-option" data-format="aac" onclick="selectFormat('aac')">AAC</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('audioGenModal')">取消</button>
+                <button class="btn btn-primary" onclick="generateAudio()">生成音频</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay code-gen-modal" id="codeGenModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">代码编写</div>
+                <button class="modal-close" onclick="closeModal('codeGenModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="select-group">
+                    <label class="select-label">代码描述</label>
+                    <textarea class="gen-desc-input" id="codeDescInput" placeholder="描述你想要生成的代码功能，例如：编写一个Python函数，实现快速排序算法..."></textarea>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">编程语言</label>
+                    <div class="language-grid">
+                        <div class="language-option selected" data-lang="Python" onclick="selectLanguage('Python')">Python</div>
+                        <div class="language-option" data-lang="JavaScript" onclick="selectLanguage('JavaScript')">JavaScript</div>
+                        <div class="language-option" data-lang="HTML" onclick="selectLanguage('HTML')">HTML</div>
+                        <div class="language-option" data-lang="CSS" onclick="selectLanguage('CSS')">CSS</div>
+                        <div class="language-option" data-lang="Java" onclick="selectLanguage('Java')">Java</div>
+                        <div class="language-option" data-lang="C++" onclick="selectLanguage('C++')">C++</div>
+                        <div class="language-option" data-lang="Go" onclick="selectLanguage('Go')">Go</div>
+                        <div class="language-option" data-lang="Rust" onclick="selectLanguage('Rust')">Rust</div>
+                        <div class="language-option" data-lang="TypeScript" onclick="selectLanguage('TypeScript')">TypeScript</div>
+                        <div class="language-option" data-lang="SQL" onclick="selectLanguage('SQL')">SQL</div>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">选择模型</label>
+                    <div class="model-options">
+                        <div class="model-option selected" data-code-model="jetcode-1.0" onclick="selectCodeModel('jetcode-1.0')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetcode 1.0</div>
+                                <div class="model-desc">标准代码生成，适合日常编程</div>
+                            </div>
+                            <span class="model-tag">标准</span>
+                        </div>
+                        <div class="model-option" data-code-model="jetcode-1.0-pro" onclick="selectCodeModel('jetcode-1.0-pro')">
+                            <div class="model-radio"></div>
+                            <div class="model-info">
+                                <div class="model-name">Jetcode 1.0 Pro</div>
+                                <div class="model-desc">专业代码生成，优化性能与可读性</div>
+                            </div>
+                            <span class="model-tag">专业</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('codeGenModal')">取消</button>
+                <button class="btn btn-primary" onclick="generateCode()">生成代码</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay legacy-models-modal" id="legacyModelsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">老旧模型</div>
+                <button class="modal-close" onclick="closeModal('legacyModelsModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-section-title">历史模型版本</div>
+                    <div class="protocol-list">
+                        <div class="protocol-item">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Ember 0.1</div>
+                                <div class="protocol-desc">初代实验性语言模型，基础对话能力测试版</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2024年3月15日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Forge Beta</div>
+                                <div class="protocol-desc">早期文本生成模型，专注于创意写作和故事创作</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2024年7月22日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Lattice 2.7</div>
+                                <div class="protocol-desc">结构化数据处理模型，擅长表格和逻辑推理任务</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2024年11月8日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Cortex 4B-C</div>
+                                <div class="protocol-desc">紧凑型40亿参数模型，优化移动端部署性能</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2025年1月19日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s;" onclick="switchToLegacyModel('nova')">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Nova 7 <span style="display: inline-block; padding: 1px 6px; background: #4b70e2; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">可使用</span></div>
+                                <div class="protocol-desc">第七代通用语言模型，多语言支持和知识问答能力显著提升</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2025年4月3日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s;" onclick="switchToLegacyModel('horizon')">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Horizon 12L <span style="display: inline-block; padding: 1px 6px; background: #4b70e2; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">可使用</span></div>
+                                <div class="protocol-desc">12层深度神经网络模型，长上下文理解和记忆能力增强</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2025年6月28日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s;" onclick="switchToLegacyModel('resonance')">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Resonance R1 <span style="display: inline-block; padding: 1px 6px; background: #4b70e2; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">可使用</span></div>
+                                <div class="protocol-desc">共振架构第一代，情感理解和共情能力专项优化</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2025年9月14日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Apex 56X</div>
+                                <div class="protocol-desc">56层超深网络实验模型，极致推理能力但资源消耗巨大</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2025年12月5日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s;" onclick="switchToLegacyModel('flux')">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Flux 0.86π <span style="display: inline-block; padding: 1px 6px; background: #4b70e2; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">可使用</span></div>
+                                <div class="protocol-desc">流式架构测试版，引入数学常数优化的注意力机制</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">发布日期：2026年2月18日</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('legacyModelsModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay beta-agreement-modal" id="betaAgreementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Jet Beta 版本用户协议</div>
+                <button class="modal-close" onclick="closeModal('betaAgreementModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="font-size: 12px; color: #999; margin-bottom: 16px;">最后更新：2026年5月17日</div>
+                
+                <div class="info-section">
+                    <div class="info-section-title">1. 欢迎使用</div>
+                    <div class="info-card">
+                        <p>感谢你参与 Jet Beta 版本的测试。使用中国最强算力集群训练，目前处于Beta测试阶段。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">2. Beta 版本特别声明</div>
+                    <div class="info-card">
+                        <p><strong>2.1 非最终版本：</strong>本模型仍在持续优化中，可能存在以下问题：</p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 幻觉（Hallucination）<br>• 推理不一致<br>• 特定领域知识缺失或过时</p>
+                        <p style="margin-top: 12px;"><strong>2.2 测试目的：</strong>你使用 Beta 版本的主要目的是协助我们发现问题、改进模型，而非获得稳定的生产级服务。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">3. 使用限制</div>
+                    <div class="info-card">
+                        <p><strong>3.1 禁止行为：</strong></p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 对模型进行逆向工程、提取参数、复现训练<br>• 使用模型生成违法、暴力、色情、恐怖、骚扰等内容<br>• 用于任何侵犯他人知识产权或隐私的活动<br>• 尝试通过提示注入等方式绕过模型安全对齐</p>
+                        <p style="margin-top: 12px;"><strong>3.2 算力资源：</strong>Beta 版本可能对单用户设置频率限制（如 QPS、日调用量），具体以系统实际执行为准。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">4. 数据与隐私</div>
+                    <div class="info-card">
+                        <p><strong>4.1 输入数据处理：</strong></p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 你在 Beta 版本中输入的所有内容，可能被记录用于模型改进、错误分析和安全研究<br>• 请勿输入任何敏感个人信息、商业秘密、国家秘密</p>
+                        <p style="margin-top: 12px;"><strong>4.2 输出数据：</strong></p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 模型生成的内容仅供参考，不构成任何专业建议（法律、医疗、金融等）<br>• 你对输出内容的使用及传播，自行承担全部责任</p>
+                        <p style="margin-top: 12px;"><strong>4.3 数据保留：</strong>Beta 测试期间的数据可能保留最长 90 天用于分析，之后可能被删除或脱敏处理。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">5. 性能免责声明</div>
+                    <div class="info-card">
+                        <p><strong>5.1 不作保证：</strong>本模型按"现状"提供，不提供任何明示或暗示的保证，包括但不限于：适销性、特定用途的适用性、不侵权、准确性、可靠性、及时性</p>
+                        <p style="margin-top: 12px;"><strong>5.2 不适用生产环境：</strong>Beta 版本强烈不建议用于任何生产系统、业务关键场景、生命相关决策或金融交易。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">6. 服务变更与终止</div>
+                    <div class="info-card">
+                        <p><strong>6.1 我们保留随时：</strong></p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 修改 Beta 版本功能<br>• 限制或终止单个用户的访问<br>• 停止 Beta 测试服务</p>
+                        <p style="margin-top: 8px;">的权利，恕不逐一提前通知。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">7. 责任限制</div>
+                    <div class="info-card">
+                        <p>在法律允许的最大范围内，我们不对以下任何损失承担责任：</p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 间接损失、附带损失、特殊损失<br>• 利润损失、数据丢失<br>• 因使用或无法使用 Beta 版本导致的任何损害</p>
+                        <p style="margin-top: 8px;">无论你是否已被告知此类损害的可能性。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">8. 反馈与贡献</div>
+                    <div class="info-card">
+                        <p><strong>8.1</strong> 如果你向 Jet Func 提供关于 Beta 版本的错误报告、建议、改进思路（统称"反馈"），则：</p>
+                        <p style="margin-top: 8px; padding-left: 16px;">• 你同意该反馈可被我们自由使用、修改、整合，无需向你支付任何费用或署名<br>• 你保留你提交内容中原本属于你的知识产权，但授权我们实施所需的权利</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">9. 适用法律与争议解决</div>
+                    <div class="info-card">
+                        <p>本协议受中华人民共和国法律管辖。因本协议产生的任何争议，应首先通过友好协商解决；协商不成的，提交深度求索公司住所地有管辖权的人民法院诉讼解决。</p>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">10. 协议接受</div>
+                    <div class="info-card">
+                        <p>使用 Jet Beta 版本，即表示你已阅读、理解并同意本协议的全部条款。</p>
+                        <p style="margin-top: 8px;">如果你不同意任何条款，请立即停止使用并删除所有与 Beta 版本相关的材料。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('betaAgreementModal')">拒绝</button>
+                <button class="btn btn-primary" onclick="acceptBetaAgreement()">同意并继续</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay search-result-modal" id="searchResultModal">
+        <div class="modal" style="max-width: 900px; width: 90%; height: 80vh;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span id="searchResultTitle">搜索结果</span>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button class="header-btn" onclick="openSearchInBrowser()" style="font-size: 12px; padding: 6px 12px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px;">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        在浏览器打开
+                    </button>
+                    <button class="modal-close" onclick="closeModal('searchResultModal')">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body" style="padding: 0; flex: 1; overflow: hidden;">
+                <iframe id="searchResultIframe" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay beta-models-modal" id="betaModelsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Beta 模型列表</div>
+                <button class="modal-close" onclick="closeModal('betaModelsModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-section-title">可用测试模型</div>
+                    <div class="protocol-list">
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s;" onclick="switchToBetaModel()">
+                            <div class="protocol-info">
+                                <div class="protocol-name">Jet Func (Beta) <span style="display: inline-block; padding: 1px 6px; background: #ff6b35; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">Beta</span></div>
+                                <div class="protocol-desc">最新测试版模型，持续优化中</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">版本：Beta v0.1 | 更新于：2026年5月17日</div>
+                            </div>
+                        </div>
+                        <div class="protocol-item" style="cursor: pointer; transition: all 0.2s; margin-top: 8px;" onclick="switchToJetNetModel()">
+                            <div class="protocol-info">
+                                <div class="protocol-name">JetNet <span style="display: inline-block; padding: 1px 6px; background: #4b70e2; color: #fff; border-radius: 3px; font-size: 10px; margin-left: 6px;">Beta</span></div>
+                                <div class="protocol-desc">优化上网性能，网络搜索与信息获取能力增强</div>
+                                <div style="margin-top: 4px; font-size: 11px; color: #999;">版本：Beta v0.2 | 更新于：2026年5月18日</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <div class="info-card" style="background: #fff3e0; border-left: 3px solid #ff6b35;">
+                        <p style="font-size: 13px; color: #e65100;">⚠️ Beta 版本可能存在不稳定情况，仅供测试使用。如发现任何问题，欢迎向我们反馈。</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('betaModelsModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="model-tooltip" id="modelTooltip">
+        <div class="model-tooltip-title" id="modelTooltipTitle"></div>
+        <div class="model-tooltip-desc" id="modelTooltipDesc"></div>
+    </div>
+
+    <!-- 倒计时选择对话框 -->
+    <div class="modal-overlay countdown-modal" id="countdownModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">⏱️ 设置倒计时</div>
+                <button class="modal-close" onclick="closeModal('countdownModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="countdown-display" id="countdownDisplay">00:00</div>
+                <div class="countdown-presets">
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(1)">1分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(3)">3分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(5)">5分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(10)">10分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(15)">15分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(25)">25分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(30)">30分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(45)">45分钟</button>
+                    <button class="countdown-preset-btn" onclick="setCountdownTime(60)">1小时</button>
+                </div>
+                <div class="countdown-custom">
+                    <label>自定义时间（分钟）</label>
+                    <div class="countdown-custom-input">
+                        <input type="number" id="customMinutes" min="1" max="180" placeholder="输入分钟数" oninput="updateCustomCountdown(this.value)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('countdownModal')">取消</button>
+                <button class="btn btn-primary" onclick="startCountdown()">开始倒计时</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        // 从 localStorage 加载对话数据
+        function loadChatsFromStorage() {
+            try {
+                const savedChats = localStorage.getItem('jet_thought_chats');
+                const savedCurrentChatId = localStorage.getItem('jet_thought_current_chat_id');
+                if (savedChats) {
+                    return {
+                        chats: JSON.parse(savedChats),
+                        currentChatId: savedCurrentChatId
+                    };
+                }
+            } catch (e) {
+                console.error('加载对话数据失败:', e);
+            }
+            return { chats: [], currentChatId: null };
+        }
+
+        // 保存对话数据到 localStorage
+        function saveChatsToStorage() {
+            const indicator = document.getElementById('saveIndicator');
+            const progressFill = document.getElementById('saveProgressFill');
+            const statusText = document.getElementById('saveStatusText');
+            
+            // 显示进度条
+            indicator.classList.add('show');
+            progressFill.classList.remove('animating');
+            void progressFill.offsetWidth; // 强制重排
+            progressFill.classList.add('animating');
+            statusText.textContent = '保存中';
+            
+            try {
+                localStorage.setItem('jet_thought_chats', JSON.stringify(chats));
+                localStorage.setItem('jet_thought_current_chat_id', currentChatId || '');
+                
+                // 1秒后显示完成并隐藏
+                setTimeout(() => {
+                    statusText.textContent = '已保存';
+                    setTimeout(() => {
+                        indicator.classList.remove('show');
+                        // 重置进度条
+                        setTimeout(() => {
+                            progressFill.classList.remove('animating');
+                        }, 300);
+                    }, 500);
+                }, 1000);
+            } catch (e) {
+                console.error('保存对话数据失败:', e);
+                statusText.textContent = '保存失败';
+                setTimeout(() => {
+                    indicator.classList.remove('show');
+                }, 1500);
+            }
+        }
+
+        // 页面加载进度条控制
+        function initPageLoader() {
+            const pageLoader = document.getElementById('pageLoader');
+            const progressBar = document.getElementById('pageLoaderProgressBar');
+            const percentText = document.getElementById('pageLoaderPercent');
+            
+            let progress = 0;
+            const duration = 2000; // 2秒
+            const interval = 100; // 每100ms更新一次
+            const increment = 100 / (duration / interval);
+            
+            const timer = setInterval(() => {
+                progress += increment;
+                
+                // 添加一些随机波动让进度更自然
+                if (Math.random() > 0.7) {
+                    progress += Math.random() * 2;
+                }
+                
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(timer);
+                    
+                    // 加载完成，隐藏进度条
+                    setTimeout(() => {
+                        pageLoader.classList.add('hidden');
+                    }, 300);
+                }
+                
+                progressBar.style.width = progress + '%';
+                percentText.textContent = Math.floor(progress) + '%';
+            }, interval);
+        }
+
+        // 启动页面加载进度条
+        initPageLoader();
+
+        // 初始化数据
+        const storedData = loadChatsFromStorage();
+        let chats = storedData.chats;
+        let currentChatId = storedData.currentChatId;
+        let isProcessing = false;
+        let searchEnabled = false;
+        let deepThinkEnabled = false;
+        let currentProtocol = 'standard';
+        let cseModeEnabled = false;
+        let cseSuggestions = [];
+        let cseSuggestionIndex = 0;
+
+        // 搜索源配置
+        const searchSources = {
+            bing: { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: '🔍' },
+            bilibili: { name: 'Bilibili', url: 'https://search.bilibili.com/all?keyword=', icon: '📺' }
+        };
+        let currentSearchSource = 'bing';
+
+        const protocols = {
+            standard: {
+                name: '标准协议',
+                desc: '标准协议提供平衡的回答风格，在准确性和创造性之间取得良好平衡，适合大多数日常对话场景。'
+            },
+            creative: {
+                name: '创意协议',
+                desc: '创意协议激发更多想象力和创造力，回答更加生动有趣，适合写作、故事创作、头脑风暴等需要灵感的任务。'
+            },
+            precise: {
+                name: '精确协议',
+                desc: '精确协议注重准确性和逻辑性，回答更加严谨详细，适合编程、数学、科学研究等技术性任务。'
+            },
+            concise: {
+                name: '简洁协议',
+                desc: '简洁协议追求言简意赅，直接给出核心要点，适合快速获取信息、摘要总结等场景。'
+            }
+        };
+
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const welcome = document.getElementById('welcome');
+        const chatList = document.getElementById('chatList');
+        const currentChatTitle = document.getElementById('currentChatTitle');
+        const searchBtn = document.getElementById('searchBtn');
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function createNewChat() {
+            const chat = {
+                id: generateId(),
+                title: '新对话',
+                messages: [],
+                createdAt: Date.now()
+            };
+            chats.unshift(chat);
+            currentChatId = chat.id;
+            saveChatsToStorage();
+            renderChatList();
+            renderCurrentChat();
+        }
+
+        function switchChat(chatId) {
+            currentChatId = chatId;
+            saveChatsToStorage();
+            renderChatList();
+            renderCurrentChat();
+        }
+
+        function deleteChat(chatId, event) {
+            event.stopPropagation();
+            chats = chats.filter(c => c.id !== chatId);
+            if (currentChatId === chatId) {
+                currentChatId = chats.length > 0 ? chats[0].id : null;
+            }
+            saveChatsToStorage();
+            renderChatList();
+            renderCurrentChat();
+        }
+
+        function renderChatList() {
+            chatList.innerHTML = '';
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'chat-item' + (chat.id === currentChatId ? ' active' : '');
+                item.onclick = () => switchChat(chat.id);
+                
+                item.innerHTML = `
+                    <svg class="chat-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="chat-item-title">${chat.title}</span>
+                    <span class="chat-item-delete" onclick="deleteChat('${chat.id}', event)">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </span>
+                `;
+                chatList.appendChild(item);
+            });
+        }
+
+        function renderCurrentChat() {
+            chatContainer.innerHTML = '';
+            
+            if (!currentChatId) {
+                welcome.style.display = 'block';
+                chatContainer.appendChild(welcome);
+                currentChatTitle.textContent = 'Jet Thaught';
+                return;
+            }
+
+            const chat = chats.find(c => c.id === currentChatId);
+            if (!chat) return;
+
+            currentChatTitle.textContent = chat.title;
+
+            if (chat.messages.length === 0) {
+                welcome.style.display = 'block';
+                chatContainer.appendChild(welcome);
+            } else {
+                welcome.style.display = 'none';
+                chat.messages.forEach(msg => {
+                    const msgId = msg.id || generateId();
+                    if (!msg.id) msg.id = msgId;
+                    
+                    // 如果有搜索 HTML，使用特殊渲染
+                    if (msg.searchHtml) {
+                        renderSearchMessage(msg, msgId);
+                    } else {
+                        addMessageToUI(msg.content, msg.isUser, false, msgId);
+                    }
+                });
+            }
+        }
+
+        // 渲染包含搜索结果的消息
+        function renderSearchMessage(msg, msgId) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai';
+            msgDiv.id = 'msg-' + msgId;
+            msgDiv.dataset.messageId = msgId;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // 提取纯文本内容（去掉 [搜索结果] 标记）
+            const textContent = msg.content.replace('\n\n[搜索结果]', '');
+            
+            // 创建文本节点
+            const textNode = document.createTextNode(textContent);
+            contentDiv.appendChild(textNode);
+            
+            // 添加搜索 HTML（iframe 会处于休眠状态）
+            const searchWrapper = document.createElement('div');
+            searchWrapper.innerHTML = msg.searchHtml;
+            
+            // 让 iframe 进入休眠状态（清空 src）
+            const iframe = searchWrapper.querySelector('iframe');
+            if (iframe) {
+                iframe.dataset.src = iframe.src || 'about:blank';
+                iframe.src = 'about:blank';
+                iframe.classList.add('sleeping');
+            }
+            
+            contentDiv.appendChild(searchWrapper);
+
+            // 添加操作按钮
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            actionsDiv.innerHTML = `
+                <button class="message-action-btn" onclick="copyMessage('${msgId}')" title="复制">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+                <button class="message-action-btn delete" onclick="deleteMessage('${msgId}')" title="删除">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                </button>
+            `;
+            contentDiv.appendChild(actionsDiv);
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function addMessageToUI(content, isUser, animate = true, messageId = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + (isUser ? 'user' : 'ai');
+            if (animate) msgDiv.style.animation = 'fadeIn 0.2s ease';
+            if (messageId) msgDiv.dataset.messageId = messageId;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = isUser ? '我' : 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // 创建文本节点
+            const textNode = document.createTextNode(content);
+            contentDiv.appendChild(textNode);
+
+            // 添加操作按钮
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            
+            // 复制按钮
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'message-action-btn';
+            copyBtn.title = '复制';
+            copyBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            `;
+            copyBtn.onclick = () => copyMessage(content, copyBtn);
+            
+            // 删除按钮
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'message-action-btn delete';
+            deleteBtn.title = '删除';
+            deleteBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            `;
+            deleteBtn.onclick = () => deleteMessage(messageId || generateId());
+            
+            actionsDiv.appendChild(copyBtn);
+            actionsDiv.appendChild(deleteBtn);
+            contentDiv.appendChild(actionsDiv);
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function copyMessage(content, btn) {
+            navigator.clipboard.writeText(content).then(() => {
+                // 显示成功提示
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4b70e2" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                `;
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 1500);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                showToast('复制失败，请手动复制');
+            });
+        }
+
+        function deleteMessage(messageId) {
+            const chat = chats.find(c => c.id === currentChatId);
+            if (!chat) return;
+
+            // 从 UI 中找到对应的消息元素
+            const msgElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (!msgElement) {
+                // 如果没有 ID，尝试通过内容匹配
+                const allMessages = Array.from(chatContainer.querySelectorAll('.message'));
+                for (let i = 0; i < allMessages.length; i++) {
+                    const contentDiv = allMessages[i].querySelector('.message-content');
+                    if (contentDiv) {
+                        const textContent = contentDiv.childNodes[0]?.textContent?.trim();
+                        const matchingMsg = chat.messages.find(msg => msg.content === textContent);
+                        if (matchingMsg) {
+                            chat.messages.splice(i, 1);
+                            allMessages[i].remove();
+                            break;
+                        }
+                    }
+                }
+            } else {
+                // 通过 ID 找到索引并删除
+                const contentDiv = msgElement.querySelector('.message-content');
+                if (contentDiv) {
+                    const textContent = contentDiv.childNodes[0]?.textContent?.trim();
+                    const messageIndex = chat.messages.findIndex(msg => msg.content === textContent);
+                    if (messageIndex !== -1) {
+                        chat.messages.splice(messageIndex, 1);
+                        msgElement.remove();
+                    }
+                }
+            }
+
+            // 如果所有消息都被删除，显示欢迎页面
+            if (chat.messages.length === 0) {
+                welcome.style.display = 'block';
+                chatContainer.appendChild(welcome);
+            }
+            
+            saveChatsToStorage();
+        }
+
+        function showTyping() {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai';
+            msgDiv.id = 'typing';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        // 打字机效果 - 每秒50个字符
+        async function typewriterEffect(text, messageId = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ai';
+            if (messageId) msgDiv.dataset.messageId = messageId;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            // 创建文本节点用于打字效果
+            const textNode = document.createTextNode('');
+            contentDiv.appendChild(textNode);
+
+            // 添加操作按钮
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'message-action-btn';
+            copyBtn.title = '复制';
+            copyBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+            `;
+            copyBtn.onclick = () => copyMessage(text, copyBtn);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'message-action-btn delete';
+            deleteBtn.title = '删除';
+            deleteBtn.innerHTML = `
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            `;
+            deleteBtn.onclick = () => deleteMessage(messageId || generateId());
+            
+            actionsDiv.appendChild(copyBtn);
+            actionsDiv.appendChild(deleteBtn);
+            contentDiv.appendChild(actionsDiv);
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(contentDiv);
+            chatContainer.appendChild(msgDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            const charsPerSecond = 50;
+            const delayPerChar = 1000 / charsPerSecond;
+
+            for (let i = 0; i < text.length; i++) {
+                textNode.textContent += text[i];
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                await new Promise(r => setTimeout(r, delayPerChar));
+            }
+        }
+
+        let searchDropdownOpen = false;
+
+        function toggleSearchDropdown() {
+            searchDropdownOpen = !searchDropdownOpen;
+            document.getElementById('searchDropdownMenu').classList.toggle('show', searchDropdownOpen);
+            updateSearchDropdownChecks();
+        }
+
+        function toggleSearchMode(enabled, source = 'bing') {
+            searchEnabled = enabled;
+            const cseModeBtn = document.getElementById('cseModeBtn');
+
+            if (enabled) {
+                currentSearchSource = source;
+                searchBtn.classList.add('active');
+                const sourceInfo = searchSources[source];
+                document.getElementById('searchBtnText').textContent = sourceInfo.name;
+                // 显示 CSE 模式按钮
+                if (cseModeBtn) cseModeBtn.style.display = 'flex';
+            } else {
+                searchBtn.classList.remove('active');
+                document.getElementById('searchBtnText').textContent = '联网搜索';
+                // 隐藏 CSE 模式按钮并关闭 CSE 模式
+                if (cseModeBtn) {
+                    cseModeBtn.style.display = 'none';
+                    // 如果 CSE 模式开启，则关闭它
+                    if (cseModeEnabled) {
+                        toggleCSEMode();
+                    }
+                }
+            }
+            searchDropdownOpen = false;
+            document.getElementById('searchDropdownMenu').classList.remove('show');
+        }
+
+        // CSE 模式切换
+        function toggleCSEMode() {
+            cseModeEnabled = !cseModeEnabled;
+            const cseModeBtn = document.getElementById('cseModeBtn');
+            const userInput = document.getElementById('userInput');
+            const inputBoxWrapper = document.getElementById('inputBoxWrapper');
+
+            if (cseModeEnabled) {
+                cseModeBtn.classList.add('active');
+                userInput.classList.add('cse-mode');
+                inputBoxWrapper.classList.add('input-wrapper-cse');
+            } else {
+                cseModeBtn.classList.remove('active');
+                userInput.classList.remove('cse-mode');
+                inputBoxWrapper.classList.remove('input-wrapper-cse');
+                hideCSESuggestion();
+            }
+        }
+
+        // 显示 CSE 联想词
+        function showCSESuggestion(userText, suggestion) {
+            const overlay = document.getElementById('cseSuggestionOverlay');
+            const userTextSpan = document.getElementById('cseUserText');
+            const ghostTextSpan = document.getElementById('cseGhostText');
+            const hint = document.getElementById('cseHint');
+
+            userTextSpan.textContent = userText;
+            ghostTextSpan.textContent = suggestion.substring(userText.length);
+            overlay.style.display = 'flex';
+            hint.classList.add('show');
+        }
+
+        // 隐藏 CSE 联想词
+        function hideCSESuggestion() {
+            const overlay = document.getElementById('cseSuggestionOverlay');
+            const hint = document.getElementById('cseHint');
+            overlay.style.display = 'none';
+            hint.classList.remove('show');
+        }
+
+        // CSE 模式 Tab 补全
+        function handleCSETabCompletion() {
+            if (!cseModeEnabled || cseSuggestions.length === 0) return false;
+
+            const userInput = document.getElementById('userInput');
+            const currentText = userInput.value;
+
+            // 获取当前建议词
+            const suggestion = cseSuggestions[cseSuggestionIndex];
+
+            // 补全文本
+            userInput.value = suggestion;
+
+            // 移动到下一个建议
+            cseSuggestionIndex = (cseSuggestionIndex + 1) % cseSuggestions.length;
+
+            // 更新显示
+            if (cseSuggestions.length > 1) {
+                const nextSuggestion = cseSuggestions[cseSuggestionIndex];
+                showCSESuggestion(suggestion, nextSuggestion);
+            } else {
+                hideCSESuggestion();
+            }
+
+            // 触发输入事件以调整高度
+            userInput.dispatchEvent(new Event('input'));
+
+            return true;
+        }
+
+        function updateSearchDropdownChecks() {
+            document.getElementById('bingSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'bing');
+            document.getElementById('bilibiliSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'bilibili');
+            document.getElementById('searchOffCheck').classList.toggle('checked', !searchEnabled);
+        }
+
+        let thinkDropdownOpen = false;
+        let dropdownOpen = false;
+        let currentThinkMode = 'fast';
+
+        const thinkModes = {
+            fast: { name: '快速', model: 'Jet Spus 1.0', desc: '快速响应' },
+            think: { name: '思考', model: 'Jet Thaught', desc: '深度思考' },
+            expert: { name: '专家', model: 'Jet Expert', desc: '专家级分析' },
+            research: { name: '研究', model: 'Jet X', desc: '研究级推理' },
+            beta: { name: 'Beta', model: 'Jet Func (Beta)', desc: '测试版模型' },
+            nova: { name: 'Nova', model: 'Jet Nova 7', desc: '第七代通用模型' },
+            horizon: { name: 'Horizon', model: 'Jet Horizon 12L', desc: '长上下文理解' },
+            resonance: { name: 'Resonance', model: 'Jet Resonance R1', desc: '情感共情优化' },
+            flux: { name: 'Flux', model: 'Jet Flux 0.86π', desc: '流式架构测试版' },
+            jetnet: { name: 'JetNet', model: 'JetNet', desc: '优化上网性能的Beta模型' }
+        };
+
+        function toggleThinkDropdown() {
+            thinkDropdownOpen = !thinkDropdownOpen;
+            document.getElementById('thinkDropdownMenu').classList.toggle('show', thinkDropdownOpen);
+        }
+
+        function selectThinkMode(mode) {
+            currentThinkMode = mode;
+            document.getElementById('thinkModeText').textContent = thinkModes[mode].name;
+            
+            // 清除所有复选框
+            document.querySelectorAll('#thinkDropdownMenu .dropdown-item-check').forEach(check => check.classList.remove('checked'));
+            
+            // 只在下拉菜单中有对应选项时才设置复选框
+            const checkElement = document.getElementById(mode + 'Check');
+            if (checkElement) {
+                checkElement.classList.add('checked');
+            }
+            
+            thinkDropdownOpen = false;
+            document.getElementById('thinkDropdownMenu').classList.remove('show');
+            
+            if (mode === 'expert' || mode === 'research') {
+                searchEnabled = true;
+                searchBtn.classList.add('active');
+            }
+            
+            updateWelcomeTitle(mode);
+        }
+
+        function updateWelcomeTitle(mode) {
+            const jetModelName = document.getElementById('jetModelName');
+            if (jetModelName && jetModelName.textContent !== thinkModes[mode].model) {
+                // 淡出并向上移动
+                jetModelName.style.opacity = '0';
+                jetModelName.style.transform = 'translateY(-10px) scale(0.95)';
+                
+                // 等待动画完成后更新文本
+                setTimeout(() => {
+                    jetModelName.textContent = thinkModes[mode].model;
+                    
+                    // 强制重排以确保动画生效
+                    void jetModelName.offsetWidth;
+                    
+                    // 淡入并恢复正常位置，带轻微弹跳效果
+                    jetModelName.style.opacity = '1';
+                    jetModelName.style.transform = 'translateY(0) scale(1)';
+                }, 300);
+            }
+        }
+
+        function toggleDropdown() {
+            dropdownOpen = !dropdownOpen;
+            document.getElementById('dropdownMenu').classList.toggle('show', dropdownOpen);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                thinkDropdownOpen = false;
+                dropdownOpen = false;
+                searchDropdownOpen = false;
+                document.getElementById('thinkDropdownMenu').classList.remove('show');
+                document.getElementById('dropdownMenu').classList.remove('show');
+                document.getElementById('searchDropdownMenu').classList.remove('show');
+            }
+        });
+
+        let imageGenSettings = {
+            ratio: '1:1',
+            style: '写实',
+            model: 'jetream-1.0-fast'
+        };
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #333;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showLegacyModels() {
+            dropdownOpen = false;
+            document.getElementById('dropdownMenu').classList.remove('show');
+            document.getElementById('legacyModelsModal').classList.add('show');
+        }
+
+        function showBetaModels() {
+            dropdownOpen = false;
+            document.getElementById('dropdownMenu').classList.remove('show');
+            // 检查是否已经同意过协议
+            const hasAccepted = localStorage.getItem('betaAgreementAccepted');
+            if (hasAccepted === 'true') {
+                document.getElementById('betaModelsModal').classList.add('show');
+            } else {
+                document.getElementById('betaAgreementModal').classList.add('show');
+            }
+        }
+
+        function acceptBetaAgreement() {
+            localStorage.setItem('betaAgreementAccepted', 'true');
+            closeModal('betaAgreementModal');
+            document.getElementById('betaModelsModal').classList.add('show');
+        }
+
+        function switchToBetaModel() {
+            // 切换到 Beta 模型
+            selectThinkMode('beta');
+            closeModal('betaModelsModal');
+            showToast('已切换到 Jet Func (Beta)');
+        }
+
+        function switchToJetNetModel() {
+            // 切换到 JetNet 模型
+            selectThinkMode('jetnet');
+            closeModal('betaModelsModal');
+            showToast('已切换到 JetNet');
+        }
+
+        function switchToLegacyModel(modelKey) {
+            // 切换到对应的老旧模型
+            selectThinkMode(modelKey);
+            // 关闭弹窗
+            closeModal('legacyModelsModal');
+            // 显示提示
+            showToast(`已切换到 ${thinkModes[modelKey].model}`);
+        }
+
+        function showImageGen() {
+            dropdownOpen = false;
+            document.getElementById('dropdownMenu').classList.remove('show');
+            document.getElementById('imageGenModal').classList.add('show');
+        }
+
+        function selectRatio(ratio) {
+            imageGenSettings.ratio = ratio;
+            document.querySelectorAll('.ratio-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-ratio="${ratio}"]`).classList.add('selected');
+        }
+
+        function selectStyle(style) {
+            imageGenSettings.style = style;
+            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-style="${style}"]`).classList.add('selected');
+        }
+
+        function selectModel(model) {
+            imageGenSettings.model = model;
+            document.querySelectorAll('.model-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-model="${model}"]`).classList.add('selected');
+        }
+
+        let audioGenSettings = {
+            model: 'jetice-1.0',
+            style: '自然',
+            format: 'mp3'
+        };
+
+        function showAudioGen() {
+            dropdownOpen = false;
+            document.getElementById('dropdownMenu').classList.remove('show');
+            document.getElementById('audioGenModal').classList.add('show');
+        }
+
+        function selectAudioModel(model) {
+            audioGenSettings.model = model;
+            document.querySelectorAll('[data-audio-model]').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-audio-model="${model}"]`).classList.add('selected');
+        }
+
+        function selectAudioStyle(style) {
+            audioGenSettings.style = style;
+            document.querySelectorAll('[data-audio-style]').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-audio-style="${style}"]`).classList.add('selected');
+        }
+
+        function selectFormat(format) {
+            audioGenSettings.format = format;
+            document.querySelectorAll('[data-format]').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-format="${format}"]`).classList.add('selected');
+        }
+
+        async function generateAudio() {
+            const descInput = document.getElementById('audioDescInput');
+            const prompt = descInput.value.trim() || '生成一段音频';
+            
+            closeModal('audioGenModal');
+            descInput.value = '';
+            
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            const modelName = audioGenSettings.model === 'jetice-1.0' ? 'Jetice 1.0' :
+                              audioGenSettings.model === 'jetice-1.0-pro' ? 'Jetice 1.0 Pro' : 'Jetice Flash';
+            
+            isProcessing = true;
+            sendBtn.disabled = true;
+
+            const chat = chats.find(c => c.id === currentChatId);
+            const userMsgId = generateId();
+            chat.messages.push({ content: `[音频生成] ${prompt}（${audioGenSettings.style}风格，${modelName}，${audioGenSettings.format.toUpperCase()}）`, isUser: true, id: userMsgId });
+            
+            if (welcome) welcome.style.display = 'none';
+            addMessageToUI(`[音频生成] ${prompt}（${audioGenSettings.style}风格，${modelName}，${audioGenSettings.format.toUpperCase()}）`, true, true, userMsgId);
+            updateChatTitle(currentChatId, prompt);
+
+            showTyping();
+
+            await new Promise(r => setTimeout(r, 2500 + Math.random() * 1500));
+
+            removeTyping();
+
+            const response = '音频生成服务繁忙，请稍后再试。';
+            const aiMsgId = generateId();
+            chat.messages.push({ content: response, isUser: false, id: aiMsgId });
+            addMessageToUI(response, false, true, aiMsgId);
+
+            saveChatsToStorage();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        let codeGenSettings = {
+            language: 'Python',
+            model: 'jetcode-1.0'
+        };
+
+        function showCodeGen() {
+            dropdownOpen = false;
+            document.getElementById('dropdownMenu').classList.remove('show');
+            document.getElementById('codeGenModal').classList.add('show');
+        }
+
+        function selectLanguage(lang) {
+            codeGenSettings.language = lang;
+            document.querySelectorAll('[data-lang]').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-lang="${lang}"]`).classList.add('selected');
+        }
+
+        function selectCodeModel(model) {
+            codeGenSettings.model = model;
+            document.querySelectorAll('[data-code-model]').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-code-model="${model}"]`).classList.add('selected');
+        }
+
+        async function generateCode() {
+            const descInput = document.getElementById('codeDescInput');
+            const prompt = descInput.value.trim() || '编写一段代码';
+            
+            closeModal('codeGenModal');
+            descInput.value = '';
+            
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            const modelName = codeGenSettings.model === 'jetcode-1.0' ? 'Jetcode 1.0' : 'Jetcode 1.0 Pro';
+            
+            isProcessing = true;
+            sendBtn.disabled = true;
+
+            const chat = chats.find(c => c.id === currentChatId);
+            const userMsgId = generateId();
+            chat.messages.push({ content: `[代码编写] ${prompt}（${codeGenSettings.language}，${modelName}）`, isUser: true, id: userMsgId });
+            
+            if (welcome) welcome.style.display = 'none';
+            addMessageToUI(`[代码编写] ${prompt}（${codeGenSettings.language}，${modelName}）`, true, true, userMsgId);
+            updateChatTitle(currentChatId, prompt);
+
+            showTyping();
+
+            await new Promise(r => setTimeout(r, 2000 + Math.random() * 1500));
+
+            removeTyping();
+
+            const response = '代码生成服务繁忙，请稍后再试。';
+            const aiMsgId = generateId();
+            chat.messages.push({ content: response, isUser: false, id: aiMsgId });
+            addMessageToUI(response, false, true, aiMsgId);
+
+            saveChatsToStorage();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        async function generateImage() {
+            const descInput = document.getElementById('imageDescInput');
+            const prompt = descInput.value.trim() || '生成一张图片';
+            
+            closeModal('imageGenModal');
+            descInput.value = '';
+            
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            const modelName = imageGenSettings.model === 'jetream-1.0-fast' ? 'Jetream 1.0 Fast' :
+                              imageGenSettings.model === 'jetream-1.5-fast' ? 'Jetream 1.5 Fast' : 'Jetream 1.5 Nov';
+            
+            isProcessing = true;
+            sendBtn.disabled = true;
+
+            const chat = chats.find(c => c.id === currentChatId);
+            const userMsgId = generateId();
+            chat.messages.push({ content: `[图像生成] ${prompt}（${imageGenSettings.style}风格，${imageGenSettings.ratio}，${modelName}）`, isUser: true, id: userMsgId });
+            
+            if (welcome) welcome.style.display = 'none';
+            addMessageToUI(`[图像生成] ${prompt}（${imageGenSettings.style}风格，${imageGenSettings.ratio}，${modelName}）`, true, true, userMsgId);
+            updateChatTitle(currentChatId, prompt);
+
+            showTyping();
+
+            await new Promise(r => setTimeout(r, 3000 + Math.random() * 2000));
+
+            removeTyping();
+
+            const response = '图像生成服务繁忙，请稍后再试。';
+            const aiMsgId = generateId();
+            chat.messages.push({ content: response, isUser: false, id: aiMsgId });
+            addMessageToUI(response, false, true, aiMsgId);
+
+            saveChatsToStorage();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        function updateChatTitle(chatId, firstMessage) {
+            const chat = chats.find(c => c.id === chatId);
+            if (chat && chat.title === '新对话') {
+                chat.title = firstMessage.slice(0, 20) + (firstMessage.length > 20 ? '...' : '');
+                saveChatsToStorage();
+                renderChatList();
+            }
+        }
+
+        function showAbout() {
+            document.getElementById('aboutModal').classList.add('show');
+        }
+
+        function showProtocols() {
+            document.getElementById('protocolModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 倒计时功能
+        let countdownTime = 0;
+        let countdownInterval = null;
+        let countdownFloatElement = null;
+
+        function showCountdownModal() {
+            countdownTime = 0;
+            updateCountdownDisplay();
+            document.querySelectorAll('.countdown-preset-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('customMinutes').value = '';
+            document.getElementById('countdownModal').classList.add('show');
+        }
+
+        function setCountdownTime(minutes) {
+            countdownTime = minutes * 60;
+            updateCountdownDisplay();
+            
+            // 更新按钮状态
+            document.querySelectorAll('.countdown-preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(minutes + '分钟') || (minutes === 60 && btn.textContent.includes('1小时'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // 清除自定义输入
+            document.getElementById('customMinutes').value = '';
+            
+            // 添加动画效果
+            const display = document.getElementById('countdownDisplay');
+            display.classList.add('active');
+            setTimeout(() => display.classList.remove('active'), 300);
+        }
+
+        function updateCustomCountdown(value) {
+            const minutes = parseInt(value) || 0;
+            if (minutes > 0 && minutes <= 180) {
+                countdownTime = minutes * 60;
+                updateCountdownDisplay();
+                
+                // 清除预设按钮选中状态
+                document.querySelectorAll('.countdown-preset-btn').forEach(btn => btn.classList.remove('active'));
+            }
+        }
+
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(countdownTime / 60);
+            const seconds = countdownTime % 60;
+            document.getElementById('countdownDisplay').textContent = 
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        }
+
+        function startCountdown() {
+            if (countdownTime <= 0) {
+                // 如果没有选择时间，默认5分钟
+                countdownTime = 300;
+            }
+            
+            closeModal('countdownModal');
+            
+            // 创建浮动倒计时显示
+            createCountdownFloat();
+            
+            // 添加AI消息提示
+            const minutes = Math.floor(countdownTime / 60);
+            const seconds = countdownTime % 60;
+            const timeText = minutes > 0 ? `${minutes}分${seconds > 0 ? seconds + '秒' : ''}` : `${seconds}秒`;
+            
+            const chat = chats.find(c => c.id === currentChatId);
+            const aiMsgId = generateId();
+            const responseText = `⏱️ 倒计时已开始！已为您设置 **${timeText}** 的倒计时。`;
+            
+            chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+            addMessageToUI(responseText, false, true, aiMsgId);
+            saveChatsToStorage();
+            
+            // 开始倒计时
+            countdownInterval = setInterval(() => {
+                countdownTime--;
+                updateCountdownFloat();
+                
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    showCountdownComplete();
+                }
+            }, 1000);
+        }
+
+        function createCountdownFloat() {
+            // 移除已有的倒计时显示
+            if (countdownFloatElement) {
+                countdownFloatElement.remove();
+            }
+            
+            countdownFloatElement = document.createElement('div');
+            countdownFloatElement.className = 'countdown-float';
+            countdownFloatElement.innerHTML = `
+                <button class="countdown-float-close" onclick="stopCountdown()">×</button>
+                <div class="countdown-float-label">倒计时</div>
+                <div id="countdownFloatTime">00:00</div>
+            `;
+            document.body.appendChild(countdownFloatElement);
+            updateCountdownFloat();
+        }
+
+        function updateCountdownFloat() {
+            if (!countdownFloatElement) return;
+            
+            const minutes = Math.floor(countdownTime / 60);
+            const seconds = countdownTime % 60;
+            const timeStr = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            document.getElementById('countdownFloatTime').textContent = timeStr;
+        }
+
+        function stopCountdown() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+            
+            if (countdownFloatElement) {
+                countdownFloatElement.classList.add('hide');
+                setTimeout(() => {
+                    if (countdownFloatElement) {
+                        countdownFloatElement.remove();
+                        countdownFloatElement = null;
+                    }
+                }, 400);
+            }
+            
+            // 添加AI消息提示
+            const chat = chats.find(c => c.id === currentChatId);
+            const aiMsgId = generateId();
+            const responseText = '⏹️ 倒计时已取消。';
+            
+            chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+            addMessageToUI(responseText, false, true, aiMsgId);
+            saveChatsToStorage();
+        }
+
+        function showCountdownComplete() {
+            if (countdownFloatElement) {
+                countdownFloatElement.classList.add('hide');
+                setTimeout(() => {
+                    if (countdownFloatElement) {
+                        countdownFloatElement.remove();
+                        countdownFloatElement = null;
+                    }
+                }, 400);
+            }
+            
+            // 播放提示音（如果浏览器支持）
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (e) {
+                // 音频播放失败，静默处理
+            }
+            
+            // 添加AI消息提示
+            const chat = chats.find(c => c.id === currentChatId);
+            const aiMsgId = generateId();
+            const responseText = '✅ 倒计时结束！时间到了。';
+            
+            chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+            addMessageToUI(responseText, false, true, aiMsgId);
+            saveChatsToStorage();
+        }
+
+        function selectProtocol(protocol) {
+            currentProtocol = protocol;
+            document.querySelectorAll('.protocol-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-protocol="${protocol}"]`).classList.add('active');
+            document.getElementById('protocolDesc').innerHTML = `<p>${protocols[protocol].desc}</p>`;
+        }
+
+        function applyProtocol() {
+            closeModal('protocolModal');
+        }
+
+        function toggleSearchResult(containerId, searchUrl) {
+            const container = document.getElementById(containerId);
+            const isExpanded = container.classList.contains('expanded');
+            const previewCard = container.previousElementSibling;
+            
+            if (isExpanded) {
+                container.classList.remove('expanded');
+                previewCard.classList.remove('expanded');
+                // 让 iframe 进入休眠状态（释放资源）
+                const iframe = container.querySelector('iframe');
+                if (iframe) {
+                    iframe.dataset.src = iframe.src;
+                    iframe.src = 'about:blank';
+                    iframe.classList.add('sleeping');
+                }
+            } else {
+                container.classList.add('expanded');
+                previewCard.classList.add('expanded');
+                // 唤醒 iframe（恢复加载）
+                const iframe = container.querySelector('iframe');
+                if (iframe) {
+                    // 延迟加载iframe，确保动画流畅
+                    setTimeout(() => {
+                        // 如果有保存的 src，使用它；否则使用传入的 searchUrl
+                        const savedSrc = iframe.dataset.src;
+                        if (savedSrc && savedSrc !== 'about:blank') {
+                            iframe.src = savedSrc;
+                        } else {
+                            iframe.src = searchUrl;
+                        }
+                        iframe.classList.remove('sleeping');
+                    }, 300);
+                }
+            }
+        }
+
+        function openSearchInNewTab(searchUrl) {
+            window.open(searchUrl, '_blank');
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text || isProcessing) return;
+
+            if (!currentChatId) {
+                createNewChat();
+            }
+
+            isProcessing = true;
+            userInput.value = '';
+            userInput.style.height = 'auto';
+            sendBtn.disabled = true;
+
+            const chat = chats.find(c => c.id === currentChatId);
+            const userMsgId = generateId();
+            chat.messages.push({ content: text, isUser: true, id: userMsgId });
+            
+            if (welcome) welcome.style.display = 'none';
+            addMessageToUI(text, true, true, userMsgId);
+            updateChatTitle(currentChatId, text);
+
+            showTyping();
+
+            let delay = 1500 + Math.random() * 1000;
+            if (deepThinkEnabled) delay += 2000;
+            if (protocols[currentProtocol].name === '精确协议') delay += 1000;
+            await new Promise(r => setTimeout(r, delay));
+
+            removeTyping();
+
+            // 根据用户输入生成回复
+            let responseText;
+            const lowerText = text.toLowerCase();
+            
+            // 联网搜索模式
+            if (searchEnabled) {
+                const sourceInfo = searchSources[currentSearchSource];
+                const searchUrl = sourceInfo.url + encodeURIComponent(text);
+                const containerId = 'search-result-' + generateId();
+                
+                responseText = `我已经为你在 **${sourceInfo.name}** 找到这些信息。`;
+                
+                // 添加搜索链接消息（直接在页面展开显示）
+                const searchMessageHtml = `<div class="search-preview-card" onclick="toggleSearchResult('${containerId}', '${searchUrl}')">
+                    <div class="search-preview-header">
+                        <div class="search-preview-info">
+                            <span style="font-size: 18px;">${sourceInfo.icon}</span>
+                            <div class="search-preview-text">
+                                <div class="search-preview-query">${text}</div>
+                                <div class="search-preview-hint">点击展开搜索结果</div>
+                            </div>
+                        </div>
+                        <svg class="search-preview-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b70e2" stroke-width="2">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </div>
+                </div>
+                <div class="search-result-container" id="${containerId}">
+                    <div class="search-result-header">
+                        <div class="search-result-title">
+                            <span>${sourceInfo.icon}</span>
+                            <span>${sourceInfo.name} 搜索结果</span>
+                        </div>
+                        <div class="search-result-actions">
+                            <button class="search-result-btn" onclick="event.stopPropagation(); openSearchInNewTab('${searchUrl}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                                新窗口打开
+                            </button>
+                            <button class="search-result-btn" onclick="event.stopPropagation(); toggleSearchResult('${containerId}', '${searchUrl}')">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                                收起
+                            </button>
+                        </div>
+                    </div>
+                    <iframe class="search-result-iframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+                </div>`;
+                
+                const aiMsgId = generateId();
+                chat.messages.push({ content: responseText + '\n\n[搜索结果]', isUser: false, id: aiMsgId, searchHtml: searchMessageHtml });
+                
+                // 添加AI消息到UI
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'message ai';
+                msgDiv.id = 'msg-' + aiMsgId;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                avatar.textContent = 'AI';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.innerHTML = responseText + searchMessageHtml;
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                actionsDiv.innerHTML = `
+                    <button class="message-action-btn" onclick="copyMessage('${aiMsgId}')" title="复制">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                    <button class="message-action-btn" onclick="deleteMessage('${aiMsgId}')" title="删除">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                `;
+                contentDiv.appendChild(actionsDiv);
+                
+                msgDiv.appendChild(avatar);
+                msgDiv.appendChild(contentDiv);
+                chatContainer.appendChild(msgDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+            } else if (lowerText.includes('你是谁') || lowerText.includes('你叫什么') || lowerText.includes('介绍一下自己')) {
+                responseText = '我是 Jet Spus 1.0，由 YziStudio 全程自主研发、自主训练的初代基础版 AI，应答风格沉稳正式，可进行日常交流与基础专业内容输出，严格恪守各项行为与伦理准则。';
+                const aiMsgId = generateId();
+                await typewriterEffect(responseText, aiMsgId);
+                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+            } else if (lowerText.includes('倒计时')) {
+                // 检测是否包含时间单位
+                const hasTimeUnit = /(\d+\s*(分钟|分|秒|小时|时|毫秒|ms|min|hour|sec)|\d+[:：]\d+(:\d+)?)/i.test(text);
+                
+                if (hasTimeUnit) {
+                    responseText = '请再说一遍您需要倒计时几分钟？';
+                } else {
+                    responseText = '请您说一下你需要倒计时几分钟，这样我才能为您倒计时。';
+                }
+                const aiMsgId = generateId();
+                await typewriterEffect(responseText, aiMsgId);
+                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+                
+                // 显示倒计时选择对话框
+                setTimeout(() => showCountdownModal(), 500);
+            } else {
+                responseText = '感谢您的提问。作为 Jet Spus 1.0，我已收到您的消息，正在处理中。目前系统处于演示模式，完整功能即将上线。';
+                const aiMsgId = generateId();
+                await typewriterEffect(responseText, aiMsgId);
+                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+            }
+
+            saveChatsToStorage();
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        // 搜索联想词功能
+        let searchSuggestionTimeout = null;
+        let currentSuggestions = [];
+        let selectedSuggestionIndex = -1;
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        const searchSuggestionsList = document.getElementById('searchSuggestionsList');
+
+        // 使用百度搜索建议 API（JSONP 方式绕过 CORS）
+        let jsonpCallbackId = 0;
+        
+        function fetchSearchSuggestions(query) {
+            // 只有在联网搜索开启时才获取联想词
+            if (!searchEnabled) {
+                hideSearchSuggestions();
+                if (cseModeEnabled) hideCSESuggestion();
+                return;
+            }
+
+            if (!query || query.length < 2) {
+                hideSearchSuggestions();
+                if (cseModeEnabled) hideCSESuggestion();
+                return;
+            }
+
+            // 创建唯一的回调函数名
+            const callbackName = 'baiduSugCallback_' + (++jsonpCallbackId);
+
+            // 创建 script 标签
+            const script = document.createElement('script');
+            script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(query)}&cb=${callbackName}`;
+
+            // 定义回调函数
+            window[callbackName] = function(data) {
+                if (data && data.s && data.s.length > 0) {
+                    currentSuggestions = data.s.slice(0, 8); // 最多显示8条
+
+                    // CSE 模式下使用内联显示
+                    if (cseModeEnabled) {
+                        cseSuggestions = data.s;
+                        cseSuggestionIndex = 0;
+                        showCSESuggestion(query, cseSuggestions[0]);
+                        hideSearchSuggestions();
+                    } else {
+                        renderSearchSuggestions(currentSuggestions, query);
+                    }
+                } else {
+                    hideSearchSuggestions();
+                    if (cseModeEnabled) hideCSESuggestion();
+                }
+
+                // 清理
+                delete window[callbackName];
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+            };
+
+            // 错误处理
+            script.onerror = function() {
+                console.log('Baidu suggestions API failed');
+                hideSearchSuggestions();
+                if (cseModeEnabled) hideCSESuggestion();
+                delete window[callbackName];
+                if (script.parentNode) {
+                    script.parentNode.removeChild(script);
+                }
+            };
+
+            // 设置超时
+            setTimeout(function() {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    if (script.parentNode) {
+                        script.parentNode.removeChild(script);
+                    }
+                    hideSearchSuggestions();
+                    if (cseModeEnabled) hideCSESuggestion();
+                }
+            }, 5000);
+
+            document.head.appendChild(script);
+        }
+
+        function renderSearchSuggestions(suggestions, query) {
+            if (suggestions.length === 0) {
+                hideSearchSuggestions();
+                return;
+            }
+
+            searchSuggestionsList.innerHTML = suggestions.map((suggestion, index) => {
+                // 高亮匹配部分
+                const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+                const highlightedText = suggestion.replace(regex, '<span class="search-suggestion-highlight">$1</span>');
+                
+                return `
+                    <div class="search-suggestion-item" data-index="${index}" onclick="selectSuggestion('${escapeHtml(suggestion)}')">
+                        <div class="search-suggestion-icon">🔍</div>
+                        <div class="search-suggestion-text">${highlightedText}</div>
+                    </div>
+                `;
+            }).join('');
+
+            searchSuggestions.classList.add('show');
+            selectedSuggestionIndex = -1;
+        }
+
+        function hideSearchSuggestions() {
+            searchSuggestions.classList.remove('show');
+            currentSuggestions = [];
+            selectedSuggestionIndex = -1;
+        }
+
+        function selectSuggestion(suggestion) {
+            userInput.value = suggestion;
+            hideSearchSuggestions();
+            userInput.focus();
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // 键盘导航
+        userInput.addEventListener('keydown', function(e) {
+            // CSE 模式 Tab 补全
+            if (e.key === 'Tab' && cseModeEnabled && cseSuggestions.length > 0) {
+                e.preventDefault();
+                handleCSETabCompletion();
+                return;
+            }
+
+            if (searchSuggestions.classList.contains('show')) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, currentSuggestions.length - 1);
+                    updateSuggestionSelection();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+                    updateSuggestionSelection();
+                } else if (e.key === 'Enter') {
+                    if (selectedSuggestionIndex >= 0 && currentSuggestions[selectedSuggestionIndex]) {
+                        e.preventDefault();
+                        selectSuggestion(currentSuggestions[selectedSuggestionIndex]);
+                        return;
+                    }
+                } else if (e.key === 'Escape') {
+                    hideSearchSuggestions();
+                }
+            }
+
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function updateSuggestionSelection() {
+            const items = searchSuggestionsList.querySelectorAll('.search-suggestion-item');
+            items.forEach((item, index) => {
+                if (index === selectedSuggestionIndex) {
+                    item.classList.add('active');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+
+            // 更新 CSE 模式下的用户文本显示
+            if (cseModeEnabled) {
+                const value = this.value;
+                document.getElementById('cseUserText').textContent = value;
+                // 如果输入被清空，隐藏联想词
+                if (!value || value.length < 2) {
+                    hideCSESuggestion();
+                    cseSuggestions = [];
+                }
+            }
+
+            // 防抖获取搜索建议
+            clearTimeout(searchSuggestionTimeout);
+            const value = this.value.trim();
+
+            if (value.length >= 2) {
+                searchSuggestionTimeout = setTimeout(() => {
+                    fetchSearchSuggestions(value);
+                }, 200); // 200ms 防抖
+            } else {
+                hideSearchSuggestions();
+                if (cseModeEnabled) hideCSESuggestion();
+            }
+        });
+
+        // 点击其他地方隐藏搜索建议
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.input-box-wrapper')) {
+                hideSearchSuggestions();
+            }
+        });
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('show');
+                }
+            });
+        });
+
+        // 模型简介 tooltip 功能
+        const jetModelName = document.getElementById('jetModelName');
+        const modelTooltip = document.getElementById('modelTooltip');
+        const modelTooltipTitle = document.getElementById('modelTooltipTitle');
+        const modelTooltipDesc = document.getElementById('modelTooltipDesc');
+        let tooltipTimeout = null;
+
+        if (jetModelName) {
+            jetModelName.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // 获取当前模型信息
+                const currentMode = currentThinkMode || 'fast';
+                const modelInfo = thinkModes[currentMode];
+                
+                if (modelInfo) {
+                    modelTooltipTitle.textContent = modelInfo.model;
+                    modelTooltipDesc.textContent = modelInfo.desc;
+                    
+                    // 计算位置
+                    const rect = jetModelName.getBoundingClientRect();
+                    const tooltipWidth = 300;
+                    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+                    let top = rect.bottom + 10;
+                    
+                    // 确保不超出屏幕
+                    if (left < 10) left = 10;
+                    if (left + tooltipWidth > window.innerWidth - 10) {
+                        left = window.innerWidth - tooltipWidth - 10;
+                    }
+                    
+                    modelTooltip.style.left = left + 'px';
+                    modelTooltip.style.top = top + 'px';
+                    modelTooltip.classList.add('show');
+                    
+                    // 3秒后自动隐藏
+                    if (tooltipTimeout) clearTimeout(tooltipTimeout);
+                    tooltipTimeout = setTimeout(() => {
+                        modelTooltip.classList.remove('show');
+                    }, 3000);
+                }
+            });
+        }
+
+        // 点击其他地方关闭 tooltip
+        document.addEventListener('click', () => {
+            if (modelTooltip) {
+                modelTooltip.classList.remove('show');
+            }
+        });
+
+        renderChatList();
+        renderCurrentChat();
+        userInput.focus();
+
+        // CSE 模式按钮右键事件
+        const cseModeBtn = document.getElementById('cseModeBtn');
+        if (cseModeBtn) {
+            cseModeBtn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                showCSEInfoModal();
+            });
+        }
+
+        // 显示 CSE 模式简介弹窗
+        function showCSEInfoModal() {
+            const modal = document.getElementById('cseInfoModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        // 关闭 CSE 模式简介弹窗
+        function closeCSEInfoModal() {
+            const modal = document.getElementById('cseInfoModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
+
+    <!-- CSE 模式简介弹窗 -->
+    <div class="modal-overlay" id="cseInfoModal">
+        <div class="modal cse-info-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    CSE 模式 - Context Select Engine
+                </div>
+                <button class="modal-close" onclick="closeCSEInfoModal()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="cse-info-content">
+                    <div class="cse-info-section">
+                        <h3>🎯 什么是 CSE 模式？</h3>
+                        <p>CSE（Context Select Engine，上下文选择引擎）是 Jet Thaught 平台推出的一项创新性智能输入辅助功能。该模式旨在通过深度学习用户的输入上下文，结合先进的搜索引擎联想词技术，为用户提供更加流畅、高效的对话体验。CSE 模式不仅仅是一个简单的自动补全工具，它代表了人机交互领域的一次重要突破，将传统的搜索建议与现代 AI 对话系统完美融合。</p>
+                    </div>
+
+                    <div class="cse-info-section">
+                        <h3>🔧 核心技术原理</h3>
+                        <p>CSE 模式的核心在于其独特的"内联联想"（Inline Suggestion）技术。与传统的下拉式搜索建议不同，CSE 模式将联想词直接嵌入到输入框的光标位置，以灰色半透明文本的形式呈现。这种设计借鉴了现代代码编辑器中的 IntelliSense 和 GitHub Copilot 的交互理念，让用户能够在不打断输入流程的情况下，实时预览和选择最合适的词汇。</p>
+                        <p>系统通过分析用户输入的每一个字符，实时调用百度搜索建议 API，获取与用户意图高度相关的联想词汇。这些词汇经过智能排序后，以循环队列的形式呈现给用户。当用户按下 Tab 键时，系统会自动将当前显示的联想词补全到输入框中，同时切换到下一个候选词，实现了无缝的循环选择体验。</p>
+                    </div>
+
+                    <div class="cse-info-section">
+                        <h3>⚡ 功能特性详解</h3>
+                        <ul>
+                            <li><strong>实时上下文感知：</strong>CSE 模式能够实时分析用户的输入内容，理解当前的对话上下文，从而提供更加精准的建议。无论是日常闲聊、专业咨询还是技术讨论，系统都能快速适应并提供相关词汇。</li>
+                            <li><strong>Tab 循环补全：</strong>用户可以通过简单的 Tab 键操作，在多个联想词之间快速切换。这种设计极大地提高了输入效率，特别是在移动设备上，避免了频繁的手指移动。</li>
+                            <li><strong>视觉层次分明：</strong>用户已输入的文本保持正常颜色显示，而联想词部分则以灰色半透明呈现，形成了清晰的视觉层次。这种设计既不会干扰用户的输入视线，又能提供足够的信息提示。</li>
+                            <li><strong>智能防抖机制：</strong>为了避免频繁的 API 调用，CSE 模式内置了 200 毫秒的防抖机制。系统会在用户停止输入后才发起联想请求，既保证了实时性，又优化了性能。</li>
+                            <li><strong>无缝模式切换：</strong>用户可以随时开启或关闭 CSE 模式，系统会在两种状态之间平滑过渡，不会中断当前的对话流程。</li>
+                        </ul>
+                    </div>
+
+                    <div class="cse-info-section">
+                        <h3>🚀 应用场景</h3>
+                        <p>CSE 模式适用于多种使用场景。在信息查询场景中，用户可以快速补全搜索关键词，获取更准确的搜索结果；在内容创作场景中，系统能够提供相关的专业术语和表达方式，辅助用户完成高质量的内容输出；在学习研究场景中，CSE 模式可以帮助用户发现相关的知识点和概念，拓展思维的广度。</p>
+                    </div>
+
+                    <div class="cse-info-section">
+                        <h3>🔮 未来展望</h3>
+                        <p>作为 Beta 版本，CSE 模式目前还处于持续优化阶段。未来，我们计划引入更多的个性化特性，包括用户习惯学习、领域特定词汇库、多语言支持等。同时，我们也在探索将 CSE 技术与大型语言模型更深度的结合，使其不仅能够提供词汇级别的建议，还能提供句子级别甚至段落级别的智能补全。</p>
+                        <p>Context Select Engine 代表了 Jet Thaught 平台在提升用户体验方面的不懈追求。我们相信，随着技术的不断演进，CSE 模式将成为智能对话系统中不可或缺的核心组件，为用户带来前所未有的交互体验。</p>
+                    </div>
+
+                    <div class="cse-info-footer">
+                        <span class="beta-tag">Beta 版本</span>
+                        <span class="version-tag">v1.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
