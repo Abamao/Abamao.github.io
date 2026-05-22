@@ -313,6 +313,378 @@
             right: 20px;
             display: flex;
             gap: 8px;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .install-cse-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #4b70e2 0%, #6b8cff 100%);
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(75, 112, 226, 0.3);
+        }
+
+        .install-cse-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(75, 112, 226, 0.4);
+        }
+
+        .install-cse-btn:active {
+            transform: translateY(0);
+        }
+
+        .install-cse-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .cse-install-progress {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            background: rgba(75, 112, 226, 0.1);
+            border-radius: 20px;
+        }
+
+        .cse-progress-bar {
+            width: 80px;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .cse-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4b70e2 0%, #6b8cff 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .cse-progress-text {
+            font-size: 11px;
+            color: #4b70e2;
+            font-weight: 500;
+            min-width: 28px;
+        }
+
+        .cse-control-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        .cse-control-btn:hover {
+            background: rgba(75, 112, 226, 0.1);
+        }
+
+        .cse-control-btn.pause {
+            color: #ff9800;
+        }
+
+        .cse-control-btn.play {
+            color: #4caf50;
+        }
+
+        .cse-control-btn.cancel {
+            color: #f44336;
+        }
+
+        .cse-control-btn.minimize {
+            color: #666;
+        }
+
+        .cse-control-btn.expand {
+            color: #4b70e2;
+        }
+
+        .cse-control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .storage-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(75, 112, 226, 0.3);
+            color: #4b70e2;
+        }
+
+        .storage-btn svg {
+            color: #4b70e2;
+        }
+
+        .storage-usage {
+            font-weight: 500;
+        }
+
+        .storage-usage.warning {
+            color: #ff9800;
+        }
+
+        .storage-usage.danger {
+            color: #f44336;
+        }
+
+        /* 存储空间管理模态框样式 */
+        .storage-modal .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .storage-overview {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .storage-total-bar {
+            height: 12px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .storage-used-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4b70e2 0%, #6b8cff 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        .storage-used-bar.warning {
+            background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .storage-used-bar.danger {
+            background: linear-gradient(90deg, #f44336 0%, #ff5722 100%);
+        }
+
+        .storage-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .storage-section {
+            margin-bottom: 24px;
+        }
+
+        .storage-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .storage-allocation {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .allocation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .allocation-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .allocation-select {
+            padding: 6px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .allocation-select:focus {
+            border-color: #4b70e2;
+        }
+
+        .storage-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .storage-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .storage-detail-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateX(4px);
+        }
+
+        .detail-icon {
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(75, 112, 226, 0.1);
+            border-radius: 8px;
+        }
+
+        .detail-info {
+            flex: 1;
+        }
+
+        .detail-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .detail-size {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+
+        .detail-action {
+            padding: 6px 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #666;
+        }
+
+        .detail-action:hover {
+            background: #f5f5f5;
+            border-color: #4b70e2;
+            color: #4b70e2;
+        }
+
+        .detail-action.danger {
+            color: #f44336;
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+
+        .detail-action.danger:hover {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+
+        .storage-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .storage-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 16px 8px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .storage-action-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: #4b70e2;
+            color: #4b70e2;
+            transform: translateY(-2px);
+        }
+
+        .storage-action-btn.danger {
+            color: #f44336;
+            border-color: rgba(244, 67, 54, 0.2);
+        }
+
+        .storage-action-btn.danger:hover {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+
+        .storage-action-btn span:first-child {
+            font-size: 20px;
+        }
+
+        /* 缓存清除后的搜索结果显示 */
+        .search-cache-cleared {
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        .search-cache-cleared a {
+            color: #4b70e2;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .search-cache-cleared a:hover {
+            color: #6b8cff;
         }
 
         /* 页面加载进度条样式 */
@@ -517,6 +889,28 @@
             to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
             }
         }
 
@@ -832,6 +1226,7 @@
         /* CSE 模式内联联想词样式 */
         .input-wrapper-cse {
             position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .cse-suggestion-overlay {
@@ -855,12 +1250,29 @@
         .cse-suggestion-ghost {
             color: rgba(150, 150, 150, 0.5);
             pointer-events: none;
+            animation: ghostFadeIn 0.3s ease;
+        }
+
+        @keyframes ghostFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         #userInput.cse-mode {
             position: relative;
             z-index: 2;
             background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        #userInput.cse-mode:focus {
+            box-shadow: 0 0 0 3px rgba(75, 112, 226, 0.15);
         }
 
         .cse-hint {
@@ -874,12 +1286,95 @@
             padding: 2px 6px;
             border-radius: 4px;
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
 
         .cse-hint.show {
             opacity: 1;
+            animation: hintPulse 2s infinite;
+        }
+
+        /* CSE 状态指示器 */
+        .cse-status-indicator {
+            position: absolute;
+            right: 80px;
+            bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #4b70e2;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .cse-status-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cse-status-dot {
+            width: 6px;
+            height: 6px;
+            background: #4b70e2;
+            border-radius: 50%;
+            animation: statusDotPulse 1.5s ease infinite;
+        }
+
+        @keyframes statusDotPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        .cse-status-text {
+            font-weight: 500;
+        }
+
+        @keyframes hintPulse {
+            0%, 100% {
+                opacity: 0.7;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* CSE 按钮动画 */
+        #cseModeBtn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #cseModeBtn.active {
+            animation: cseBtnPulse 1.5s ease infinite;
+            background: #4b70e2;
+            border-color: transparent;
+            color: white;
+        }
+
+        @keyframes cseBtnPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(75, 112, 226, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(75, 112, 226, 0);
+            }
+        }
+
+        #cseModeBtn:hover {
+            transform: scale(1.05);
+        }
+
+        #cseModeBtn:active {
+            transform: scale(0.95);
         }
 
         .search-result-modal .modal {
@@ -2389,6 +2884,374 @@
             transform: scale(1.1);
             background: #fff;
         }
+
+        /* 板书模式样式 */
+        .blackboard-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .blackboard-modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .blackboard-container {
+            width: 90vw;
+            height: 85vh;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .blackboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .blackboard-header h3 {
+            color: #fff;
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .blackboard-tools {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* 板书模式专用工具按钮 */
+        .blackboard-tools .tool-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .blackboard-tools .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .blackboard-tools .tool-btn.active {
+            background: #4b70e2;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 8px;
+            padding-left: 12px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .color-btn {
+            width: 24px;
+            height: 24px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .color-btn.active {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px #4b70e2;
+        }
+
+        .blackboard-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .blackboard-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .save-btn {
+            background: #4b70e2;
+            color: #fff;
+        }
+
+        .save-btn:hover {
+            background: #3a5bc7;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .blackboard-canvas-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #blackboardCanvas {
+            width: 100%;
+            height: 100%;
+            cursor: none;
+            touch-action: none;
+        }
+
+        /* 自定义鼠标样式 - 笔形光标 */
+        .custom-cursor {
+            position: fixed;
+            width: 24px;
+            height: 24px;
+            pointer-events: none;
+            z-index: 100000;
+            transform: translate(-50%, -50%);
+            transition: transform 0.05s ease-out, opacity 0.2s ease;
+            opacity: 0;
+        }
+
+        .custom-cursor.visible {
+            opacity: 1;
+        }
+
+        .custom-cursor.pen {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 20px solid currentColor;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .custom-cursor.eraser {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #333;
+            border-radius: 4px;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .custom-cursor.eraser::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+
+        .custom-cursor.drawing {
+            transform: translate(-50%, -50%) scale(0.8) rotate(-45deg);
+        }
+
+        .custom-cursor.eraser.drawing {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .straighten-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .straighten-hint.show {
+            opacity: 1;
+        }
+
+        .blackboard-footer {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .brush-size-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
+
+        .brush-size-slider {
+            width: 120px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .brush-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #4b70e2;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .auto-straighten-status {
+            margin-left: auto;
+            color: #4ecdc4;
+            font-size: 13px;
+        }
+
+        .smooth-mode-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: 12px;
+        }
+
+        .smooth-mode-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .smooth-mode-btn.active {
+            background: #4b70e2;
+            border-color: #4b70e2;
+            color: #fff;
+        }
+
+        .smooth-mode-btn.active:hover {
+            background: #3a5bc7;
+        }
+
+        /* 板书提示弹窗 */
+        .blackboard-prompt {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            padding: 32px 48px;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 99999;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .blackboard-prompt.show {
+            display: block;
+            animation: scaleIn 0.3s ease;
+        }
+
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .blackboard-prompt h4 {
+            color: #fff;
+            margin: 0 0 16px 0;
+            font-size: 20px;
+        }
+
+        .blackboard-prompt p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0 0 24px 0;
+            font-size: 14px;
+        }
+
+        .blackboard-prompt-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .blackboard-prompt-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .blackboard-prompt-btn.primary {
+            background: #4b70e2;
+            color: #fff;
+        }
+
+        .blackboard-prompt-btn.primary:hover {
+            background: #3a5bc7;
+        }
+
+        .blackboard-prompt-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .blackboard-prompt-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -2452,12 +3315,60 @@
 
     <div class="main">
         <div class="header">
-            <div class="logo" id="currentChatTitle">Jet Thaught</div>
+            <div class="header-left">
+                <div class="logo" id="currentChatTitle">Jet Thaught</div>
+                <button class="install-cse-btn" id="installCseBtn" onclick="installCSE()" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span>安装 CSE</span>
+                </button>
+                <div class="cse-install-progress" id="cseInstallProgress" style="display: none;">
+                    <div class="cse-progress-bar">
+                        <div class="cse-progress-fill" id="cseProgressFill"></div>
+                    </div>
+                    <span class="cse-progress-text" id="cseProgressText">0%</span>
+                    <button class="cse-control-btn pause" id="csePauseBtn" onclick="togglePauseInstall()" title="暂停">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+                    <button class="cse-control-btn play" id="csePlayBtn" onclick="togglePauseInstall()" style="display: none;" title="继续">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                        </svg>
+                    </button>
+                    <button class="cse-control-btn cancel" onclick="cancelInstall()" title="取消">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button class="cse-control-btn minimize" onclick="minimizeInstall()" title="最小化">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <div class="save-indicator" id="saveIndicator">
                 <div class="save-progress-bar">
                     <div class="save-progress-fill" id="saveProgressFill"></div>
                 </div>
                 <span class="save-status-text" id="saveStatusText">保存中</span>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn storage-btn" id="storageBtn" onclick="openStorageModal()" title="存储空间">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span class="storage-usage" id="storageUsageText">0MB / 2GB</span>
+                </button>
             </div>
         </div>
 
@@ -2549,9 +3460,25 @@
                                 <div class="dropdown-item-icon">🔍</div>
                                 <div class="dropdown-item-content">
                                     <div class="dropdown-item-title">Bing 搜索</div>
-                                    <div class="dropdown-item-desc">使用 Bing 搜索引擎</div>
+                                    <div class="dropdown-item-desc">微软 Bing 搜索引擎</div>
                                 </div>
                                 <div class="dropdown-item-check" id="bingSearchCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="toggleSearchMode(true, 'google')">
+                                <div class="dropdown-item-icon">🌐</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">Google 搜索</div>
+                                    <div class="dropdown-item-desc">Google 搜索引擎</div>
+                                </div>
+                                <div class="dropdown-item-check" id="googleSearchCheck"></div>
+                            </div>
+                            <div class="dropdown-item" onclick="toggleSearchMode(true, 'duckduckgo')">
+                                <div class="dropdown-item-icon">🦆</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">DuckDuckGo</div>
+                                    <div class="dropdown-item-desc">隐私保护搜索引擎</div>
+                                </div>
+                                <div class="dropdown-item-check" id="duckduckgoSearchCheck"></div>
                             </div>
                             <div class="dropdown-item" onclick="toggleSearchMode(true, 'bilibili')">
                                 <div class="dropdown-item-icon">📺</div>
@@ -2560,6 +3487,14 @@
                                     <div class="dropdown-item-desc">在 Bilibili 搜索视频</div>
                                 </div>
                                 <div class="dropdown-item-check" id="bilibiliSearchCheck"></div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" onclick="clearSearchCache()">
+                                <div class="dropdown-item-icon">🗑️</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">清除缓存</div>
+                                    <div class="dropdown-item-desc">清除搜索缓存数据</div>
+                                </div>
                             </div>
                             <div class="dropdown-item" onclick="toggleSearchMode(false)">
                                 <div class="dropdown-item-icon">
@@ -2658,6 +3593,14 @@
                                     <div class="dropdown-item-desc">Beta 版本测试通道</div>
                                 </div>
                             </div>
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-item" onclick="openBlackboard()">
+                                <div class="dropdown-item-icon">📝</div>
+                                <div class="dropdown-item-content">
+                                    <div class="dropdown-item-title">板书模式</div>
+                                    <div class="dropdown-item-desc">手写板书与绘图</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2674,6 +3617,10 @@
                         autocomplete="off"
                     ></textarea>
                     <div class="cse-hint" id="cseHint">按 Tab 补全</div>
+                    <div class="cse-status-indicator" id="cseStatusIndicator">
+                        <span class="cse-status-dot"></span>
+                        <span class="cse-status-text">CSE 就绪</span>
+                    </div>
                     <button class="send-btn" id="sendBtn" onclick="sendMessage()">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -3365,6 +4312,103 @@
     </div>
     </div>
 
+    <!-- 存储空间管理模态框 -->
+    <div class="modal-overlay storage-modal" id="storageModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <div class="modal-title">💾 存储空间管理</div>
+                <button class="modal-close" onclick="closeModal('storageModal')">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- 存储空间概览 -->
+                <div class="storage-overview">
+                    <div class="storage-total-bar">
+                        <div class="storage-used-bar" id="storageUsedBar" style="width: 0%"></div>
+                    </div>
+                    <div class="storage-info">
+                        <span id="storageUsedText">已使用 0 MB</span>
+                        <span id="storageTotalText">总空间 2 GB</span>
+                    </div>
+                </div>
+
+                <!-- 空间分配设置 -->
+                <div class="storage-section">
+                    <div class="storage-section-title">📊 空间分配</div>
+                    <div class="storage-allocation">
+                        <div class="allocation-item">
+                            <span class="allocation-label">总存储空间</span>
+                            <select class="allocation-select" id="totalStorageSelect" onchange="updateTotalStorage(this.value)">
+                                <option value="1">1 GB</option>
+                                <option value="2" selected>2 GB</option>
+                                <option value="4">4 GB</option>
+                                <option value="8">8 GB</option>
+                                <option value="16">16 GB</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 存储详情 -->
+                <div class="storage-section">
+                    <div class="storage-section-title">📁 存储详情</div>
+                    <div class="storage-details">
+                        <div class="storage-detail-item" id="chatStorageItem">
+                            <div class="detail-icon">💬</div>
+                            <div class="detail-info">
+                                <div class="detail-name">对话记录</div>
+                                <div class="detail-size" id="chatStorageSize">0 MB</div>
+                            </div>
+                            <button class="detail-action" onclick="clearChatStorage()">清除</button>
+                        </div>
+                        <div class="storage-detail-item" id="searchCacheItem">
+                            <div class="detail-icon">🔍</div>
+                            <div class="detail-info">
+                                <div class="detail-name">搜索缓存</div>
+                                <div class="detail-size" id="searchCacheSize">0 MB</div>
+                            </div>
+                            <button class="detail-action" onclick="clearSearchCacheFromModal()">清除</button>
+                        </div>
+                        <div class="storage-detail-item" id="cseStorageItem">
+                            <div class="detail-icon">⚡</div>
+                            <div class="detail-info">
+                                <div class="detail-name">CSE 模式数据</div>
+                                <div class="detail-size" id="cseStorageSize">526 MB</div>
+                            </div>
+                            <button class="detail-action danger" onclick="clearCSEStorage()">删除</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 一键清理 -->
+                <div class="storage-section">
+                    <div class="storage-section-title">🧹 一键清理</div>
+                    <div class="storage-actions">
+                        <button class="storage-action-btn" onclick="clearAllChats()">
+                            <span>🗑️</span>
+                            <span>清除所有对话</span>
+                        </button>
+                        <button class="storage-action-btn" onclick="clearAllCache()">
+                            <span>🧹</span>
+                            <span>清除所有缓存</span>
+                        </button>
+                        <button class="storage-action-btn danger" onclick="disableCSEAndClear()">
+                            <span>⚡</span>
+                            <span>关闭 CSE 并清理</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('storageModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // 从 localStorage 加载对话数据
         function loadChatsFromStorage() {
@@ -3472,9 +4516,53 @@
         // 搜索源配置
         const searchSources = {
             bing: { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: '🔍' },
-            bilibili: { name: 'Bilibili', url: 'https://search.bilibili.com/all?keyword=', icon: '📺' }
+            bilibili: { name: 'Bilibili', url: 'https://search.bilibili.com/all?keyword=', icon: '📺' },
+            google: { name: 'Google', url: 'https://www.google.com/search?q=', icon: '🌐' },
+            duckduckgo: { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=', icon: '🦆' }
         };
         let currentSearchSource = 'bing';
+
+        // 搜索缓存系统
+        const searchCache = {
+            data: new Map(),
+            maxSize: 50,
+            ttl: 1000 * 60 * 30, // 30分钟缓存
+            
+            get(key) {
+                const item = this.data.get(key);
+                if (!item) return null;
+                if (Date.now() - item.timestamp > this.ttl) {
+                    this.data.delete(key);
+                    return null;
+                }
+                return item.value;
+            },
+            
+            set(key, value) {
+                if (this.data.size >= this.maxSize) {
+                    const firstKey = this.data.keys().next().value;
+                    this.data.delete(firstKey);
+                }
+                this.data.set(key, { value, timestamp: Date.now() });
+            },
+            
+            clear() {
+                this.data.clear();
+            },
+            
+            generateKey(query, source) {
+                return `${source}:${query.toLowerCase().trim()}`;
+            }
+        };
+
+        // 搜索状态管理
+        const searchState = {
+            isSearching: false,
+            abortController: null,
+            lastQuery: '',
+            retryCount: 0,
+            maxRetries: 3
+        };
 
         const protocols = {
             standard: {
@@ -3877,8 +4965,8 @@
                 searchBtn.classList.add('active');
                 const sourceInfo = searchSources[source];
                 document.getElementById('searchBtnText').textContent = sourceInfo.name;
-                // 显示 CSE 模式按钮
-                if (cseModeBtn) cseModeBtn.style.display = 'flex';
+                // 显示 CSE 模式按钮（如果 CSE 数据未被删除）
+                if (cseModeBtn && !cseDataDeleted) cseModeBtn.style.display = 'flex';
             } else {
                 searchBtn.classList.remove('active');
                 document.getElementById('searchBtnText').textContent = '联网搜索';
@@ -3897,20 +4985,46 @@
 
         // CSE 模式切换
         function toggleCSEMode() {
+            // 如果 CSE 数据已被删除，则无法启用
+            if (cseDataDeleted && !cseModeEnabled) {
+                showToast('CSE 模式数据已被删除，无法启用 CSE 模式', 'error');
+                return;
+            }
+
             cseModeEnabled = !cseModeEnabled;
             const cseModeBtn = document.getElementById('cseModeBtn');
             const userInput = document.getElementById('userInput');
             const inputBoxWrapper = document.getElementById('inputBoxWrapper');
 
             if (cseModeEnabled) {
+                // 启用 CSE 模式 - 添加动画效果
                 cseModeBtn.classList.add('active');
                 userInput.classList.add('cse-mode');
                 inputBoxWrapper.classList.add('input-wrapper-cse');
+
+                // 添加激活动画
+                setTimeout(() => {
+                    inputBoxWrapper.classList.add('cse-active');
+                }, 100);
+
+                // 显示状态指示器
+                const statusIndicator = document.getElementById('cseStatusIndicator');
+                if (statusIndicator) statusIndicator.classList.add('show');
+
+                // 显示启用提示
+                showToast('✨ CSE 模式已启用 - 智能联想已开启', 'success');
             } else {
+                // 禁用 CSE 模式
                 cseModeBtn.classList.remove('active');
                 userInput.classList.remove('cse-mode');
-                inputBoxWrapper.classList.remove('input-wrapper-cse');
+                inputBoxWrapper.classList.remove('input-wrapper-cse', 'cse-active');
                 hideCSESuggestion();
+
+                // 隐藏状态指示器
+                const statusIndicator = document.getElementById('cseStatusIndicator');
+                if (statusIndicator) statusIndicator.classList.remove('show');
+
+                showToast('CSE 模式已关闭', 'info');
             }
         }
 
@@ -3922,17 +5036,56 @@
             const hint = document.getElementById('cseHint');
 
             userTextSpan.textContent = userText;
-            ghostTextSpan.textContent = suggestion.substring(userText.length);
+
+            // 打字机效果显示联想词
+            const ghostText = suggestion.substring(userText.length);
+            ghostTextSpan.textContent = ghostText;
+            ghostTextSpan.style.animation = 'none';
+            ghostTextSpan.offsetHeight; // 触发重排
+            ghostTextSpan.style.animation = 'ghostFadeIn 0.3s ease';
+
             overlay.style.display = 'flex';
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'translateY(5px)';
+
+            // 淡入动画
+            requestAnimationFrame(() => {
+                overlay.style.transition = 'all 0.2s ease';
+                overlay.style.opacity = '1';
+                overlay.style.transform = 'translateY(0)';
+            });
+
             hint.classList.add('show');
+
+            // 添加输入框发光效果
+            const inputBoxWrapper = document.getElementById('inputBoxWrapper');
+            if (inputBoxWrapper) {
+                inputBoxWrapper.style.boxShadow = '0 0 20px rgba(75, 112, 226, 0.2)';
+            }
         }
 
         // 隐藏 CSE 联想词
         function hideCSESuggestion() {
             const overlay = document.getElementById('cseSuggestionOverlay');
             const hint = document.getElementById('cseHint');
-            overlay.style.display = 'none';
+
+            // 淡出动画
+            overlay.style.transition = 'all 0.15s ease';
+            overlay.style.opacity = '0';
+            overlay.style.transform = 'translateY(-3px)';
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                overlay.style.transform = 'translateY(0)';
+            }, 150);
+
             hint.classList.remove('show');
+
+            // 移除输入框发光效果
+            const inputBoxWrapper = document.getElementById('inputBoxWrapper');
+            if (inputBoxWrapper) {
+                inputBoxWrapper.style.boxShadow = '';
+            }
         }
 
         // CSE 模式 Tab 补全
@@ -3944,6 +5097,17 @@
 
             // 获取当前建议词
             const suggestion = cseSuggestions[cseSuggestionIndex];
+
+            // 添加补全动画效果
+            const inputBoxWrapper = document.getElementById('inputBoxWrapper');
+            if (inputBoxWrapper) {
+                inputBoxWrapper.style.transform = 'scale(1.02)';
+                inputBoxWrapper.style.boxShadow = '0 0 30px rgba(75, 112, 226, 0.3)';
+                setTimeout(() => {
+                    inputBoxWrapper.style.transform = '';
+                    inputBoxWrapper.style.boxShadow = '';
+                }, 200);
+            }
 
             // 补全文本
             userInput.value = suggestion;
@@ -3962,13 +5126,548 @@
             // 触发输入事件以调整高度
             userInput.dispatchEvent(new Event('input'));
 
+            // 显示补全成功提示
+            showToast('✓ 已补全', 'success', 1000);
+
             return true;
         }
 
         function updateSearchDropdownChecks() {
             document.getElementById('bingSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'bing');
+            document.getElementById('googleSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'google');
+            document.getElementById('duckduckgoSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'duckduckgo');
             document.getElementById('bilibiliSearchCheck').classList.toggle('checked', searchEnabled && currentSearchSource === 'bilibili');
             document.getElementById('searchOffCheck').classList.toggle('checked', !searchEnabled);
+        }
+
+        // 清除搜索缓存
+        function clearSearchCache() {
+            searchCache.clear();
+            showToast('搜索缓存已清除', 'success');
+            searchDropdownOpen = false;
+            document.getElementById('searchDropdownMenu').classList.remove('show');
+        }
+
+        // 显示提示消息
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 14px;
+                z-index: 10000;
+                animation: slideDown 0.3s ease;
+                backdrop-filter: blur(10px);
+                ${type === 'success' ? 'background: rgba(76, 175, 80, 0.9); color: white;' : 'background: rgba(33, 150, 243, 0.9); color: white;'}
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // 存储空间管理系统
+        const storageManager = {
+            totalSpace: 2 * 1024 * 1024 * 1024, // 默认 2GB (bytes)
+            cseDataSize: 526 * 1024 * 1024, // CSE 数据 526MB (bytes)
+            
+            // 计算对话存储大小
+            calculateChatSize() {
+                try {
+                    const chatsData = localStorage.getItem('jet_thought_chats') || '[]';
+                    return new Blob([chatsData]).size;
+                } catch (e) {
+                    return 0;
+                }
+            },
+            
+            // 计算搜索缓存大小
+            calculateSearchCacheSize() {
+                let size = 0;
+                searchCache.data.forEach((value, key) => {
+                    size += new Blob([JSON.stringify(value)]).size;
+                    size += new Blob([key]).size;
+                });
+                return size;
+            },
+            
+            // 计算 CSE 数据大小（如果被删除则为 0，如果正在安装则包含已安装部分）
+            calculateCSESize() {
+                if (cseDataDeleted) {
+                    // 如果正在安装，返回已安装的大小
+                    return cseInstallingSize;
+                }
+                return this.cseDataSize;
+            },
+            
+            // 计算总使用空间（CSE 数据默认始终占用，除非被删除）
+            calculateTotalUsed() {
+                return this.calculateChatSize() + this.calculateSearchCacheSize() + this.calculateCSESize();
+            },
+            
+            // 格式化字节为可读格式
+            formatBytes(bytes) {
+                if (bytes === 0) return '0 MB';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            },
+            
+            // 更新存储显示
+            updateDisplay() {
+                const used = this.calculateTotalUsed();
+                const total = this.totalSpace;
+                const percentage = (used / total) * 100;
+                
+                // 更新顶部按钮显示
+                const usageText = document.getElementById('storageUsageText');
+                if (usageText) {
+                    usageText.textContent = `${this.formatBytes(used)} / ${this.formatBytes(total)}`;
+                    usageText.className = 'storage-usage' + 
+                        (percentage > 90 ? ' danger' : percentage > 70 ? ' warning' : '');
+                }
+                
+                // 更新模态框显示（如果打开）
+                this.updateModalDisplay();
+            },
+            
+            // 更新模态框显示
+            updateModalDisplay() {
+                const used = this.calculateTotalUsed();
+                const total = this.totalSpace;
+                const percentage = Math.min((used / total) * 100, 100);
+                
+                const usedBar = document.getElementById('storageUsedBar');
+                const usedText = document.getElementById('storageUsedText');
+                const totalText = document.getElementById('storageTotalText');
+                
+                if (usedBar) {
+                    usedBar.style.width = percentage + '%';
+                    usedBar.className = 'storage-used-bar' + 
+                        (percentage > 90 ? ' danger' : percentage > 70 ? ' warning' : '');
+                }
+                if (usedText) usedText.textContent = `已使用 ${this.formatBytes(used)}`;
+                if (totalText) totalText.textContent = `总空间 ${this.formatBytes(total)}`;
+                
+                // 更新详情
+                const chatSize = document.getElementById('chatStorageSize');
+                const searchSize = document.getElementById('searchCacheSize');
+                const cseSize = document.getElementById('cseStorageSize');
+                const cseActionBtn = document.querySelector('#cseStorageItem .detail-action');
+                
+                if (chatSize) chatSize.textContent = this.formatBytes(this.calculateChatSize());
+                if (searchSize) searchSize.textContent = this.formatBytes(this.calculateSearchCacheSize());
+                if (cseSize) {
+                    if (cseDataDeleted) {
+                        cseSize.textContent = '已删除';
+                        cseSize.style.color = '#999';
+                    } else {
+                        cseSize.textContent = this.formatBytes(this.cseDataSize);
+                        cseSize.style.color = '';
+                    }
+                }
+                if (cseActionBtn) {
+                    if (cseDataDeleted) {
+                        cseActionBtn.textContent = '已删除';
+                        cseActionBtn.disabled = true;
+                        cseActionBtn.style.opacity = '0.5';
+                        cseActionBtn.style.cursor = 'not-allowed';
+                    } else {
+                        cseActionBtn.textContent = '删除';
+                        cseActionBtn.disabled = false;
+                        cseActionBtn.style.opacity = '';
+                        cseActionBtn.style.cursor = '';
+                    }
+                }
+            },
+            
+            // 设置总存储空间
+            setTotalSpace(gb) {
+                this.totalSpace = gb * 1024 * 1024 * 1024;
+                localStorage.setItem('jet_thought_storage_limit', gb);
+                this.updateDisplay();
+            },
+            
+            // 加载存储设置
+            loadSettings() {
+                const savedLimit = localStorage.getItem('jet_thought_storage_limit');
+                if (savedLimit) {
+                    this.totalSpace = parseInt(savedLimit) * 1024 * 1024 * 1024;
+                    const select = document.getElementById('totalStorageSelect');
+                    if (select) select.value = savedLimit;
+                }
+                // 加载 CSE 数据删除状态
+                cseDataDeleted = localStorage.getItem('jet_thought_cse_deleted') === 'true';
+            }
+        };
+
+        // 打开存储空间管理模态框
+        function openStorageModal() {
+            storageManager.loadSettings();
+            storageManager.updateModalDisplay();
+            document.getElementById('storageModal').classList.add('show');
+        }
+
+        // 更新总存储空间
+        function updateTotalStorage(gb) {
+            storageManager.setTotalSpace(parseInt(gb));
+            showToast(`存储空间已设置为 ${gb}GB`, 'success');
+        }
+
+        // 清除对话存储
+        function clearChatStorage() {
+            if (confirm('确定要清除所有对话记录吗？此操作不可恢复。')) {
+                localStorage.removeItem('jet_thought_chats');
+                localStorage.removeItem('jet_thought_current_chat_id');
+                chats = [];
+                currentChatId = null;
+                renderChatList();
+                createNewChat();
+                storageManager.updateDisplay();
+                showToast('对话记录已清除', 'success');
+            }
+        }
+
+        // 从模态框清除搜索缓存
+        function clearSearchCacheFromModal() {
+            clearSearchCache();
+            storageManager.updateDisplay();
+            // 标记搜索缓存已清除，用于显示提示
+            localStorage.setItem('jet_thought_search_cache_cleared', Date.now().toString());
+        }
+
+        // CSE 数据是否已被删除
+        let cseDataDeleted = localStorage.getItem('jet_thought_cse_deleted') === 'true';
+
+        // 清除 CSE 存储
+        function clearCSEStorage() {
+            if (confirm('确定要删除 CSE 模式数据吗？这将关闭 CSE 模式并释放 526MB 空间。')) {
+                cseModeEnabled = false;
+                cseDataDeleted = true;
+                localStorage.removeItem('jet_thought_cse_enabled');
+                localStorage.setItem('jet_thought_cse_deleted', 'true');
+                const cseBtn = document.getElementById('cseModeBtn');
+                if (cseBtn) {
+                    cseBtn.classList.remove('active');
+                    cseBtn.style.display = 'none';
+                }
+                hideCSESuggestion();
+                storageManager.updateDisplay();
+                updateInstallCSEButton();
+                showToast('CSE 模式数据已删除，释放 526MB 空间', 'success');
+            }
+        }
+
+        // 清除所有对话
+        function clearAllChats() {
+            clearChatStorage();
+        }
+
+        // 清除所有缓存
+        function clearAllCache() {
+            clearSearchCache();
+            localStorage.removeItem('jet_thought_search_cache_cleared');
+            storageManager.updateDisplay();
+            showToast('所有缓存已清除', 'success');
+        }
+
+        // 关闭 CSE 并清理
+        function disableCSEAndClear() {
+            clearCSEStorage();
+        }
+
+        // 更新安装 CSE 按钮显示状态
+        function updateInstallCSEButton() {
+            const installBtn = document.getElementById('installCseBtn');
+            const installProgress = document.getElementById('cseInstallProgress');
+            
+            if (cseDataDeleted) {
+                if (installBtn) installBtn.style.display = 'flex';
+                if (installProgress) installProgress.style.display = 'none';
+            } else {
+                if (installBtn) installBtn.style.display = 'none';
+                if (installProgress) installProgress.style.display = 'none';
+            }
+        }
+
+        // CSE 安装进度
+        let cseInstallInterval = null;
+        let cseInstallingSize = 0; // 正在安装的 CSE 数据大小（用于实时显示）
+        let cseInstallPaused = false; // 是否暂停
+        let cseInstallElapsed = 0; // 已安装的时间
+        const CSE_INSTALL_TOTAL_TIME = 18000; // 18秒 = 0.3分钟
+        const CSE_TOTAL_SIZE = 526 * 1024 * 1024; // 526MB
+
+        // 安装 CSE
+        function installCSE() {
+            if (!cseDataDeleted) {
+                showToast('CSE 模式数据已存在', 'info');
+                return;
+            }
+            
+            const installBtn = document.getElementById('installCseBtn');
+            const installProgress = document.getElementById('cseInstallProgress');
+            const pauseBtn = document.getElementById('csePauseBtn');
+            const playBtn = document.getElementById('csePlayBtn');
+            
+            // 隐藏按钮，显示进度
+            if (installBtn) installBtn.style.display = 'none';
+            if (installProgress) installProgress.style.display = 'flex';
+            if (pauseBtn) pauseBtn.style.display = 'flex';
+            if (playBtn) playBtn.style.display = 'none';
+            
+            showToast('开始安装 CSE 模式数据...', 'info');
+            
+            cseInstallPaused = false;
+            startCSEInstallProgress();
+        }
+
+        // 开始/继续安装进度
+        function startCSEInstallProgress() {
+            const progressFill = document.getElementById('cseProgressFill');
+            const progressText = document.getElementById('cseProgressText');
+            
+            cseInstallInterval = setInterval(() => {
+                if (cseInstallPaused) return;
+                
+                cseInstallElapsed += 500;
+                const percentage = Math.min((cseInstallElapsed / CSE_INSTALL_TOTAL_TIME) * 100, 100);
+                
+                // 计算当前已安装的 CSE 数据大小
+                cseInstallingSize = Math.floor((percentage / 100) * CSE_TOTAL_SIZE);
+                
+                // 更新进度显示
+                if (progressFill) progressFill.style.width = percentage + '%';
+                if (progressText) progressText.textContent = Math.floor(percentage) + '%';
+                
+                // 实时更新存储空间显示
+                storageManager.updateDisplay();
+                
+                if (cseInstallElapsed >= CSE_INSTALL_TOTAL_TIME) {
+                    clearInterval(cseInstallInterval);
+                    cseInstallingSize = 0;
+                    cseInstallElapsed = 0;
+                    completeCSEInstall();
+                }
+            }, 500);
+        }
+
+        // 暂停/继续安装
+        function togglePauseInstall() {
+            const pauseBtn = document.getElementById('csePauseBtn');
+            const playBtn = document.getElementById('csePlayBtn');
+            
+            cseInstallPaused = !cseInstallPaused;
+            
+            if (cseInstallPaused) {
+                if (pauseBtn) pauseBtn.style.display = 'none';
+                if (playBtn) playBtn.style.display = 'flex';
+                showToast('安装已暂停', 'info');
+            } else {
+                if (pauseBtn) pauseBtn.style.display = 'flex';
+                if (playBtn) playBtn.style.display = 'none';
+                showToast('继续安装...', 'info');
+            }
+        }
+
+        // 取消安装
+        function cancelInstall() {
+            if (confirm('确定要取消安装吗？已下载的数据将被清除。')) {
+                // 清除定时器
+                if (cseInstallInterval) {
+                    clearInterval(cseInstallInterval);
+                    cseInstallInterval = null;
+                }
+                
+                // 重置状态
+                cseInstallPaused = false;
+                cseInstallElapsed = 0;
+                cseInstallingSize = 0;
+                
+                // 重置 UI
+                const installBtn = document.getElementById('installCseBtn');
+                const installProgress = document.getElementById('cseInstallProgress');
+                const pauseBtn = document.getElementById('csePauseBtn');
+                const playBtn = document.getElementById('csePlayBtn');
+                const progressFill = document.getElementById('cseProgressFill');
+                const progressText = document.getElementById('cseProgressText');
+                
+                if (installBtn) installBtn.style.display = 'flex';
+                if (installProgress) installProgress.style.display = 'none';
+                if (pauseBtn) pauseBtn.style.display = 'flex';
+                if (playBtn) playBtn.style.display = 'none';
+                if (progressFill) progressFill.style.width = '0%';
+                if (progressText) progressText.textContent = '0%';
+                
+                // 更新存储显示
+                storageManager.updateDisplay();
+                
+                showToast('安装已取消', 'info');
+            }
+        }
+
+        // 最小化安装进度
+        let cseInstallMinimized = false;
+
+        function minimizeInstall() {
+            const installProgress = document.getElementById('cseInstallProgress');
+            const installBtn = document.getElementById('installCseBtn');
+            
+            if (!cseInstallMinimized) {
+                // 最小化：只显示进度条和百分比，隐藏控制按钮
+                if (installProgress) {
+                    installProgress.style.padding = '4px 8px';
+                    installProgress.style.gap = '6px';
+                }
+                
+                // 隐藏控制按钮
+                const controlBtns = installProgress.querySelectorAll('.cse-control-btn');
+                controlBtns.forEach(btn => btn.style.display = 'none');
+                
+                // 添加一个展开按钮
+                let expandBtn = document.getElementById('cseExpandBtn');
+                if (!expandBtn) {
+                    expandBtn = document.createElement('button');
+                    expandBtn.id = 'cseExpandBtn';
+                    expandBtn.className = 'cse-control-btn expand';
+                    expandBtn.title = '展开';
+                    expandBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+                    expandBtn.onclick = minimizeInstall;
+                    installProgress.appendChild(expandBtn);
+                } else {
+                    expandBtn.style.display = 'flex';
+                }
+                
+                cseInstallMinimized = true;
+                showToast('安装进度已最小化', 'info');
+            } else {
+                // 展开：恢复显示
+                if (installProgress) {
+                    installProgress.style.padding = '';
+                    installProgress.style.gap = '';
+                }
+                
+                // 显示控制按钮
+                const pauseBtn = document.getElementById('csePauseBtn');
+                const playBtn = document.getElementById('csePlayBtn');
+                const cancelBtn = document.querySelector('.cse-control-btn.cancel');
+                const minimizeBtn = document.querySelector('.cse-control-btn.minimize');
+                
+                if (cseInstallPaused) {
+                    if (pauseBtn) pauseBtn.style.display = 'none';
+                    if (playBtn) playBtn.style.display = 'flex';
+                } else {
+                    if (pauseBtn) pauseBtn.style.display = 'flex';
+                    if (playBtn) playBtn.style.display = 'none';
+                }
+                if (cancelBtn) cancelBtn.style.display = 'flex';
+                if (minimizeBtn) minimizeBtn.style.display = 'flex';
+                
+                // 隐藏展开按钮
+                const expandBtn = document.getElementById('cseExpandBtn');
+                if (expandBtn) expandBtn.style.display = 'none';
+                
+                cseInstallMinimized = false;
+                showToast('安装进度已展开', 'info');
+            }
+        }
+
+        // 完成 CSE 安装
+        function completeCSEInstall() {
+            cseDataDeleted = false;
+            localStorage.removeItem('jet_thought_cse_deleted');
+            cseInstallElapsed = 0;
+            
+            const installBtn = document.getElementById('installCseBtn');
+            const installProgress = document.getElementById('cseInstallProgress');
+            const pauseBtn = document.getElementById('csePauseBtn');
+            const playBtn = document.getElementById('csePlayBtn');
+            
+            if (installBtn) installBtn.style.display = 'none';
+            if (installProgress) installProgress.style.display = 'none';
+            if (pauseBtn) pauseBtn.style.display = 'flex';
+            if (playBtn) playBtn.style.display = 'none';
+            
+            storageManager.updateDisplay();
+            showToast('CSE 模式数据安装完成！', 'success');
+            
+            // 如果当前有联网搜索，显示 CSE 按钮
+            if (searchEnabled) {
+                const cseBtn = document.getElementById('cseModeBtn');
+                if (cseBtn) cseBtn.style.display = 'flex';
+            }
+        }
+
+        // 检查并显示缓存清除提示
+        function checkSearchCacheCleared() {
+            const cleared = localStorage.getItem('jet_thought_search_cache_cleared');
+            if (cleared) {
+                // 查找所有搜索结果容器并显示提示
+                document.querySelectorAll('.search-result-container').forEach(container => {
+                    const iframe = container.querySelector('iframe');
+                    const cacheKey = container.dataset.cacheKey;
+                    if (iframe && cacheKey && !searchCache.get(cacheKey)) {
+                        // 缓存已被清除，显示提示
+                        const hintDiv = document.createElement('div');
+                        hintDiv.className = 'search-cache-cleared';
+                        hintDiv.innerHTML = '缓存已清除，<a onclick="reloadSearchResult(this)">要再次打开吗？</a>';
+                        
+                        // 隐藏 iframe 和加载状态
+                        iframe.style.display = 'none';
+                        const loadingDiv = container.querySelector('.search-result-loading');
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                        
+                        // 插入提示
+                        container.insertBefore(hintDiv, iframe);
+                    }
+                });
+                
+                // 清除标记
+                localStorage.removeItem('jet_thought_search_cache_cleared');
+            }
+        }
+
+        // 重新加载搜索结果
+        function reloadSearchResult(linkElement) {
+            const container = linkElement.closest('.search-result-container');
+            if (!container) return;
+            
+            const previewCard = container.previousElementSibling;
+            const searchUrl = previewCard ? previewCard.dataset.searchUrl : null;
+            
+            if (searchUrl) {
+                // 移除提示
+                const hintDiv = container.querySelector('.search-cache-cleared');
+                if (hintDiv) hintDiv.remove();
+                
+                // 显示 iframe 并加载
+                const iframe = container.querySelector('iframe');
+                if (iframe) {
+                    iframe.style.display = 'block';
+                    iframe.src = searchUrl;
+                }
+            }
+        }
+
+        // 初始化存储管理
+        function initStorageManager() {
+            storageManager.loadSettings();
+            storageManager.updateDisplay();
+            updateInstallCSEButton();
+            
+            // 定期检查存储使用情况
+            setInterval(() => {
+                storageManager.updateDisplay();
+                checkSearchCacheCleared();
+            }, 30000); // 每30秒更新一次
         }
 
         let thinkDropdownOpen = false;
@@ -4547,12 +6246,16 @@
 
         function toggleSearchResult(containerId, searchUrl) {
             const container = document.getElementById(containerId);
+            if (!container) return;
+            
             const isExpanded = container.classList.contains('expanded');
             const previewCard = container.previousElementSibling;
             
             if (isExpanded) {
+                // 收起
                 container.classList.remove('expanded');
-                previewCard.classList.remove('expanded');
+                if (previewCard) previewCard.classList.remove('expanded');
+                
                 // 让 iframe 进入休眠状态（释放资源）
                 const iframe = container.querySelector('iframe');
                 if (iframe) {
@@ -4561,13 +6264,20 @@
                     iframe.classList.add('sleeping');
                 }
             } else {
+                // 展开
                 container.classList.add('expanded');
-                previewCard.classList.add('expanded');
-                // 唤醒 iframe（恢复加载）
+                if (previewCard) previewCard.classList.add('expanded');
+                
+                // 显示加载状态
+                const loadingDiv = container.querySelector('.search-result-loading');
                 const iframe = container.querySelector('iframe');
-                if (iframe) {
-                    // 延迟加载iframe，确保动画流畅
-                    setTimeout(() => {
+                
+                if (loadingDiv) loadingDiv.style.display = 'block';
+                if (iframe) iframe.style.opacity = '0';
+                
+                // 延迟加载iframe，确保动画流畅
+                setTimeout(() => {
+                    if (iframe) {
                         // 如果有保存的 src，使用它；否则使用传入的 searchUrl
                         const savedSrc = iframe.dataset.src;
                         if (savedSrc && savedSrc !== 'about:blank') {
@@ -4576,8 +6286,53 @@
                             iframe.src = searchUrl;
                         }
                         iframe.classList.remove('sleeping');
-                    }, 300);
-                }
+                        
+                        // iframe 加载完成后隐藏加载状态
+                        iframe.onload = () => {
+                            if (loadingDiv) loadingDiv.style.display = 'none';
+                            iframe.style.opacity = '1';
+                        };
+                        
+                        // 加载超时处理
+                        setTimeout(() => {
+                            if (loadingDiv && loadingDiv.style.display !== 'none') {
+                                loadingDiv.innerHTML = '<div style="color: #999;">加载超时，请尝试刷新或新窗口打开</div>';
+                            }
+                        }, 15000);
+                    }
+                }, 300);
+            }
+        }
+
+        // 刷新搜索结果
+        function refreshSearchResult(containerId, searchUrl) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const iframe = container.querySelector('iframe');
+            const loadingDiv = container.querySelector('.search-result-loading');
+            const cacheKey = container.dataset.cacheKey;
+            
+            // 清除缓存
+            if (cacheKey) {
+                searchCache.data.delete(cacheKey);
+            }
+            
+            // 显示加载状态
+            if (loadingDiv) loadingDiv.style.display = 'block';
+            if (iframe) {
+                iframe.style.opacity = '0';
+                iframe.src = searchUrl;
+                
+                iframe.onload = () => {
+                    if (loadingDiv) loadingDiv.style.display = 'none';
+                    iframe.style.opacity = '1';
+                };
+            }
+            
+            // 更新缓存
+            if (cacheKey) {
+                searchCache.set(cacheKey, { url: searchUrl, timestamp: Date.now() });
             }
         }
 
@@ -4625,16 +6380,27 @@
                 const searchUrl = sourceInfo.url + encodeURIComponent(text);
                 const containerId = 'search-result-' + generateId();
                 
-                responseText = `我已经为你在 **${sourceInfo.name}** 找到这些信息。`;
+                // 检查缓存
+                const cacheKey = searchCache.generateKey(text, currentSearchSource);
+                const cachedResult = searchCache.get(cacheKey);
+                
+                let responseText;
+                if (cachedResult) {
+                    responseText = `我从缓存中为你找到 **${sourceInfo.name}** 的相关信息。`;
+                } else {
+                    responseText = `我已经为你在 **${sourceInfo.name}** 找到这些信息。`;
+                    // 缓存搜索结果
+                    searchCache.set(cacheKey, { url: searchUrl, query: text, timestamp: Date.now() });
+                }
                 
                 // 添加搜索链接消息（直接在页面展开显示）
-                const searchMessageHtml = `<div class="search-preview-card" onclick="toggleSearchResult('${containerId}', '${searchUrl}')">
+                const searchMessageHtml = `<div class="search-preview-card" onclick="toggleSearchResult('${containerId}', '${searchUrl}')" data-search-url="${searchUrl}">
                     <div class="search-preview-header">
                         <div class="search-preview-info">
                             <span style="font-size: 18px;">${sourceInfo.icon}</span>
                             <div class="search-preview-text">
-                                <div class="search-preview-query">${text}</div>
-                                <div class="search-preview-hint">点击展开搜索结果</div>
+                                <div class="search-preview-query">${escapeHtml(text)}</div>
+                                <div class="search-preview-hint">${cachedResult ? '📋 来自缓存' : '🔍 点击展开搜索结果'}</div>
                             </div>
                         </div>
                         <svg class="search-preview-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b70e2" stroke-width="2">
@@ -4642,13 +6408,20 @@
                         </svg>
                     </div>
                 </div>
-                <div class="search-result-container" id="${containerId}">
+                <div class="search-result-container" id="${containerId}" data-cache-key="${cacheKey}">
                     <div class="search-result-header">
                         <div class="search-result-title">
                             <span>${sourceInfo.icon}</span>
                             <span>${sourceInfo.name} 搜索结果</span>
                         </div>
                         <div class="search-result-actions">
+                            <button class="search-result-btn" onclick="event.stopPropagation(); refreshSearchResult('${containerId}', '${searchUrl}')" title="刷新">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23 4 23 10 17 10"></polyline>
+                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                                </svg>
+                                刷新
+                            </button>
                             <button class="search-result-btn" onclick="event.stopPropagation(); openSearchInNewTab('${searchUrl}')">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -4666,11 +6439,23 @@
                             </button>
                         </div>
                     </div>
-                    <iframe class="search-result-iframe" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+                    <div class="search-result-loading" style="display: none; padding: 20px; text-align: center; color: #666;">
+                        <div class="typing-indicator">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px;">正在加载搜索结果...</div>
+                    </div>
+                    <iframe class="search-result-iframe" sandbox="allow-scripts allow-same-origin allow-forms" loading="lazy"></iframe>
                 </div>`;
                 
                 const aiMsgId = generateId();
-                chat.messages.push({ content: responseText + '\n\n[搜索结果]', isUser: false, id: aiMsgId, searchHtml: searchMessageHtml });
+                chat.messages.push({ 
+                    content: responseText + '\n\n[搜索结果]', 
+                    isUser: false, 
+                    id: aiMsgId, 
+                    searchHtml: searchMessageHtml,
+                    searchData: { url: searchUrl, source: currentSearchSource, query: text }
+                });
                 
                 // 添加AI消息到UI
                 const msgDiv = document.createElement('div');
@@ -4751,7 +6536,21 @@
         // 使用百度搜索建议 API（JSONP 方式绕过 CORS）
         let jsonpCallbackId = 0;
         
-        function fetchSearchSuggestions(query) {
+        // 搜索建议 API 配置（多源备份）
+        const suggestionAPIs = [
+            {
+                name: 'baidu',
+                url: (query, cb) => `https://suggestion.baidu.com/su?wd=${encodeURIComponent(query)}&cb=${cb}`,
+                parser: (data) => data && data.s ? data.s : []
+            },
+            {
+                name: 'google',
+                url: (query, cb) => `https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}&callback=${cb}`,
+                parser: (data) => data && data[1] ? data[1] : []
+            }
+        ];
+        
+        async function fetchSearchSuggestions(query) {
             // 只有在联网搜索开启时才获取联想词
             if (!searchEnabled) {
                 hideSearchSuggestions();
@@ -4765,63 +6564,120 @@
                 return;
             }
 
-            // 创建唯一的回调函数名
-            const callbackName = 'baiduSugCallback_' + (++jsonpCallbackId);
-
-            // 创建 script 标签
-            const script = document.createElement('script');
-            script.src = `https://suggestion.baidu.com/su?wd=${encodeURIComponent(query)}&cb=${callbackName}`;
-
-            // 定义回调函数
-            window[callbackName] = function(data) {
-                if (data && data.s && data.s.length > 0) {
-                    currentSuggestions = data.s.slice(0, 8); // 最多显示8条
-
-                    // CSE 模式下使用内联显示
-                    if (cseModeEnabled) {
-                        cseSuggestions = data.s;
-                        cseSuggestionIndex = 0;
-                        showCSESuggestion(query, cseSuggestions[0]);
-                        hideSearchSuggestions();
-                    } else {
-                        renderSearchSuggestions(currentSuggestions, query);
-                    }
-                } else {
+            // 检查缓存
+            const cacheKey = `suggest:${query.toLowerCase().trim()}`;
+            const cached = searchCache.get(cacheKey);
+            if (cached) {
+                currentSuggestions = cached;
+                if (cseModeEnabled) {
+                    cseSuggestions = cached;
+                    cseSuggestionIndex = 0;
+                    showCSESuggestion(query, cseSuggestions[0]);
                     hideSearchSuggestions();
-                    if (cseModeEnabled) hideCSESuggestion();
+                } else {
+                    renderSearchSuggestions(cached, query);
                 }
+                return;
+            }
 
-                // 清理
-                delete window[callbackName];
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
+            // 尝试多个 API 源
+            for (let apiIndex = 0; apiIndex < suggestionAPIs.length; apiIndex++) {
+                const api = suggestionAPIs[apiIndex];
+                try {
+                    const suggestions = await fetchSuggestionsFromAPI(query, api);
+                    if (suggestions && suggestions.length > 0) {
+                        currentSuggestions = suggestions.slice(0, 8);
+                        
+                        // 缓存结果
+                        searchCache.set(cacheKey, currentSuggestions);
+                        
+                        // CSE 模式下使用内联显示
+                        if (cseModeEnabled) {
+                            cseSuggestions = currentSuggestions;
+                            cseSuggestionIndex = 0;
+                            showCSESuggestion(query, cseSuggestions[0]);
+                            hideSearchSuggestions();
+                        } else {
+                            renderSearchSuggestions(currentSuggestions, query);
+                        }
+                        return;
+                    }
+                } catch (error) {
+                    console.log(`${api.name} API failed:`, error);
+                    continue;
                 }
-            };
+            }
 
-            // 错误处理
-            script.onerror = function() {
-                console.log('Baidu suggestions API failed');
+            // 所有 API 都失败，使用本地历史建议
+            const localSuggestions = getLocalSuggestions(query);
+            if (localSuggestions.length > 0) {
+                currentSuggestions = localSuggestions.slice(0, 5);
+                renderSearchSuggestions(currentSuggestions, query);
+            } else {
                 hideSearchSuggestions();
                 if (cseModeEnabled) hideCSESuggestion();
-                delete window[callbackName];
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
-                }
-            };
+            }
+        }
 
-            // 设置超时
-            setTimeout(function() {
-                if (window[callbackName]) {
+        function fetchSuggestionsFromAPI(query, api) {
+            return new Promise((resolve, reject) => {
+                const callbackName = `sugCallback_${api.name}_${++jsonpCallbackId}`;
+                const script = document.createElement('script');
+                script.src = api.url(query, callbackName);
+
+                let resolved = false;
+
+                window[callbackName] = function(data) {
+                    if (!resolved) {
+                        resolved = true;
+                        const suggestions = api.parser(data);
+                        resolve(suggestions);
+                    }
+                    cleanup();
+                };
+
+                script.onerror = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        reject(new Error(`${api.name} script error`));
+                    }
+                    cleanup();
+                };
+
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        resolved = true;
+                        reject(new Error(`${api.name} timeout`));
+                    }
+                    cleanup();
+                }, 3000);
+
+                function cleanup() {
+                    clearTimeout(timeout);
                     delete window[callbackName];
                     if (script.parentNode) {
                         script.parentNode.removeChild(script);
                     }
-                    hideSearchSuggestions();
-                    if (cseModeEnabled) hideCSESuggestion();
                 }
-            }, 5000);
 
-            document.head.appendChild(script);
+                document.head.appendChild(script);
+            });
+        }
+
+        // 从聊天历史中获取本地建议
+        function getLocalSuggestions(query) {
+            const suggestions = new Set();
+            const lowerQuery = query.toLowerCase();
+            
+            chats.forEach(chat => {
+                chat.messages.forEach(msg => {
+                    if (msg.isUser && msg.content.toLowerCase().includes(lowerQuery)) {
+                        suggestions.add(msg.content);
+                    }
+                });
+            });
+            
+            return Array.from(suggestions);
         }
 
         function renderSearchSuggestions(suggestions, query) {
@@ -5015,6 +6871,9 @@
         renderCurrentChat();
         userInput.focus();
 
+        // 初始化存储管理器
+        initStorageManager();
+
         // CSE 模式按钮右键事件
         const cseModeBtn = document.getElementById('cseModeBtn');
         if (cseModeBtn) {
@@ -5039,6 +6898,566 @@
                 modal.classList.remove('show');
             }
         }
+
+        // ==================== 板书模式功能 ====================
+        let blackboardCtx = null;
+        let blackboardCanvas = null;
+        let isDrawing = false;
+        let currentTool = 'pen';
+        let currentColor = '#ffffff';
+        let brushSize = 4;
+        let lastX = 0;
+        let lastY = 0;
+        let drawingPoints = [];
+        let straightenTimer = null;
+        let isStraightening = false;
+
+        // 平滑移动相关变量
+        let isSmoothMode = false;
+        let velocityX = 0;
+        let velocityY = 0;
+        let lastDrawTime = 0;
+        let smoothAnimationId = null;
+        let lastPoints = []; // 存储最近的点用于计算速度
+
+        // 板书关键词
+        const blackboardKeywords = ['板书', '黑板', '写字', '手写', '画图', '绘制', '草图', '示意图'];
+
+        // 检查是否包含板书关键词
+        function checkBlackboardKeywords(text) {
+            return blackboardKeywords.some(keyword => text.includes(keyword));
+        }
+
+        // 显示板书提示
+        function showBlackboardPrompt() {
+            const prompt = document.getElementById('blackboardPrompt');
+            if (prompt) {
+                prompt.classList.add('show');
+            }
+        }
+
+        // 关闭板书提示
+        function dismissBlackboardPrompt() {
+            const prompt = document.getElementById('blackboardPrompt');
+            if (prompt) {
+                prompt.classList.remove('show');
+            }
+        }
+
+        // 切换平滑移动模式
+        function toggleSmoothMode() {
+            isSmoothMode = !isSmoothMode;
+            const btn = document.getElementById('smoothModeBtn');
+            if (btn) {
+                if (isSmoothMode) {
+                    btn.classList.add('active');
+                    showToast('✓ 平滑移动已开启', 'success');
+                } else {
+                    btn.classList.remove('active');
+                    showToast('✗ 平滑移动已关闭', 'info');
+                    // 取消正在进行的平滑动画
+                    if (smoothAnimationId) {
+                        cancelAnimationFrame(smoothAnimationId);
+                        smoothAnimationId = null;
+                    }
+                }
+            }
+        }
+
+        // 打开板书模式
+        function openBlackboard() {
+            dismissBlackboardPrompt();
+            const modal = document.getElementById('blackboardModal');
+            if (modal) {
+                modal.classList.add('show');
+                initBlackboard();
+            }
+        }
+
+        // 关闭板书模式
+        function closeBlackboard() {
+            const modal = document.getElementById('blackboardModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+            clearStraightenTimer();
+        }
+
+        // 自定义光标元素
+        let customCursor = null;
+
+        // 初始化自定义光标
+        function initCustomCursor() {
+            customCursor = document.getElementById('customCursor');
+            if (!customCursor || !blackboardCanvas) return;
+
+            // 鼠标进入画布区域
+            blackboardCanvas.addEventListener('mouseenter', () => {
+                customCursor.classList.add('visible');
+            });
+
+            // 鼠标离开画布区域
+            blackboardCanvas.addEventListener('mouseleave', () => {
+                customCursor.classList.remove('visible');
+                customCursor.classList.remove('drawing');
+            });
+
+            // 鼠标在画布上移动
+            blackboardCanvas.addEventListener('mousemove', (e) => {
+                customCursor.style.left = e.clientX + 'px';
+                customCursor.style.top = e.clientY + 'px';
+            });
+        }
+
+        // 更新光标样式
+        function updateCursorStyle() {
+            if (!customCursor) return;
+            
+            customCursor.className = 'custom-cursor visible';
+            if (currentTool === 'eraser') {
+                customCursor.classList.add('eraser');
+            } else {
+                customCursor.classList.add('pen');
+                customCursor.style.color = currentColor;
+            }
+        }
+
+        // 初始化板书画布
+        function initBlackboard() {
+            blackboardCanvas = document.getElementById('blackboardCanvas');
+            if (!blackboardCanvas) return;
+
+            const wrapper = blackboardCanvas.parentElement;
+            blackboardCanvas.width = wrapper.clientWidth;
+            blackboardCanvas.height = wrapper.clientHeight;
+
+            blackboardCtx = blackboardCanvas.getContext('2d');
+            blackboardCtx.lineCap = 'round';
+            blackboardCtx.lineJoin = 'round';
+            blackboardCtx.strokeStyle = currentColor;
+            blackboardCtx.lineWidth = brushSize;
+
+            // 初始化自定义光标
+            initCustomCursor();
+
+            // 绑定事件
+            blackboardCanvas.addEventListener('mousedown', startDrawing);
+            blackboardCanvas.addEventListener('mousemove', draw);
+            blackboardCanvas.addEventListener('mouseup', stopDrawing);
+            blackboardCanvas.addEventListener('mouseout', stopDrawing);
+
+            // 触摸事件支持
+            blackboardCanvas.addEventListener('touchstart', handleTouch);
+            blackboardCanvas.addEventListener('touchmove', handleTouch);
+            blackboardCanvas.addEventListener('touchend', stopDrawing);
+
+            // 工具按钮事件 - 只选择板书模式内的按钮
+            blackboardCanvas.parentElement.parentElement.querySelectorAll('.blackboard-tools .tool-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tool = btn.dataset.tool;
+                    if (tool === 'clear') {
+                        clearBlackboard();
+                    } else {
+                        setTool(tool);
+                        blackboardCanvas.parentElement.parentElement.querySelectorAll('.blackboard-tools .tool-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    }
+                });
+            });
+
+            // 颜色按钮事件
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentColor = btn.dataset.color;
+                    updateCursorStyle();
+                    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // 笔刷大小
+            const brushSlider = document.getElementById('brushSize');
+            if (brushSlider) {
+                brushSlider.addEventListener('input', (e) => {
+                    brushSize = parseInt(e.target.value);
+                });
+            }
+        }
+
+        // 开始绘制
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = blackboardCanvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+            drawingPoints = [{ x: lastX, y: lastY, time: Date.now() }];
+            
+            // 重置平滑移动数据
+            lastPoints = [{ x: lastX, y: lastY, time: Date.now() }];
+            velocityX = 0;
+            velocityY = 0;
+            lastDrawTime = Date.now();
+            
+            // 取消之前的平滑动画
+            if (smoothAnimationId) {
+                cancelAnimationFrame(smoothAnimationId);
+                smoothAnimationId = null;
+            }
+            
+            // 添加绘制状态到光标
+            if (customCursor) {
+                customCursor.classList.add('drawing');
+            }
+        }
+
+        // 绘制
+        function draw(e) {
+            if (!isDrawing || isStraightening) return;
+
+            const rect = blackboardCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const currentTime = Date.now();
+
+            // 笔锋效果 - 根据速度调整粗细
+            const distance = Math.sqrt(Math.pow(x - lastX, 2) + Math.pow(y - lastY, 2));
+            const speed = distance / 3; // 增加速度敏感度
+            
+            // 增强笔锋效果：快速时更细，慢速时更粗
+            const minWidth = brushSize * 0.3; // 最细可以到原粗细的30%
+            const maxWidth = brushSize * 1.8; // 最粗可以到原粗细的180%
+            const speedFactor = Math.min(speed * 0.05, 1); // 速度因子 0-1
+            const dynamicWidth = maxWidth - (maxWidth - minWidth) * speedFactor;
+
+            // 设置笔锋样式
+            blackboardCtx.beginPath();
+            blackboardCtx.moveTo(lastX, lastY);
+
+            // 使用二次贝塞尔曲线使线条更平滑
+            const controlX = (lastX + x) / 2;
+            const controlY = (lastY + y) / 2;
+            blackboardCtx.quadraticCurveTo(controlX, controlY, x, y);
+
+            blackboardCtx.strokeStyle = currentTool === 'eraser' ? '#1a1a2e' : currentColor;
+            blackboardCtx.lineWidth = currentTool === 'eraser' ? brushSize * 3 : dynamicWidth;
+            
+            // 添加圆角线帽和连接，让笔锋更自然
+            blackboardCtx.lineCap = 'round';
+            blackboardCtx.lineJoin = 'round';
+            
+            blackboardCtx.stroke();
+
+            drawingPoints.push({ x, y, time: currentTime });
+
+            // 记录点用于计算速度（平滑移动）
+            lastPoints.push({ x, y, time: currentTime });
+            if (lastPoints.length > 5) {
+                lastPoints.shift(); // 只保留最近5个点
+            }
+
+            lastX = x;
+            lastY = y;
+            lastDrawTime = currentTime;
+        }
+
+        // 平滑移动动画
+        function smoothMove() {
+            if (!isSmoothMode || Math.abs(velocityX) < 0.5 && Math.abs(velocityY) < 0.5) {
+                smoothAnimationId = null;
+                return;
+            }
+
+            // 计算新的位置
+            const newX = lastX + velocityX;
+            const newY = lastY + velocityY;
+
+            // 检查边界
+            if (newX < 0 || newX > blackboardCanvas.width || newY < 0 || newY > blackboardCanvas.height) {
+                smoothAnimationId = null;
+                return;
+            }
+
+            // 绘制线段
+            const minWidth = brushSize * 0.3;
+            const maxWidth = brushSize * 1.8;
+            const speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+            const speedFactor = Math.min(speed * 0.05, 1);
+            const dynamicWidth = maxWidth - (maxWidth - minWidth) * speedFactor;
+
+            blackboardCtx.beginPath();
+            blackboardCtx.moveTo(lastX, lastY);
+            blackboardCtx.lineTo(newX, newY);
+            blackboardCtx.strokeStyle = currentTool === 'eraser' ? '#1a1a2e' : currentColor;
+            blackboardCtx.lineWidth = currentTool === 'eraser' ? brushSize * 3 : dynamicWidth;
+            blackboardCtx.lineCap = 'round';
+            blackboardCtx.lineJoin = 'round';
+            blackboardCtx.stroke();
+
+            lastX = newX;
+            lastY = newY;
+
+            // 减速（摩擦力）
+            velocityX *= 0.92;
+            velocityY *= 0.92;
+
+            // 继续动画
+            smoothAnimationId = requestAnimationFrame(smoothMove);
+        }
+
+        // 停止绘制
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            // 拉直功能已关闭
+            
+            // 移除绘制状态从光标
+            if (customCursor) {
+                customCursor.classList.remove('drawing');
+            }
+
+            // 如果开启平滑模式，计算速度并启动惯性滑动
+            if (isSmoothMode && lastPoints.length >= 2) {
+                const recent = lastPoints.slice(-3); // 取最近3个点
+                let totalVx = 0, totalVy = 0, count = 0;
+                
+                for (let i = 1; i < recent.length; i++) {
+                    const dt = recent[i].time - recent[i-1].time;
+                    if (dt > 0) {
+                        totalVx += (recent[i].x - recent[i-1].x) / dt * 15; // 缩放因子
+                        totalVy += (recent[i].y - recent[i-1].y) / dt * 15;
+                        count++;
+                    }
+                }
+                
+                if (count > 0) {
+                    velocityX = totalVx / count;
+                    velocityY = totalVy / count;
+                    
+                    // 限制最大速度
+                    const maxSpeed = 30;
+                    const currentSpeed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+                    if (currentSpeed > maxSpeed) {
+                        velocityX = (velocityX / currentSpeed) * maxSpeed;
+                        velocityY = (velocityY / currentSpeed) * maxSpeed;
+                    }
+                    
+                    // 启动平滑移动动画
+                    if (Math.abs(velocityX) > 1 || Math.abs(velocityY) > 1) {
+                        smoothAnimationId = requestAnimationFrame(smoothMove);
+                    }
+                }
+            }
+        }
+
+        // 处理触摸事件
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            blackboardCanvas.dispatchEvent(mouseEvent);
+        }
+
+        // 设置工具
+        function setTool(tool) {
+            currentTool = tool;
+            updateCursorStyle();
+        }
+
+        // 清空板书
+        function clearBlackboard() {
+            blackboardCtx.fillStyle = '#1a1a2e';
+            blackboardCtx.fillRect(0, 0, blackboardCanvas.width, blackboardCanvas.height);
+            drawingPoints = [];
+            clearStraightenTimer();
+        }
+
+        // 显示拉直提示
+        function showStraightenHint() {
+            const hint = document.getElementById('straightenHint');
+            if (hint) hint.classList.add('show');
+        }
+
+        // 隐藏拉直提示
+        function hideStraightenHint() {
+            const hint = document.getElementById('straightenHint');
+            if (hint) hint.classList.remove('show');
+        }
+
+        // 启动自动拉直计时器 - 已禁用
+        function startStraightenTimer() {
+            // 自动拉直功能已关闭
+            return;
+        }
+
+        // 重置自动拉直计时器
+        function resetStraightenTimer() {
+            clearStraightenTimer();
+        }
+
+        // 清除自动拉直计时器
+        function clearStraightenTimer() {
+            if (straightenTimer) {
+                clearTimeout(straightenTimer);
+                straightenTimer = null;
+            }
+        }
+
+        // 自动拉直功能
+        function autoStraighten() {
+            if (drawingPoints.length < 3) return;
+
+            isStraightening = true;
+            hideStraightenHint();
+
+            // 分析笔画并拉直
+            const groups = groupStrokes(drawingPoints);
+
+            // 清除并重绘
+            clearBlackboard();
+
+            groups.forEach(group => {
+                if (group.length < 2) return;
+
+                const straightened = straightenStroke(group);
+                drawStraightenedStroke(straightened);
+            });
+
+            drawingPoints = [];
+            isStraightening = false;
+
+            showToast('✓ 已自动拉直笔画', 'success');
+        }
+
+        // 分组笔画
+        function groupStrokes(points) {
+            const groups = [];
+            let currentGroup = [points[0]];
+
+            for (let i = 1; i < points.length; i++) {
+                const prev = points[i - 1];
+                const curr = points[i];
+                const distance = Math.sqrt(Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2));
+                const timeDiff = curr.time - prev.time;
+
+                // 如果距离太远或时间间隔太长，认为是新的笔画
+                if (distance > 50 || timeDiff > 200) {
+                    groups.push(currentGroup);
+                    currentGroup = [curr];
+                } else {
+                    currentGroup.push(curr);
+                }
+            }
+
+            if (currentGroup.length > 0) {
+                groups.push(currentGroup);
+            }
+
+            return groups;
+        }
+
+        // 拉直单个笔画
+        function straightenStroke(points) {
+            if (points.length < 3) return points;
+
+            // 计算主方向
+            const start = points[0];
+            const end = points[points.length - 1];
+            const dx = end.x - start.x;
+            const dy = end.y - start.y;
+            const angle = Math.atan2(dy, dx);
+
+            // 判断是水平、垂直还是斜线
+            const absAngle = Math.abs(angle);
+            const isHorizontal = absAngle < Math.PI / 6 || absAngle > 5 * Math.PI / 6;
+            const isVertical = absAngle > Math.PI / 3 && absAngle < 2 * Math.PI / 3;
+
+            let straightened;
+            if (isHorizontal) {
+                // 拉直为水平线
+                const avgY = points.reduce((sum, p) => sum + p.y, 0) / points.length;
+                straightened = [
+                    { x: start.x, y: avgY },
+                    { x: end.x, y: avgY }
+                ];
+            } else if (isVertical) {
+                // 拉直为垂直线
+                const avgX = points.reduce((sum, p) => sum + p.x, 0) / points.length;
+                straightened = [
+                    { x: avgX, y: start.y },
+                    { x: avgX, y: end.y }
+                ];
+            } else {
+                // 保持斜线，但使其更直
+                straightened = [start, end];
+            }
+
+            return straightened;
+        }
+
+        // 绘制拉直后的笔画
+        function drawStraightenedStroke(points) {
+            if (points.length < 2) return;
+
+            blackboardCtx.beginPath();
+            blackboardCtx.moveTo(points[0].x, points[0].y);
+
+            for (let i = 1; i < points.length; i++) {
+                blackboardCtx.lineTo(points[i].x, points[i].y);
+            }
+
+            blackboardCtx.strokeStyle = currentColor;
+            blackboardCtx.lineWidth = brushSize;
+            blackboardCtx.lineCap = 'round';
+            blackboardCtx.lineJoin = 'round';
+            blackboardCtx.stroke();
+        }
+
+        // 保存板书
+        function saveBlackboard() {
+            if (!blackboardCanvas) return;
+
+            const link = document.createElement('a');
+            link.download = `板书_${new Date().toLocaleString().replace(/[/:]/g, '-')}.png`;
+            link.href = blackboardCanvas.toDataURL();
+            link.click();
+
+            showToast('✓ 板书已保存', 'success');
+        }
+
+        // 监听输入框内容变化，检测板书关键词
+        function initBlackboardKeywordListener() {
+            const blackboardUserInput = document.getElementById('userInput');
+            if (blackboardUserInput) {
+                blackboardUserInput.addEventListener('input', function() {
+                    const text = this.value;
+                    if (checkBlackboardKeywords(text)) {
+                        // 延迟显示提示，避免频繁弹出
+                        setTimeout(() => {
+                            if (this.value === text && checkBlackboardKeywords(text)) {
+                                showBlackboardPrompt();
+                            }
+                        }, 500);
+                    }
+                });
+            }
+        }
+        
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initBlackboardKeywordListener);
+        } else {
+            initBlackboardKeywordListener();
+        }
+
+        // 点击模态框外部关闭
+        document.getElementById('blackboardModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeBlackboard();
+            }
+        });
     </script>
 
     <!-- CSE 模式简介弹窗 -->
@@ -5101,6 +7520,90 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- 自定义鼠标光标 -->
+    <div class="custom-cursor pen" id="customCursor"></div>
+
+    <!-- 板书模式弹窗 -->
+    <div class="blackboard-modal" id="blackboardModal">
+        <div class="blackboard-container">
+            <div class="blackboard-header">
+                <h3>📝 板书模式</h3>
+                <div class="blackboard-tools">
+                    <button class="tool-btn active" data-tool="pen" title="钢笔">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                            <path d="M2 2l7.586 7.586"></path>
+                            <circle cx="11" cy="11" r="2"></circle>
+                        </svg>
+                    </button>
+                    <button class="tool-btn" data-tool="eraser" title="橡皮擦">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 20H7L3 16C2 15 2 13 3 12L13 2L22 11L20 20Z"></path>
+                            <path d="M17 17L7 7"></path>
+                        </svg>
+                    </button>
+                    <button class="tool-btn" data-tool="clear" title="清空">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                    <div class="color-picker">
+                        <button class="color-btn active" data-color="#ffffff" style="background: #ffffff;"></button>
+                        <button class="color-btn" data-color="#ff6b6b" style="background: #ff6b6b;"></button>
+                        <button class="color-btn" data-color="#4ecdc4" style="background: #4ecdc4;"></button>
+                        <button class="color-btn" data-color="#ffe66d" style="background: #ffe66d;"></button>
+                    </div>
+                </div>
+                <div class="blackboard-actions">
+                    <button class="blackboard-btn save-btn" onclick="saveBlackboard()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        保存
+                    </button>
+                    <button class="blackboard-btn close-btn" onclick="closeBlackboard()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        关闭
+                    </button>
+                </div>
+            </div>
+            <div class="blackboard-canvas-wrapper">
+                <canvas id="blackboardCanvas"></canvas>
+
+            </div>
+            <div class="blackboard-footer">
+                <span class="brush-size-label">笔刷大小:</span>
+                <input type="range" class="brush-size-slider" id="brushSize" min="2" max="20" value="4">
+                <span class="auto-straighten-status" id="autoStraightenStatus">✗ 自动拉直已关闭</span>
+                <button class="smooth-mode-btn" id="smoothModeBtn" onclick="toggleSmoothMode()" title="平滑移动">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                        <path d="M2 17l10 5 10-5"></path>
+                        <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    <span>平滑移动</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 板书提示弹窗 -->
+    <div class="blackboard-prompt" id="blackboardPrompt">
+        <h4>📝 是否进入板书模式？</h4>
+        <p>检测到板书相关关键词，是否打开板书功能？</p>
+        <div class="blackboard-prompt-buttons">
+            <button class="blackboard-prompt-btn primary" onclick="openBlackboard()">进入板书</button>
+            <button class="blackboard-prompt-btn secondary" onclick="dismissBlackboardPrompt()">取消</button>
         </div>
     </div>
 </body>
