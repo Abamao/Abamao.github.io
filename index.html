@@ -606,6 +606,38 @@
             box-shadow: 0 6px 25px rgba(0, 212, 255, 0.6), inset 0 2px 15px rgba(255, 255, 255, 0.3);
             animation: glitch 0.3s ease-in-out, tacticalPulse 0.5s ease-in-out infinite;
         }
+        
+        /* YziLoud 云存储链接样式 */
+        .yziloud-link {
+            position: fixed;
+            top: 20px;
+            left: 180px;
+            height: 50px;
+            padding: 0 20px;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+            text-decoration: none;
+            white-space: nowrap;
+            animation: float 3s ease-in-out infinite;
+        }
+        .yziloud-link:hover { 
+            transform: scale(1.15) rotate(5deg); 
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6), inset 0 2px 15px rgba(255, 255, 255, 0.3);
+        }
+        
         .fish-icon::after {
             content: '🔒';
             position: absolute;
@@ -1541,6 +1573,14 @@
         }
         body.easy-mode .fish-icon::before {
             display: none;
+        }
+        
+        /* 简单模式 - YziLoud 链接 */
+        body.easy-mode .yziloud-link {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 25px;
+            animation: none;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
         }
         
         /* 简单模式 - 简化新发布标识 */
@@ -5186,6 +5226,7 @@
     <button class="theme-toggle bg-toggle" onclick="changeBackground()" title="更换背景图">🖼️</button>
     <button class="theme-toggle cookie-toggle" onclick="clearAllData()" title="清除所有数据">🍪</button>
     <div class="fish-icon" title="VIP 权益" onclick="showFishPasswordModal(); unlockAchievement('fishClicker');"><span style="color: #ffb300; font-size: 1.2em;">👑</span> VIP 权益</div>
+    <a href="https://abamao.github.io/Yziloud" target="_blank" class="yziloud-link" title="YziLoud 云存储">☁️ YziLoud</a>
     <div class="huashuishui-icon" title="划划水" onclick="openHuashuishuiPanel()">🐟 划划水</div>
 
     <!-- 鱼图标密码保护弹窗 -->
