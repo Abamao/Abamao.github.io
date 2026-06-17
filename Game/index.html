@@ -1,0 +1,4659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stream — 创建账号</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+/* System font stack fallback */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: local('Outfit'), local('Outfit Regular'),
+       url('https://fonts.cdnfonts.com/s/66725/Outfit-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: local('Plus Jakarta Sans'), local('PlusJakartaSans'),
+       url('https://fonts.cdnfonts.com/s/91771/PlusJakartaSans-Regular.woff') format('woff');
+}
+</style>
+<style>
+:root {
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --primary: #FF5722;
+  --primary-dark: #E64A19;
+  --primary-soft: #FFF1EA;
+  --text: #111111;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  --border-strong: #D1D5DB;
+  --shadow: 0 1px 2px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.06);
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body { display: flex; flex-direction: column; min-height: 100vh; }
+
+button { font-family: inherit; }
+
+/* === Top Bar === */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 32px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.logo-mark {
+  width: 30px; height: 30px;
+  background: var(--primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+  position: relative;
+}
+
+.logo-mark::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; right: -3px;
+  width: 8px; height: 8px;
+  background: #FFB300;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.topbar-nav { display: flex; gap: 28px; align-items: center; }
+
+.topbar-nav button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 0;
+  position: relative;
+  transition: color 0.15s;
+}
+
+.topbar-nav button:hover { color: var(--text); }
+.topbar-nav button:hover::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+/* === Points Pill === */
+.points-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #FFB300, #FF8A50);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  cursor: default;
+  box-shadow: 0 2px 8px rgba(255, 138, 80, 0.3);
+  animation: pointsIn 0.4s ease;
+}
+
+@keyframes pointsIn {
+  from { opacity: 0; transform: scale(0.8) translateY(-4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.points-pill .coin-icon {
+  font-size: 14px;
+}
+
+.points-pill .points-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* === Main === */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.auth-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 600px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Decorative bouncing ball */
+.ball {
+  position: absolute;
+  width: 20px; height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: bounce 1.6s ease-in-out infinite;
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+
+.ball.b1 { top: 18%; left: 14%; animation-delay: 0s; background: #FF5722; }
+.ball.b2 { top: 75%; left: 12%; animation-delay: 0.3s; background: #FFB300; width: 14px; height: 14px; }
+.ball.b3 { top: 22%; right: 15%; animation-delay: 0.6s; background: #00C853; width: 16px; height: 16px; }
+.ball.b4 { top: 70%; right: 11%; animation-delay: 0.9s; background: #2979FF; width: 12px; height: 12px; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  10% { transform: translateY(0) scale(1.1, 0.9); }
+  50% { transform: translateY(-40px) scale(0.95, 1.05); }
+  60% { transform: translateY(-40px) scale(0.95, 1.05); }
+}
+
+.main { position: relative; }
+
+/* === Card === */
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow);
+  position: relative;
+  z-index: 1;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.card-title em {
+  font-style: normal;
+  color: var(--primary);
+}
+
+.card-subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* === Form === */
+.form { display: flex; flex-direction: column; gap: 16px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.field-input {
+  width: 100%;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.field-input::placeholder { color: #9CA3AF; }
+
+.field-input:focus {
+  border-color: var(--primary);
+  background: white;
+}
+
+.field-input.error { border-color: var(--primary); }
+
+/* Checkbox */
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 2px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 5px;
+  background: white;
+  margin-top: 1px;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.checkbox-row input[type="checkbox"]:hover { border-color: var(--primary); }
+
+.checkbox-row input[type="checkbox"]:checked {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox-row input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.checkbox-row a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.checkbox-row a:hover { text-decoration: underline; }
+
+/* Buttons */
+.btn {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 6px rgba(255, 87, 34, 0.25);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin: 4px 0;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.alt-actions { display: flex; gap: 10px; }
+
+.alt-btn {
+  flex: 1;
+  padding: 12px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.alt-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* === Footer === */
+.footer {
+  padding: 20px 32px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+.footer-link {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.footer-link:hover { color: var(--primary); }
+
+.footer-sep { color: var(--border-strong); }
+
+/* === Toast === */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #1F2937;
+  color: white;
+  padding: 13px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast-dot {
+  width: 8px; height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* === Success === */
+.success-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  padding: 20px;
+}
+
+.success-overlay.show { opacity: 1; pointer-events: auto; }
+
+.success-card {
+  background: white;
+  border-radius: 20px;
+  padding: 36px 32px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.success-icon {
+  width: 64px; height: 64px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.success-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.success-msg {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* === Captcha Slider === */
+.captcha {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.captcha-track {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.captcha-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, #FFE0B2, var(--primary));
+  transition: width 0.15s ease;
+  border-radius: 0 10px 10px 0;
+}
+
+.captcha-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.captcha-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 2;
+  color: var(--primary);
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+  transition: background 0.15s, left 0.25s ease;
+}
+
+.captcha-handle:hover { background: var(--primary-soft); }
+.captcha-handle:active { cursor: grabbing; }
+
+.captcha.dragging .captcha-handle { transition: none; }
+.captcha.dragging .captcha-fill { transition: none; }
+
+.captcha.success .captcha-track { border-color: var(--primary); }
+.captcha.success .captcha-handle {
+  background: var(--primary);
+  color: white;
+}
+.captcha.success .captcha-fill {
+  width: 100% !important;
+  background: linear-gradient(90deg, #FFE0B2, var(--primary));
+}
+.captcha.success .captcha-text {
+  color: white;
+  font-weight: 600;
+}
+
+.captcha.fail .captcha-track {
+  animation: shake 0.5s;
+  border-color: var(--primary);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+/* === Policy Modal === */
+.policy-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  padding: 20px;
+}
+
+.policy-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.policy-modal {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: policyIn 0.25s ease;
+}
+
+@keyframes policyIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.policy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.policy-header h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.policy-header .policy-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 400;
+  font-family: var(--font-body);
+}
+
+.policy-close {
+  background: var(--bg);
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.policy-close:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.policy-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text-muted);
+}
+
+.policy-content::-webkit-scrollbar { width: 6px; }
+.policy-content::-webkit-scrollbar-track { background: transparent; }
+.policy-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.policy-content::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+.policy-content h3 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin-top: 22px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--primary);
+}
+
+.policy-content h3:first-child { margin-top: 0; }
+
+.policy-content p { margin-bottom: 10px; }
+
+.policy-content strong { color: var(--text); font-weight: 600; }
+
+.policy-content ul { margin: 6px 0 12px 4px; }
+.policy-content li {
+  list-style: none;
+  padding-left: 16px;
+  position: relative;
+  margin-bottom: 4px;
+}
+.policy-content li::before {
+  content: '·';
+  color: var(--primary);
+  position: absolute;
+  left: 4px;
+  font-weight: bold;
+}
+
+.policy-content .last-updated {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border);
+}
+
+.policy-content .contact {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.policy-content .contact strong { color: var(--primary); }
+
+.policy-footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  background: var(--bg);
+}
+
+.policy-footer .btn {
+  width: auto;
+  padding: 10px 22px;
+  font-size: 14px;
+}
+
+/* === Login Modal === */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  padding: 20px;
+}
+
+.login-overlay.show { opacity: 1; pointer-events: auto; }
+
+.login-modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: policyIn 0.25s ease;
+  overflow: hidden;
+}
+
+.login-close {
+  position: absolute;
+  top: 14px; right: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  font-size: 22px;
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.login-close:hover { background: white; color: var(--primary); }
+
+.login-hero {
+  padding: 32px 28px 20px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--primary-soft) 0%, rgba(255, 241, 234, 0) 100%);
+}
+
+.login-mark {
+  width: 52px; height: 52px;
+  background: var(--primary);
+  border-radius: 14px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  box-shadow: 0 4px 16px rgba(255, 87, 34, 0.3);
+}
+
+.login-mark::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; right: -3px;
+  width: 12px; height: 12px;
+  background: #FFB300;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.login-hero h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.login-hero p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.login-form {
+  padding: 20px 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+}
+
+.login-options .checkbox-row {
+  font-size: 13px;
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.forgot-link {
+  color: var(--primary);
+  text-decoration: none;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forgot-link:hover { text-decoration: underline; }
+
+.social-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.social-btn {
+  padding: 10px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.social-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.social-discord { color: #5865F2; }
+.social-google { color: #4285F4; }
+
+.login-footer {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.login-footer a, .login-footer button {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.login-footer a:hover, .login-footer button:hover {
+  text-decoration: underline;
+}
+
+.login-success {
+  padding: 44px 28px 36px;
+  text-align: center;
+}
+
+.login-success .success-icon {
+  width: 64px; height: 64px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.login-success h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.login-success p {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+}
+
+.login-success p strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* User pill in topbar */
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  background: var(--primary-soft);
+  border: 1.5px solid transparent;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.user-pill:hover {
+  border-color: var(--primary);
+}
+
+.user-pill-avatar {
+  width: 24px; height: 24px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.user-pill-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* === Dashboard === */
+.dashboard {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 32px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FF5722 0%, #FF8A50 50%, #FFB74D 100%);
+  color: white;
+  box-shadow: 0 8px 24px rgba(255, 87, 34, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+  border-radius: 50%;
+}
+
+.welcome-banner::after {
+  content: '🎮';
+  position: absolute;
+  bottom: -20px; right: 30px;
+  font-size: 120px;
+  opacity: 0.12;
+  transform: rotate(-15deg);
+}
+
+.welcome-text { z-index: 1; }
+.welcome-text h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.welcome-text p {
+  font-size: 15px;
+  opacity: 0.95;
+}
+
+.welcome-stats {
+  display: flex;
+  gap: 24px;
+  z-index: 1;
+}
+
+.welcome-stat {
+  text-align: center;
+  padding: 0 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.welcome-stat:last-child { border-right: none; }
+
+.welcome-stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  display: block;
+}
+
+.welcome-stat-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Section headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.section-link {
+  font-size: 13px;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.section-link:hover { text-decoration: underline; }
+
+/* Empty state */
+.empty-state {
+  background: white;
+  border-radius: 16px;
+  padding: 56px 32px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.empty-icon {
+  width: 96px; height: 96px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, var(--primary-soft), #FFE0B2);
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  position: relative;
+  box-shadow: 0 8px 20px rgba(255, 87, 34, 0.15);
+}
+
+.empty-icon::after {
+  content: '';
+  position: absolute;
+  bottom: -6px; right: -6px;
+  width: 24px; height: 24px;
+  background: #FFB300;
+  border: 3px solid white;
+  border-radius: 50%;
+}
+
+.empty-state h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.empty-state > p {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: 24px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.empty-actions .btn {
+  width: auto;
+  padding: 11px 22px;
+  font-size: 14px;
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+/* Quick actions */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.action-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.action-btn .action-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.action-btn:hover .action-icon {
+  background: white;
+}
+
+.action-btn.logout {
+  color: #E63946;
+}
+
+.action-btn.logout:hover {
+  background: #FFE5E5;
+  border-color: #E63946;
+  color: #E63946;
+}
+
+.action-btn.logout .action-icon {
+  background: #FFE5E5;
+  color: #E63946;
+}
+
+/* === Account Menu (dropdown) === */
+.account-control {
+  position: relative;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.98);
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  overflow: hidden;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.account-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.account-menu-header {
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary-soft) 0%, #FFE0B2 100%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+
+.account-menu-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 16px; right: 16px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.account-avatar {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, var(--primary), #FF8A50);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+}
+
+.account-info { flex: 1; min-width: 0; }
+
+.account-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.account-email {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.account-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  background: white;
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  letter-spacing: 0.1em;
+  border: 1px solid rgba(255, 87, 34, 0.2);
+}
+
+.account-menu-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 14px 0;
+  background: white;
+}
+
+.account-stat {
+  text-align: center;
+  padding: 0 8px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+
+.account-stat:last-child { border-right: none; }
+
+.account-stat-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.account-stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.account-menu-section {
+  padding: 10px 20px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.account-menu-items {
+  padding: 4px 8px;
+}
+
+.account-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  border-radius: 8px;
+  user-select: none;
+}
+
+.account-menu-item:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.account-menu-item .item-icon {
+  width: 32px; height: 32px;
+  background: var(--bg);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background 0.1s;
+}
+
+.account-menu-item:hover .item-icon {
+  background: white;
+}
+
+.account-menu-item .item-label { flex: 1; }
+
+.account-menu-item .item-badge {
+  background: var(--primary);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+  font-family: var(--font-display);
+}
+
+.account-menu-item .item-arrow {
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.account-menu-item .toggle-switch {
+  position: relative;
+  width: 36px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.account-menu-item .toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: left 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.account-menu-item .toggle-switch.on {
+  background: var(--primary);
+}
+
+.account-menu-item .toggle-switch.on::after {
+  left: 18px;
+}
+
+.account-menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 16px;
+}
+
+.account-menu-item.logout {
+  color: #E63946;
+}
+
+.account-menu-item.logout:hover {
+  background: #FFE5E5;
+  color: #E63946;
+}
+
+.account-menu-item.logout .item-icon {
+  background: #FFE5E5;
+}
+
+/* === RRTF Drop Overlay === */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 8, 15, 0.85);
+  backdrop-filter: blur(12px);
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.drop-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drop-zone {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px dashed rgba(255, 87, 34, 0.5);
+  border-radius: 28px;
+  padding: 56px 72px;
+  text-align: center;
+  animation: dropPulse 2s ease-in-out infinite;
+  box-shadow: 0 24px 80px rgba(255, 87, 34, 0.2), inset 0 0 60px rgba(255, 87, 34, 0.05);
+  position: relative;
+  overflow: hidden;
+  min-width: 420px;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 87, 34, 0.06) 50%, transparent 70%);
+  animation: dropShine 3s linear infinite;
+  pointer-events: none;
+}
+
+.drop-zone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.4), rgba(255, 138, 80, 0.2), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes dropShine {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(0deg); }
+}
+
+@keyframes dropPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 24px 80px rgba(255, 87, 34, 0.2), inset 0 0 60px rgba(255, 87, 34, 0.05); }
+  50% { transform: scale(1.015); box-shadow: 0 28px 90px rgba(255, 87, 34, 0.35), inset 0 0 80px rgba(255, 87, 34, 0.08); }
+}
+
+.drop-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  display: block;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(255, 87, 34, 0.3));
+}
+
+.drop-zone h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  color: #fff;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+.drop-zone p {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.drop-formats {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(255, 87, 34, 0.15);
+  color: #FF8A50;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 87, 34, 0.2);
+}
+
+.drop-formats .format-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(255, 87, 34, 0.25);
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.drop-sample-link {
+  display: block;
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  z-index: 1;
+  transition: color 0.15s;
+}
+
+.drop-sample-link:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.drop-sample-link a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.drop-sample-link a:hover {
+  text-decoration: underline;
+}
+
+/* Drag active state */
+.drop-overlay.drag-active .drop-zone {
+  border-color: rgba(255, 87, 34, 0.8);
+  background: linear-gradient(135deg, #1a1a2e 0%, #1e2a4a 100%);
+}
+
+/* === RRTF Preview === */
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0f1419;
+  z-index: 1400;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.preview-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(180deg, #1c2128, #161b22);
+  color: white;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.preview-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  min-width: 0;
+}
+
+.preview-title-icon {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--primary), #FF8A50);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.preview-filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+.preview-filesize {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.preview-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.preview-close {
+  background: var(--primary);
+  border: none;
+  color: white;
+  width: 32px; height: 32px;
+  border-radius: 7px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  margin-left: 4px;
+  transition: background 0.15s;
+}
+
+.preview-close:hover {
+  background: var(--primary-dark);
+}
+
+.preview-frame-wrap {
+  flex: 1;
+  background: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.preview-frame-loading {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1;
+  font-family: var(--font-body);
+  color: var(--text-muted);
+}
+
+.preview-frame-loading .spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === Points Cards === */
+.points-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid var(--border);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.points-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary);
+}
+
+.points-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.points-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.points-card-header h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.points-card-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.checkin-streak {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 8px 12px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.checkin-streak strong {
+  color: var(--primary);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.click-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* === Games Grid === */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.game-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.game-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--primary);
+}
+
+.game-thumb {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.game-thumb-emoji {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.game-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.game-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.game-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.game-price {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-price-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, #FFB300, #FF8A50);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(255, 138, 80, 0.3);
+}
+
+.free-tag {
+  background: linear-gradient(135deg, #43A047, #2E7D32) !important;
+  box-shadow: 0 2px 6px rgba(67, 160, 71, 0.3) !important;
+}
+
+.game-play-btn {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 14px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* === Click Slider === */
+.click-slider-wrap {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.click-slider-track {
+  position: relative;
+  width: 100%;
+  height: 44px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.click-slider-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, #FFE0B2, var(--primary));
+  transition: width 0.15s ease;
+  border-radius: 0 10px 10px 0;
+}
+
+.click-slider-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.click-slider-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 2;
+  color: var(--primary);
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.06);
+  transition: background 0.15s, left 0.25s ease;
+}
+
+.click-slider-handle:hover { background: var(--primary-soft); }
+.click-slider-handle:active { cursor: grabbing; }
+
+.click-slider-wrap.dragging .click-slider-handle { transition: none; }
+.click-slider-wrap.dragging .click-slider-fill { transition: none; }
+
+.click-slider-wrap.success .click-slider-track { border-color: var(--primary); }
+.click-slider-wrap.success .click-slider-handle {
+  background: var(--primary);
+  color: white;
+}
+.click-slider-wrap.success .click-slider-fill {
+  width: 100% !important;
+  background: linear-gradient(90deg, #FFE0B2, var(--primary));
+}
+.click-slider-wrap.success .click-slider-text {
+  color: white;
+  font-weight: 600;
+}
+
+.click-slider-wrap.fail .click-slider-track {
+  animation: shake 0.5s;
+  border-color: var(--primary);
+}
+
+.click-progress-bar {
+  flex: 1;
+  height: 10px;
+  background: var(--bg);
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.click-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFB300, var(--primary));
+  border-radius: 5px;
+  transition: width 0.2s ease;
+}
+
+.click-progress-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  min-width: 40px;
+  text-align: right;
+}
+
+#checkinBtn:disabled {
+  background: #9CA3AF;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+#checkinBtn.checked-in {
+  background: #10B981;
+  cursor: default;
+}
+
+#checkinBtn.checked-in:hover {
+  transform: none;
+}
+
+/* === Responsive === */
+
+/* Tablet (max-width: 900px) */
+@media (max-width: 900px) {
+  .quick-actions { grid-template-columns: repeat(2, 1fr); }
+  .welcome-banner { flex-direction: column; align-items: flex-start; gap: 20px; }
+  .welcome-stats { width: 100%; justify-content: space-between; }
+  .welcome-stat { padding: 0 12px; }
+  .welcome-stat-num { font-size: 20px; }
+  .dashboard { padding: 24px 16px 40px; }
+  .points-section { grid-template-columns: 1fr !important; }
+  .drop-zone { min-width: 320px; padding: 40px 32px; }
+  .drop-zone h2 { font-size: 22px; }
+  .preview-filename { max-width: 200px; }
+  .policy-modal { max-width: 520px; }
+}
+
+/* Mobile (max-width: 600px) */
+@media (max-width: 600px) {
+  /* Topbar */
+  .topbar { padding: 12px 16px; }
+  .topbar-nav { gap: 12px; }
+  .topbar-nav button { font-size: 13px; }
+  .logo { font-size: 18px; }
+  .logo-mark { width: 26px; height: 26px; font-size: 14px; }
+
+  /* Auth card */
+  .auth-view { min-height: auto; padding: 20px 0; }
+  .card { padding: 28px 20px; border-radius: 16px; max-width: 100%; margin: 0 12px; }
+  .card-title { font-size: 22px; }
+  .card-subtitle { font-size: 14px; margin-bottom: 20px; }
+  .field-input { padding: 11px 14px; font-size: 16px; }
+  .btn { padding: 12px 16px; font-size: 14px; }
+  .alt-btn { padding: 10px; font-size: 13px; }
+  .ball { display: none; }
+
+  /* Dashboard */
+  .dashboard { padding: 16px 12px 32px; gap: 20px; }
+  .welcome-banner { padding: 20px 20px; border-radius: 12px; }
+  .welcome-text h1 { font-size: 20px; }
+  .welcome-text p { font-size: 13px; }
+  .welcome-stats { gap: 12px; }
+  .welcome-stat { padding: 0 8px; }
+  .welcome-stat-num { font-size: 18px; }
+  .welcome-stat-label { font-size: 10px; }
+  .welcome-banner::after { font-size: 80px; bottom: -10px; right: 10px; }
+
+  /* Points cards */
+  .points-card { padding: 18px; border-radius: 12px; }
+  .points-card-header { gap: 10px; margin-bottom: 12px; }
+  .points-card-icon { width: 38px; height: 38px; font-size: 18px; border-radius: 10px; }
+  .points-card-header h3 { font-size: 15px; }
+  .points-card-header p { font-size: 12px; }
+  .checkin-streak { font-size: 12px; padding: 6px 10px; }
+  .click-progress-bar { height: 8px; }
+  .click-progress-text { font-size: 12px; min-width: 36px; }
+
+  /* Games */
+  .games-grid { grid-template-columns: 1fr; }
+  .game-card { padding: 16px; gap: 12px; }
+  .game-thumb { width: 52px; height: 52px; font-size: 26px; }
+  .game-name { font-size: 15px; }
+  .game-desc { font-size: 12px; }
+  .game-play-btn { padding: 8px 14px; font-size: 13px; }
+
+  /* Quick actions */
+  .quick-actions { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .action-btn { padding: 10px 12px; font-size: 13px; gap: 8px; }
+  .action-btn .action-icon { width: 28px; height: 28px; font-size: 14px; }
+
+  /* Empty state */
+  .empty-state { padding: 40px 20px; }
+  .empty-icon { width: 72px; height: 72px; border-radius: 20px; font-size: 36px; }
+  .empty-icon::after { width: 20px; height: 20px; bottom: -4px; right: -4px; border-width: 2px; }
+  .empty-state h2 { font-size: 20px; }
+  .empty-state > p { font-size: 13px; margin-bottom: 16px; }
+  .empty-actions .btn { padding: 9px 16px; font-size: 13px; }
+
+  /* Section headers */
+  .section-header { margin-bottom: 10px; }
+  .section-title { font-size: 16px; }
+  .section-link { font-size: 12px; }
+
+  /* Footer */
+  .footer { padding: 14px 16px; font-size: 12px; gap: 12px; }
+
+  /* Points pill */
+  .points-pill { display: none !important; }
+
+  /* Account menu */
+  .account-menu { width: calc(100vw - 32px); right: -8px; max-width: 320px; }
+  .user-pill span:not(.user-pill-avatar) { display: none; }
+  .user-pill { padding: 4px 8px 4px 4px; }
+
+  /* Success overlay */
+  .success-card { padding: 28px 24px; margin: 0 16px; }
+  .success-icon { width: 56px; height: 56px; font-size: 26px; }
+  .success-title { font-size: 20px; }
+  .success-msg { font-size: 14px; }
+
+  /* Login modal */
+  .login-modal { border-radius: 16px; margin: 0 16px; }
+  .login-hero { padding: 24px 20px 16px; }
+  .login-mark { width: 44px; height: 44px; font-size: 22px; border-radius: 12px; }
+  .login-hero h2 { font-size: 20px; }
+  .login-form { padding: 16px 20px 20px; gap: 12px; }
+  .social-buttons { grid-template-columns: 1fr; }
+  .login-success { padding: 32px 20px 24px; }
+  .login-success .success-icon { width: 56px; height: 56px; font-size: 26px; }
+  .login-success h2 { font-size: 20px; }
+
+  /* Policy modal */
+  .policy-modal { border-radius: 12px; max-height: 90vh; }
+  .policy-header { padding: 14px 18px; }
+  .policy-header h2 { font-size: 16px; }
+  .policy-content { padding: 18px 20px; font-size: 13px; }
+  .policy-footer { padding: 12px 18px; }
+  .policy-footer .btn { padding: 8px 16px; font-size: 13px; }
+
+  /* Drop overlay */
+  .drop-zone { min-width: auto; width: calc(100vw - 32px); padding: 32px 24px; border-radius: 20px; }
+  .drop-zone h2 { font-size: 20px; }
+  .drop-zone p { font-size: 13px; }
+  .drop-icon { font-size: 48px; }
+  .drop-formats { font-size: 11px; padding: 4px 12px; }
+  .drop-formats .format-tag { font-size: 10px; }
+
+  /* Preview overlay */
+  .preview-header { padding: 10px 14px; }
+  .preview-title { font-size: 13px; gap: 8px; }
+  .preview-title-icon { width: 24px; height: 24px; font-size: 12px; }
+  .preview-filename { max-width: 120px; }
+  .preview-btn { padding: 5px 10px; font-size: 12px; }
+  .preview-close { width: 28px; height: 28px; font-size: 16px; }
+
+  /* Captcha */
+  .captcha-track { height: 40px; }
+  .captcha-handle { width: 40px; height: 40px; }
+  .captcha-text { font-size: 12px; }
+}
+
+/* Small mobile (max-width: 380px) */
+@media (max-width: 380px) {
+  .topbar-nav { gap: 8px; }
+  .topbar-nav button { font-size: 12px; }
+  .card { padding: 24px 16px; }
+  .card-title { font-size: 20px; }
+  .welcome-text h1 { font-size: 18px; }
+  .welcome-stats { gap: 8px; }
+  .welcome-stat-num { font-size: 16px; }
+  .quick-actions { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .action-btn { padding: 8px 10px; font-size: 12px; }
+}
+
+/* Landscape phone optimization */
+@media (max-height: 500px) and (orientation: landscape) {
+  .auth-view { padding: 10px 0; }
+  .card { padding: 20px 18px; }
+  .welcome-banner { padding: 16px 20px; }
+  .welcome-banner::after { display: none; }
+  .drop-zone { padding: 24px 20px; }
+  .drop-zone h2 { font-size: 18px; }
+  .preview-header { padding: 8px 12px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <button class="logo">
+    <span class="logo-mark">S</span>
+    <span>Stream</span>
+  </button>
+  <nav class="topbar-nav">
+    <button data-tbd="游戏">游戏</button>
+    <button data-tbd="社区">社区</button>
+    <button data-tbd="排行榜">排行榜</button>
+    <div class="points-pill" id="pointsPill" style="display: none;">
+      <span class="coin-icon">🪙</span>
+      <span class="points-num" id="pointsNum">0</span>
+    </div>
+    <button data-action="open-login" id="loginNavBtn">登录</button>
+
+    <div class="account-control" id="accountControl" style="display: none;">
+      <button class="account-menu-item logout" id="menuLogoutBtn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 10px; color: var(--text-muted); font-size: 14px; font-weight: 500; transition: color 0.15s, background 0.15s;">
+        <span class="item-icon">🚪</span>
+        <span class="item-label">退出登录</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="ball b1"></div>
+  <div class="ball b2"></div>
+  <div class="ball b3"></div>
+  <div class="ball b4"></div>
+
+  <!-- Auth view (registration / login entry) -->
+  <div class="auth-view" id="authView">
+    <div class="card">
+    <h1 class="card-title">创建你的<br><em>游戏账号</em></h1>
+    <p class="card-subtitle">加入 Stream 社区，10 秒即可开始游戏</p>
+
+    <form class="form" id="regForm" novalidate autocomplete="off">
+      <div class="field">
+        <label class="field-label" for="username">用户名</label>
+        <input class="field-input" type="text" id="username" placeholder="3-16 位字母/数字/下划线" maxlength="16" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="email">邮箱</label>
+        <input class="field-input" type="email" id="email" placeholder="player@example.com" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">密码</label>
+        <input class="field-input" type="password" id="password" placeholder="至少 8 位" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="confirm">确认密码</label>
+        <input class="field-input" type="password" id="confirm" placeholder="再次输入密码" required>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="agreement" required>
+        <span>我已阅读并同意 <a href="#" id="showAgreement">《用户协议》</a> 和 <a href="#" id="showPrivacy">《隐私政策》</a></span>
+      </label>
+
+      <!-- 人机验证 -->
+      <div class="captcha" id="captcha">
+        <div class="captcha-track" id="captchaTrack">
+          <div class="captcha-fill" id="captchaFill"></div>
+          <div class="captcha-text" id="captchaText">按住滑块向右拖动完成验证</div>
+          <div class="captcha-handle" id="captchaHandle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+              <polyline points="5 18 11 12 5 6" opacity="0.5"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">创建账号</button>
+
+      <div class="divider">或</div>
+
+      <div class="alt-actions">
+        <button type="button" class="alt-btn" data-action="open-login">已有账号 · 登录</button>
+        <button type="button" class="alt-btn" id="guestModeBtn">游客模式</button>
+      </div>
+    </form>
+    </div>
+  </div>
+
+  <!-- Dashboard view (after login) -->
+  <div class="dashboard" id="dashboard" style="display: none;">
+    <!-- Welcome banner -->
+    <div class="welcome-banner">
+      <div class="welcome-text">
+        <h1>欢迎回来，<span id="dashboardUsername">--</span> 👋</h1>
+        <p>准备好开始新一局了吗？</p>
+      </div>
+      <div class="welcome-stats">
+        <div class="welcome-stat">
+          <span class="welcome-stat-num" id="statPoints">0</span>
+          <span class="welcome-stat-label">点券</span>
+        </div>
+        <div class="welcome-stat">
+          <span class="welcome-stat-num">0h</span>
+          <span class="welcome-stat-label">游戏时长</span>
+        </div>
+        <div class="welcome-stat">
+          <span class="welcome-stat-num">0</span>
+          <span class="welcome-stat-label">解锁成就</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Points Actions -->
+    <div class="points-section" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px;">
+      <!-- Daily Check-in -->
+      <div class="points-card" id="checkinCard">
+        <div class="points-card-header">
+          <span class="points-card-icon">📅</span>
+          <div>
+            <h3>每日签到</h3>
+            <p>连续签到获得更多点券</p>
+          </div>
+        </div>
+        <div class="checkin-streak" id="checkinStreak">已连续签到 <strong>0</strong> 天</div>
+        <button class="btn btn-primary" id="checkinBtn" style="width: 100%; margin-top: 12px;">立即签到 +10 🪙</button>
+      </div>
+
+      <!-- Click to Earn -->
+      <div class="points-card" id="clickCard">
+        <div class="points-card-header">
+          <span class="points-card-icon">👆</span>
+          <div>
+            <h3>帮我们收集人类点击数据</h3>
+            <p>滑动 5 次 +5 点券 · 点击 10 次 +1 点券</p>
+          </div>
+        </div>
+        <div class="click-slider-wrap">
+          <div class="click-slider-track" id="clickSliderTrack">
+            <div class="click-slider-fill" id="clickSliderFill"></div>
+            <div class="click-slider-text" id="clickSliderText">按住滑块向右滑动验证</div>
+            <div class="click-slider-handle" id="clickSliderHandle">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+                <polyline points="5 18 11 12 5 6" opacity="0.5"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数学验证 -->
+        <div class="math-verify-wrap" id="mathVerifyWrap" style="margin-top: 14px; display: none;">
+          <div class="math-verify-content">
+            <div class="math-question" id="mathQuestion"></div>
+            <div class="math-input-wrap">
+              <input type="number" class="math-input" id="mathInput" placeholder="?" />
+              <button class="btn btn-primary math-submit-btn" id="mathSubmitBtn">验证</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 防痴呆数学题 -->
+        <div class="brain-train-wrap" id="brainTrainWrap">
+          <div class="brain-train-header">
+            <span>🧠 防痴呆数学题</span>
+            <span class="brain-train-hint">答对 +3 点券</span>
+          </div>
+          <div class="brain-train-content" id="brainTrainContent">
+            <div class="math-question" id="brainQuestion"></div>
+            <div class="math-input-wrap">
+              <input type="number" class="math-input" id="brainInput" placeholder="?" />
+              <button class="btn btn-primary math-submit-btn" id="brainSubmitBtn">回答</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="click-progress-wrap" style="margin-top: 14px;">
+          <div class="click-progress-bar">
+            <div class="click-progress-fill" id="clickProgressFill" style="width: 0%"></div>
+          </div>
+          <div class="click-progress-text" id="clickProgressText">0 / 10</div>
+        </div>
+        <button class="btn btn-primary" id="clickEarnBtn" style="width: 100%; margin-top: 12px;">点击我! 👆</button>
+      </div>
+    </div>
+
+    <!-- Games Section -->
+    <div>
+      <div class="section-header" style="align-items: center;">
+        <h2 class="section-title">🎮 我的世界整合包</h2>
+        <button class="btn btn-primary" id="buyAllMinecraft" style="padding: 8px 16px; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+          <span>一键购买全套</span>
+          <span style="background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 6px; font-size: 12px;">25 点券</span>
+        </button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">比单独购买省 5 点卷！</p>
+      <div class="games-grid">
+        <div class="game-card" id="minecraftCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #4CAF50, #2E7D32); box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);">
+            <span class="game-thumb-emoji">⛏️</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">我的世界标准版</h3>
+            <p class="game-desc">经典 1.8.8 版本，原版生存</p>
+            <div class="game-price">
+              <span class="game-price-tag">10 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playMinecraft">开始游戏</button>
+        </div>
+
+        <div class="game-card" id="minecraftHighCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #8E24AA, #5E1A8A); box-shadow: 0 4px 12px rgba(142, 36, 170, 0.3);">
+            <span class="game-thumb-emoji">🗡️</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">我的世界高版本</h3>
+            <p class="game-desc">1.12.2 版本，更多内容</p>
+            <div class="game-price">
+              <span class="game-price-tag">15 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playMinecraftHigh">开始游戏</button>
+        </div>
+
+        <div class="game-card" id="minecraftLowCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #FF6F00, #E65100); box-shadow: 0 4px 12px rgba(255, 111, 0, 0.3);">
+            <span class="game-thumb-emoji">🪨</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">我的世界低版本</h3>
+            <p class="game-desc">1.5.2 版本，经典怀旧</p>
+            <div class="game-price">
+              <span class="game-price-tag">5 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playMinecraftLow">开始游戏</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Launcher Section -->
+    <div>
+      <div class="section-header">
+        <h2 class="section-title">🚀 我的世界启动器</h2>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" id="pcl2Card">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #1976D2, #0D47A1); box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);">
+            <span class="game-thumb-emoji">📦</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">PCL2启动器</h3>
+            <p class="game-desc">官方正版支持，稳定兼容</p>
+            <div class="game-price">
+              <span class="game-price-tag">5 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playPcl2">立即下载</button>
+        </div>
+
+        <div class="game-card" id="hmclCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #FF8F00, #FF6F00); box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);">
+            <span class="game-thumb-emoji">🌟</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">HMCL启动器</h3>
+            <p class="game-desc">支持联机内测版本</p>
+            <div class="game-price">
+              <span class="game-price-tag">15 点券起</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playHmcl">立即下载</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Red Alert Section -->
+    <div>
+      <div class="section-header">
+        <h2 class="section-title">🎮 更多游戏</h2>
+      </div>
+      <div class="games-grid">
+        <div class="game-card" id="redAlertCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #D32F2F, #B71C1C); box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);">
+            <span class="game-thumb-emoji">🚧</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">红警</h3>
+            <p class="game-desc">经典即时战略游戏</p>
+            <div class="game-price">
+              <span class="game-price-tag">10 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playRedAlert">开始游戏</button>
+        </div>
+
+        <div class="game-card" id="marioCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #E53935, #C62828); box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);">
+            <span class="game-thumb-emoji">🍄</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">超级马里奥</h3>
+            <p class="game-desc">经典怀旧平台跳跃游戏</p>
+            <div class="game-price">
+              <span class="game-price-tag free-tag">免费</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playMario">开始游戏</button>
+        </div>
+
+        <div class="game-card" id="slowRoadsCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #7B1FA2, #4A148C); box-shadow: 0 4px 12px rgba(123, 31, 162, 0.3);">
+            <span class="game-thumb-emoji">🛣️</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">慢路</h3>
+            <p class="game-desc">作者推荐 · 轻松休闲</p>
+            <div class="game-price">
+              <span class="game-price-tag">5 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playSlowRoads">开始游戏</button>
+        </div>
+
+        <div class="game-card" id="lifeRestartCard">
+          <div class="game-thumb" style="background: linear-gradient(135deg, #00ACC1, #00838F); box-shadow: 0 4px 12px rgba(0, 172, 193, 0.3);">
+            <span class="game-thumb-emoji">🔄</span>
+          </div>
+          <div class="game-info">
+            <h3 class="game-name">垃圾人生</h3>
+            <p class="game-desc">重新开始你的人生</p>
+            <div class="game-price">
+              <span class="game-price-tag">20 点券</span>
+            </div>
+          </div>
+          <button class="btn btn-primary game-play-btn" id="playLifeRestart">开始游戏</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <button class="footer-link" id="showAbout">关于</button>
+  <span class="footer-sep">·</span>
+  <button class="footer-link" id="showHelp">帮助</button>
+  <span class="footer-sep">·</span>
+  <button class="footer-link" id="showTerms">条款</button>
+  <span class="footer-sep">·</span>
+  <button class="footer-link" id="showPrivacyFooter">隐私</button>
+  <span class="footer-sep">·</span>
+  <span>© 2026 Stream</span>
+</footer>
+
+<!-- HMCL 下载弹窗 -->
+<div class="policy-overlay" id="hmclOverlay">
+  <div class="policy-modal" style="max-width: 400px;">
+    <div class="policy-header">
+      <div>
+        <h2>选择下载版本</h2>
+        <div class="policy-sub">HMCL启动器</div>
+      </div>
+      <button class="policy-close" id="closeHmclOverlay" aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 18px;">请选择您的下载方式：</p>
+      <div class="hmcl-options">
+        <div class="hmcl-option" id="hmclNormal">
+          <div class="hmcl-option-icon">📦</div>
+          <div class="hmcl-option-info">
+            <h4>正常下载</h4>
+            <p>标准下载通道</p>
+          </div>
+          <div class="hmcl-option-price">15 点券</div>
+        </div>
+        <div class="hmcl-option hmcl-option-highlight" id="hmclFast">
+          <div class="hmcl-option-icon">🚀</div>
+          <div class="hmcl-option-info">
+            <h4>高速下载</h4>
+            <p>端对端优化技术</p>
+          </div>
+          <div class="hmcl-option-price">20 点券</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.hmcl-options { display: flex; flex-direction: column; gap: 12px; }
+.hmcl-option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.hmcl-option:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.hmcl-option-icon {
+  width: 44px; height: 44px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.hmcl-option-info { flex: 1; }
+.hmcl-option-info h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.hmcl-option-info p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.hmcl-option-price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--primary);
+}
+.hmcl-option-highlight {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+.hmcl-option-highlight .hmcl-option-price {
+  color: var(--primary);
+}
+
+/* === Math Verify === */
+.math-verify-wrap {
+  background: var(--bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.math-verify-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.math-question {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+}
+
+.math-input-wrap {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.math-input {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 18px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: white;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.math-input:focus {
+  border-color: var(--primary);
+}
+
+.math-submit-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* === Brain Training Math === */
+.brain-train-wrap {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.brain-train-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.brain-train-hint {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+}
+</style>
+
+<div class="toast" id="toast">
+  <span class="toast-dot"></span>
+  <span id="toastMessage">该功能开发中...</span>
+</div>
+
+<div class="success-overlay" id="successOverlay">
+  <div class="success-card">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">注册成功！</h2>
+    <p class="success-msg">欢迎加入 Stream 社区，<br>现在可以开始你的游戏之旅。</p>
+    <button class="btn btn-primary" id="closeSuccess">开始游戏</button>
+  </div>
+</div>
+
+<!-- RRTF Drop Overlay -->
+<div class="drop-overlay" id="dropOverlay">
+  <div class="drop-zone" id="dropZone">
+    <div class="drop-icon">📦</div>
+    <h2>拖入 RRTF 文件</h2>
+    <p>支持 .rrtf / .html 格式 · YziStudio 游戏资源文件</p>
+    <div class="drop-formats">
+      <span class="format-tag">.rrtf</span>
+      <span class="format-tag">.html</span>
+    </div>
+    <button class="drop-sample-link" id="loadSampleRrtf">没有 RRTF 文件? <a>试试示例 →</a></button>
+  </div>
+</div>
+
+<!-- RRTF Preview -->
+<div class="preview-overlay" id="previewOverlay">
+  <div class="preview-header">
+    <div class="preview-title">
+      <div class="preview-title-icon">📦</div>
+      <span class="preview-filename" id="previewFilename">preview.rrtf</span>
+      <span class="preview-filesize" id="previewFilesize"></span>
+    </div>
+    <div class="preview-actions">
+      <button class="preview-btn" data-tbd="刷新预览" id="reloadPreview">🔄 刷新</button>
+      <button class="preview-btn" data-tbd="在新窗口打开" id="openInNewWindow">↗ 新窗口</button>
+      <button class="preview-btn" data-tbd="下载源文件" id="downloadRrtf">⬇ 下载</button>
+      <button class="preview-close" id="closePreview" aria-label="关闭预览">×</button>
+    </div>
+  </div>
+  <div class="preview-frame-wrap">
+    <div class="preview-frame-loading" id="previewLoading">
+      <div class="spinner"></div>
+      <div>正在加载 RRTF 内容...</div>
+    </div>
+    <iframe class="preview-frame" id="previewFrame" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals" title="RRTF Preview"></iframe>
+  </div>
+</div>
+
+<!-- Hidden file input -->
+<input type="file" id="rrtfFileInput" accept=".rrtf,.html" style="display: none;">
+
+<!-- 登录 -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-modal">
+    <button class="login-close" data-close-login aria-label="关闭">×</button>
+
+    <div class="login-hero">
+      <div class="login-mark" style="position: relative;">S</div>
+      <h2>欢迎回来</h2>
+      <p>登录账号继续 Stream 之旅</p>
+    </div>
+
+    <form class="login-form" id="loginForm" autocomplete="off">
+      <div class="field">
+        <label class="field-label" for="loginAccount">账号</label>
+        <input class="field-input" type="text" id="loginAccount" placeholder="用户名或邮箱" required>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="loginPassword">密码</label>
+        <input class="field-input" type="password" id="loginPassword" placeholder="请输入密码" required>
+      </div>
+
+      <div class="login-options">
+        <label class="checkbox-row">
+          <input type="checkbox" id="rememberMe">
+          <span>记住我</span>
+        </label>
+        <button type="button" class="forgot-link" data-tbd="找回密码">忘记密码？</button>
+      </div>
+
+      <button type="submit" class="btn btn-primary">登 录</button>
+
+      <div class="divider">或使用社交账号</div>
+
+      <div class="social-buttons">
+        <button type="button" class="social-btn" data-tbd="Discord 登录">
+          <span class="social-discord">🎮</span> Discord
+        </button>
+        <button type="button" class="social-btn" data-tbd="Google 登录">
+          <span class="social-google">G</span> Google
+        </button>
+      </div>
+
+      <div class="login-footer">
+        还没有账号？<button type="button" id="goRegister">立即注册</button>
+      </div>
+    </form>
+
+    <div class="login-success" id="loginSuccess" style="display: none;">
+      <div class="success-icon">✓</div>
+      <h2>登录成功！</h2>
+      <p>欢迎回来，<strong id="loggedInUsername">--</strong></p>
+      <button class="btn btn-primary" id="enterStreamBtn">进入 Stream</button>
+    </div>
+  </div>
+</div>
+
+<!-- 关于 -->
+<div class="policy-overlay" id="aboutOverlay">
+  <div class="policy-modal">
+    <div class="policy-header">
+      <div>
+        <h2>关于 Stream</h2>
+        <div class="policy-sub">About Us</div>
+      </div>
+      <button class="policy-close" data-close-policy aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <div class="last-updated">Version 3.7.2 · 2026</div>
+
+      <h3>我们是谁</h3>
+      <p><strong>Stream</strong> 是一个专注于轻松游戏体验的社区平台，汇聚了来自全球的玩家。我们相信游戏不仅仅是娱乐，更是连接人与人的桥梁。</p>
+      <p>2026 年春天，几个热爱游戏的朋友在 张江高科 的咖啡馆里写下了第一行代码。从一个小小的休闲游戏开始，我们想让每一个碎片时间都充满乐趣。</p>
+
+      <h3>我们在做什么</h3>
+      <ul>
+        <li>聚合优质休闲与独立游戏</li>
+        <li>构建活跃、友善的玩家社区</li>
+        <li>举办公平的休闲竞技赛事</li>
+        <li>为创作者提供展示与变现平台</li>
+      </ul>
+
+      <h3>团队与文化</h3>
+      <p>我们是一支 30+ 人的小而美团队，分布在 上海 / 杭州 / 远程 。没有 996，没有 KPI 文化 —— 我们用作品说话。</p>
+
+      <h3>加入我们</h3>
+      <p>如果你也相信游戏能让世界变得有趣一点，欢迎投递简历：</p>
+      <ul>
+        <li>前端 / 后端 / 客户端工程师</li>
+        <li>游戏策划 / 关卡设计师</li>
+        <li>视觉 / 交互 / 动效设计师</li>
+        <li>社区运营 / 内容编辑</li>
+      </ul>
+
+      <h3>联系我们</h3>
+      <div class="contact">
+        📧 合作 / 商务：<strong>hello@stream.game</strong><br>
+        📧 招聘：<strong>hr@stream.game</strong><br>
+        📧 媒体 / PR：<strong>pr@stream.game</strong><br>
+        📍 上海市浦东新区张江高科博云路 2 号<br>
+        🐦 微博：<strong>@Stream游戏</strong> · 💬 Discord：<strong>discord.gg/stream</strong>
+      </div>
+    </div>
+    <div class="policy-footer">
+      <button class="btn btn-primary" data-close-policy>明白了</button>
+    </div>
+  </div>
+</div>
+
+<!-- 帮助 -->
+<div class="policy-overlay" id="helpOverlay">
+  <div class="policy-modal">
+    <div class="policy-header">
+      <div>
+        <h2>帮助中心</h2>
+        <div class="policy-sub">Help Center</div>
+      </div>
+      <button class="policy-close" data-close-policy aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <h3>账号相关</h3>
+      <p><strong>Q1：忘记密码怎么办？</strong></p>
+      <p>点击登录页面的「忘记密码」链接，通过注册邮箱验证身份后即可重置。</p>
+
+      <p><strong>Q2：账号被盗怎么办？</strong></p>
+      <p>请立即发送邮件至 <strong>security@stream.game</strong>，附上注册邮箱、最后登录时间及充值记录（如有），我们会在 24 小时内协助您找回。</p>
+
+      <p><strong>Q3：如何修改用户名？</strong></p>
+      <p>进入「我的」→「资料设置」即可修改，每位用户每月可修改 1 次。</p>
+
+      <p><strong>Q4：如何注销账号？</strong></p>
+      <p>进入「我的」→「账号安全」→「注销账号」，按提示操作。注销后所有游戏数据、虚拟物品、好友关系将不可恢复地删除。</p>
+
+      <h3>支付相关</h3>
+      <p><strong>Q5：充值未到账怎么办？</strong></p>
+      <p>请保留支付截图与订单号，联系 <strong>support@stream.game</strong>，我们会在 48 小时内核实并处理。</p>
+
+      <p><strong>Q6：支持哪些支付方式？</strong></p>
+      <p>目前支持 微信支付、支付宝、QQ 钱包、银联卡，以及 PayPal（仅限海外）。</p>
+
+      <h3>游戏相关</h3>
+      <p><strong>Q7：遇到 Bug 如何反馈？</strong></p>
+      <ul>
+        <li>游戏内点击「反馈」按钮提交</li>
+        <li>邮件至 <strong>bug@stream.game</strong></li>
+        <li>加入 Discord 在 #feedback 频道</li>
+      </ul>
+
+      <p><strong>Q8：可以开外挂吗？</strong></p>
+      <p>不可以。使用任何形式的第三方辅助工具将导致账号永久封禁，且虚拟物品不予退还。</p>
+
+      <h3>联系客服</h3>
+      <div class="contact">
+        📧 客服邮箱：<strong>support@stream.game</strong><br>
+        💬 在线客服：工作日 9:00 - 22:00 / 周末 10:00 - 20:00<br>
+        🐛 Bug 反馈：<strong>bug@stream.game</strong><br>
+        🛡️ 安全问题：<strong>security@stream.game</strong>
+      </div>
+    </div>
+    <div class="policy-footer">
+      <button class="btn btn-primary" data-close-policy>关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 条款 -->
+<div class="policy-overlay" id="termsOverlay">
+  <div class="policy-modal">
+    <div class="policy-header">
+      <div>
+        <h2>Stream 服务条款</h2>
+        <div class="policy-sub">Terms of Service</div>
+      </div>
+      <button class="policy-close" data-close-policy aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <div class="last-updated">最后更新日期：2026 年 6 月 14 日</div>
+
+      <p>本《服务条款》适用于您使用 <strong>Stream</strong> 平台所提供的全部服务。请仔细阅读，如有任何疑问请联系客服。</p>
+
+      <h3>1. 服务内容</h3>
+      <p>Stream 提供包括但不限于 游戏运营、社区交流、虚拟物品交易、赛事举办、内容创作 等服务。本平台有权根据业务调整新增、变更或终止部分服务。</p>
+
+      <h3>2. 服务可用性</h3>
+      <ul>
+        <li>我们努力保持 7×24 小时服务可用</li>
+        <li>因维护、升级导致的短暂中断，会提前 24 小时公告</li>
+        <li>因不可抗力（自然灾害、网络中断、政府行为）导致的中断不承担责任</li>
+        <li>部分功能可能因地区、设备、版本不同而有所差异</li>
+      </ul>
+
+      <h3>3. 付费与退款</h3>
+      <ul>
+        <li>平台内所有付费项目以 人民币（CNY）结算</li>
+        <li>虚拟商品一经购买，除法律规定的特殊情况外，原则上不支持退款</li>
+        <li>因平台原因导致的重复扣款或系统故障，将于 5 个工作日内原路退回</li>
+        <li>活动奖励、赠品、限时礼包不适用退款</li>
+        <li>未成年人消费需在监护人明示同意下进行</li>
+      </ul>
+
+      <h3>4. 知识产权许可</h3>
+      <ul>
+        <li>您在平台创作的内容（评论、攻略、视频等），您保留所有权</li>
+        <li>您授予平台 非独家的、免费的、全球范围内 的使用权（用于展示、推广、改进服务）</li>
+        <li>平台有权对违规内容进行删除、屏蔽、降低曝光等处理</li>
+        <li>未经授权，不得对平台内容进行商业性使用</li>
+      </ul>
+
+      <h3>5. 第三方服务</h3>
+      <p>平台可能集成第三方服务（支付、登录、地图、社交分享等）。使用第三方服务时需同时遵守对应服务方的条款。因第三方服务问题导致的损失，由其服务方承担责任。</p>
+
+      <h3>6. 责任限制</h3>
+      <ul>
+        <li>平台不对因您自身原因（密码泄露、设备问题、误操作等）造成的损失承担责任</li>
+        <li>平台对您的累计赔偿责任，不超过您在过去 12 个月内向平台支付的总费用</li>
+        <li>法律明确禁止的责任限制条款不适用于本条款</li>
+      </ul>
+
+      <h3>7. 条款变更</h3>
+      <p>平台有权根据需要修改本条款。重大变更将于生效前 7 日通过站内通知、邮件等方式告知。继续使用服务即视为接受变更后的条款。</p>
+
+      <h3>8. 法律适用与争议解决</h3>
+      <p>本条款的解释、效力及争议解决均适用中华人民共和国法律。因本条款产生的争议，双方应友好协商；协商不成的，提交平台所在地有管辖权的人民法院诉讼解决。</p>
+    </div>
+    <div class="policy-footer">
+      <button class="btn btn-primary" data-close-policy>我已阅读</button>
+    </div>
+  </div>
+</div>
+<!-- 用户协议 -->
+<div class="policy-overlay" id="agreementOverlay">
+  <div class="policy-modal">
+    <div class="policy-header">
+      <div>
+        <h2>Stream 用户协议</h2>
+        <div class="policy-sub">User Agreement</div>
+      </div>
+      <button class="policy-close" data-close-policy aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <div class="last-updated">最后更新日期：2026 年 6 月 14 日</div>
+
+      <p>欢迎使用 <strong>Stream</strong>（以下简称"本平台"）。在使用我们的服务前，请仔细阅读本协议。您的注册或使用行为即视为已充分理解并同意接受本协议全部条款的约束。</p>
+
+      <h3>1. 协议接受与变更</h3>
+      <p>您一旦完成注册程序或使用本平台服务，即视为您已充分阅读、理解并同意本协议全部条款。平台有权根据法律法规变更或业务调整修改本协议，修改后将于生效前 7 日通过站内通知等方式告知。</p>
+
+      <h3>2. 账户注册</h3>
+      <ul>
+        <li>您应保证注册时提供的资料真实、准确、完整、有效</li>
+        <li>用户名不得包含违法、违规、侮辱性或侵犯他人权益的内容</li>
+        <li>同一自然人仅可注册一个账号，账号不得转借、出租</li>
+        <li>您应妥善保管账号与密码，因密码泄露造成的损失由您自行承担</li>
+      </ul>
+
+      <h3>3. 用户行为规范</h3>
+      <p>您承诺不在本平台从事以下行为：</p>
+      <ul>
+        <li>发布违反法律法规或公序良俗的内容</li>
+        <li>传播病毒、木马或其他恶意程序</li>
+        <li>利用漏洞获取不正当利益，破坏游戏公平性</li>
+        <li>侮辱、歧视、骚扰其他用户，进行人身攻击</li>
+        <li>使用外挂、脚本、辅助程序等作弊行为</li>
+        <li>从事任何商业性宣传或营销活动</li>
+      </ul>
+
+      <h3>4. 虚拟物品与货币</h3>
+      <ul>
+        <li>平台内的虚拟物品、虚拟货币仅限本平台使用</li>
+        <li>虚拟物品不具有现实世界财产属性，不得进行交易</li>
+        <li>因违规行为导致的虚拟物品损失，平台有权不予恢复</li>
+        <li>未成年人消费需在监护人同意下进行</li>
+      </ul>
+
+      <h3>5. 知识产权</h3>
+      <p>本平台所有内容（包括但不限于文字、图片、音视频、游戏元素、代码、商标等）的知识产权归本平台及授权方所有。未经许可，您不得以任何形式复制、传播、修改或用于商业用途。</p>
+
+      <h3>6. 协议的变更与终止</h3>
+      <p>平台有权根据违规严重程度对账号采取警告、限期整改、暂停或永久封禁等措施。如您对处理结果有异议，可在 15 日内提交申诉。</p>
+
+      <h3>7. 免责声明</h3>
+      <ul>
+        <li>因不可抗力（如自然灾害、网络中断、政府行为）造成的服务中断，平台不承担责任</li>
+        <li>平台不对第三方链接、产品或服务承担任何责任</li>
+        <li>本平台按"现状"提供服务，不承诺无瑕疵或绝对安全</li>
+      </ul>
+
+      <h3>8. 法律适用与争议解决</h3>
+      <p>本协议的解释、效力及争议解决均适用中华人民共和国法律。因本协议产生的争议，双方应友好协商解决；协商不成的，提交平台所在地有管辖权的人民法院诉讼解决。</p>
+    </div>
+    <div class="policy-footer">
+      <button class="btn btn-primary" data-close-policy>我已阅读</button>
+    </div>
+  </div>
+</div>
+
+<!-- 隐私政策 -->
+<div class="policy-overlay" id="privacyOverlay">
+  <div class="policy-modal">
+    <div class="policy-header">
+      <div>
+        <h2>Stream 隐私政策</h2>
+        <div class="policy-sub">Privacy Policy</div>
+      </div>
+      <button class="policy-close" data-close-policy aria-label="关闭">×</button>
+    </div>
+    <div class="policy-content">
+      <div class="last-updated">最后更新日期：2026 年 6 月 14 日</div>
+
+      <p><strong>Stream</strong>（以下简称"我们"）深知个人信息对您的重要性，并致力于保护您的隐私安全。本政策说明了我们如何收集、使用、存储和保护您的个人信息。请仔细阅读。</p>
+
+      <h3>1. 我们收集的信息</h3>
+      <p><strong>账户信息：</strong>用户名、邮箱地址、加密后的密码、个人头像（可选）。</p>
+      <p><strong>设备信息：</strong>设备型号、操作系统版本、设备识别码、网络类型。</p>
+      <p><strong>日志信息：</strong>IP 地址、访问时间、使用的功能、崩溃日志。</p>
+      <p><strong>游戏数据：</strong>游戏进度、成就记录、虚拟物品、好友关系。</p>
+
+      <h3>2. 信息使用目的</h3>
+      <ul>
+        <li>提供、维护、改进和优化本平台服务</li>
+        <li>验证用户身份，防止欺诈与账号盗用</li>
+        <li>个性化内容推荐与游戏匹配</li>
+        <li>客户支持与问题排查</li>
+        <li>发送服务通知、安全提醒与活动信息</li>
+        <li>满足法律法规的合规要求</li>
+      </ul>
+
+      <h3>3. 信息共享</h3>
+      <p>我们承诺不会出售您的个人信息。仅在以下情况下可能共享您的信息：</p>
+      <ul>
+        <li>获得您的明确同意或主动请求</li>
+        <li>与可信的第三方服务提供商共享（如云服务、支付通道、数据分析）</li>
+        <li>依据法律法规、政府主管部门的强制性要求</li>
+        <li>涉及合并、收购或资产转让，以合法方式告知您</li>
+      </ul>
+
+      <h3>4. Cookie 与同类技术</h3>
+      <p>我们使用 Cookie 和类似技术来：</p>
+      <ul>
+        <li>保持您的登录状态</li>
+        <li>记忆您的偏好设置（如语言、主题）</li>
+        <li>分析使用情况以改进服务</li>
+      </ul>
+      <p>您可以通过浏览器设置管理或清除 Cookie，但部分功能可能因此无法正常使用。</p>
+
+      <h3>5. 信息存储与安全</h3>
+      <ul>
+        <li>您的信息存储于位于中华人民共和国境内的安全服务器中</li>
+        <li>采用加密传输（HTTPS/TLS）与加密存储</li>
+        <li>仅在为您提供服务所必需的最短期限内保留您的信息</li>
+        <li>已建立完善的内部管理制度保护您的信息安全</li>
+      </ul>
+      <p>尽管已采取上述措施，请理解互联网环境并非绝对安全。若发生信息安全事件，我们将依法及时通知您。</p>
+
+      <h3>6. 您的权利</h3>
+      <p>您对自己的个人信息享有以下权利：</p>
+      <ul>
+        <li><strong>访问权：</strong>查看我们持有的关于您的信息</li>
+        <li><strong>更正权：</strong>更新或修改不准确的个人信息</li>
+        <li><strong>删除权：</strong>申请删除您的账户与相关数据</li>
+        <li><strong>撤回授权：</strong>撤回此前授予的任何同意</li>
+        <li><strong>投诉举报：</strong>通过下方联系方式向我们反馈</li>
+      </ul>
+
+      <h3>7. 未成年人保护</h3>
+      <p>本平台不建议 <strong>16 周岁以下的未成年人</strong>使用。如您是未成年人，在使用本平台前需取得监护人的明示同意。如发现未经监护人同意收集未成年人信息的情况，我们将在确认后尽快删除相关数据。</p>
+
+      <h3>8. 政策更新</h3>
+      <p>本政策可能不定期更新。重大变更将通过站内通知、弹窗提醒等方式告知您。请定期查阅本政策以了解最新内容。</p>
+
+      <h3>9. 联系我们</h3>
+      <p>如您对本政策有任何疑问、意见或投诉，请通过以下方式联系我们：</p>
+      <div class="contact">
+        📧 邮箱：<strong>privacy@stream.game</strong><br>
+        🕘 工作时间：周一至周五 9:00 - 18:00<br>
+        📍 地址：上海市浦东新区张江高科技园区博云路 2 号
+      </div>
+    </div>
+    <div class="policy-footer">
+      <button class="btn btn-primary" data-close-policy>我已阅读</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Toast
+const toast = document.getElementById('toast');
+const toastMessage = document.getElementById('toastMessage');
+let toastTimer;
+
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  toastMessage.textContent = msg;
+  toast.classList.add('show');
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// TBD handlers
+document.querySelectorAll('[data-tbd]').forEach(el => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    const name = el.getAttribute('data-tbd');
+    showToast(name && name !== 'true' ? `${name}：待开发中...` : '该功能开发中...');
+  });
+});
+
+// === Policy modals ===
+const policyOverlays = {
+  agreement: document.getElementById('agreementOverlay'),
+  privacy: document.getElementById('privacyOverlay'),
+  about: document.getElementById('aboutOverlay'),
+  help: document.getElementById('helpOverlay'),
+  terms: document.getElementById('termsOverlay'),
+};
+const successOverlay = document.getElementById('successOverlay');
+
+function openPolicy(name) {
+  policyOverlays[name].classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAllPolicies() {
+  Object.values(policyOverlays).forEach(o => o.classList.remove('show'));
+  document.body.style.overflow = '';
+}
+
+// Checkbox-row links
+const showAgreement = document.getElementById('showAgreement');
+const showPrivacy = document.getElementById('showPrivacy');
+if (showAgreement) showAgreement.addEventListener('click', (e) => { e.preventDefault(); openPolicy('agreement'); });
+if (showPrivacy) showPrivacy.addEventListener('click', (e) => { e.preventDefault(); openPolicy('privacy'); });
+
+// Footer links
+const showAbout = document.getElementById('showAbout');
+const showHelp = document.getElementById('showHelp');
+const showTerms = document.getElementById('showTerms');
+const showPrivacyFooter = document.getElementById('showPrivacyFooter');
+if (showAbout) showAbout.addEventListener('click', () => openPolicy('about'));
+if (showHelp) showHelp.addEventListener('click', () => openPolicy('help'));
+if (showTerms) showTerms.addEventListener('click', () => openPolicy('terms'));
+if (showPrivacyFooter) showPrivacyFooter.addEventListener('click', () => openPolicy('privacy'));
+
+// Close buttons (× and "我已阅读" / "明白了" / "关闭")
+document.querySelectorAll('[data-close-policy]').forEach(btn => {
+  btn.addEventListener('click', closeAllPolicies);
+});
+
+// Click outside modal to close
+Object.values(policyOverlays).forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeAllPolicies();
+  });
+});
+
+// ESC to close
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeAllPolicies();
+    const so = document.getElementById('successOverlay');
+    if (so) so.classList.remove('show');
+  }
+});
+
+// === Login modal ===
+const loginOverlay = document.getElementById('loginOverlay');
+const loginForm = document.getElementById('loginForm');
+const loginSuccess = document.getElementById('loginSuccess');
+const loggedInUsername = document.getElementById('loggedInUsername');
+const loginAccount = document.getElementById('loginAccount');
+const loginPassword = document.getElementById('loginPassword');
+const loginNavBtn = document.getElementById('loginNavBtn');
+const goRegisterBtn = document.getElementById('goRegister');
+
+function openLogin() {
+  loginOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+  // Reset to form view
+  loginForm.style.display = 'flex';
+  loginSuccess.style.display = 'none';
+}
+
+function closeLogin() {
+  loginOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+  // Clear password for safety
+  loginPassword.value = '';
+}
+
+// Open triggers
+document.querySelectorAll('[data-action="open-login"]').forEach(el => {
+  el.addEventListener('click', openLogin);
+});
+
+// Close triggers
+document.querySelectorAll('[data-close-login]').forEach(el => {
+  el.addEventListener('click', closeLogin);
+});
+
+// Click outside to close
+loginOverlay.addEventListener('click', (e) => {
+  if (e.target === loginOverlay) closeLogin();
+});
+
+// Switch to register
+goRegisterBtn.addEventListener('click', () => {
+  closeLogin();
+  setTimeout(() => {
+    document.getElementById('username').focus();
+    document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+});
+
+// Guest mode
+const guestModeBtn = document.getElementById('guestModeBtn');
+if (guestModeBtn) {
+  guestModeBtn.addEventListener('click', () => {
+    sessionStorage.setItem('stream_user', '游客');
+    showDashboard('游客');
+    showToast('已进入游客模式，部分功能受限');
+  });
+}
+
+// Login submit
+loginForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const account = loginAccount.value.trim();
+  const password = loginPassword.value;
+
+  if (!account) return showToast('请输入账号');
+  if (password.length < 6) return showToast('密码至少 6 位');
+
+  // Mock successful login
+  const displayName = account.includes('@') ? account.split('@')[0] : account;
+  loggedInUsername.textContent = displayName;
+
+  // Persist (remember me vs session)
+  const remember = document.getElementById('rememberMe').checked;
+  if (remember) {
+    localStorage.setItem('stream_user', displayName);
+  } else {
+    sessionStorage.setItem('stream_user', displayName);
+  }
+
+  // Switch to success view
+  loginForm.style.display = 'none';
+  loginSuccess.style.display = 'block';
+});
+
+// Enter Stream button (from login success state)
+const enterStreamBtn = document.getElementById('enterStreamBtn');
+if (enterStreamBtn) {
+  enterStreamBtn.addEventListener('click', () => {
+    closeLogin();
+    const u = localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user');
+    showDashboard(u);
+  });
+}
+
+// === Points System ===
+const POINTS_KEY = 'stream_points';
+const CLICK_COUNT_KEY = 'stream_click_count';
+
+function getCurrentUserKey() {
+  return localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user') || 'guest';
+}
+
+function getPoints() {
+  return parseInt(localStorage.getItem(POINTS_KEY) || '0', 10);
+}
+
+function setPoints(val) {
+  localStorage.setItem(POINTS_KEY, String(val));
+  updatePointsUI();
+}
+
+function addPoints(delta) {
+  const newVal = getPoints() + delta;
+  setPoints(newVal);
+}
+
+function updatePointsUI() {
+  const pts = getPoints();
+  const pointsNum = document.getElementById('pointsNum');
+  const statPoints = document.getElementById('statPoints');
+  const pointsPill = document.getElementById('pointsPill');
+  if (pointsNum) pointsNum.textContent = pts;
+  if (statPoints) statPoints.textContent = pts;
+  // Show points pill when logged in
+  const username = localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user');
+  if (pointsPill) {
+    pointsPill.style.display = username ? 'inline-flex' : 'none';
+  }
+}
+
+// Check-in logic (per user)
+function getCheckinDateKey() { return 'stream_checkin_date_' + getCurrentUserKey(); }
+function getCheckinStreakKey() { return 'stream_checkin_streak_' + getCurrentUserKey(); }
+
+function getTodayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getLastCheckinDate() {
+  return localStorage.getItem(getCheckinDateKey()) || '';
+}
+
+function getStreak() {
+  return parseInt(localStorage.getItem(getCheckinStreakKey()) || '0', 10);
+}
+
+function setStreak(val) {
+  localStorage.setItem(getCheckinStreakKey(), String(val));
+}
+
+function isCheckedInToday() {
+  return getLastCheckinDate() === getTodayStr();
+}
+
+function doCheckin() {
+  if (isCheckedInToday()) return;
+  const today = getTodayStr();
+  const last = getLastCheckinDate();
+  let streak = getStreak();
+  // Check if consecutive
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  if (last === yesterdayStr) {
+    streak++;
+  } else {
+    streak = 1;
+  }
+  localStorage.setItem(getCheckinDateKey(), today);
+  setStreak(streak);
+  addPoints(10);
+  updateCheckinUI();
+  showToast(`签到成功！+10 点券 (连续 ${streak} 天)`);
+}
+
+function updateCheckinUI() {
+  const btn = document.getElementById('checkinBtn');
+  const streakEl = document.getElementById('checkinStreak');
+  if (!btn || !streakEl) return;
+  const streak = getStreak();
+  streakEl.innerHTML = `已连续签到 <strong>${streak}</strong> 天`;
+  if (isCheckedInToday()) {
+    btn.textContent = '今日已签到 ✓';
+    btn.classList.add('checked-in');
+    btn.disabled = true;
+  } else {
+    btn.textContent = '立即签到 +10 🪙';
+    btn.classList.remove('checked-in');
+    btn.disabled = false;
+  }
+}
+
+// Click to earn logic (per user)
+function getClickCountKey() { return 'stream_click_count_' + getCurrentUserKey(); }
+
+function getClickCount() {
+  return parseInt(localStorage.getItem(getClickCountKey()) || '0', 10);
+}
+
+function setClickCount(val) {
+  localStorage.setItem(getClickCountKey(), String(val));
+}
+
+function doClickEarn() {
+  let count = getClickCount() + 1;
+  if (count >= 10) {
+    count = 0;
+    addPoints(1);
+    showToast('点击 10 次！+1 点券');
+  }
+  setClickCount(count);
+  updateClickUI();
+}
+
+function updateClickUI() {
+  const count = getClickCount();
+  const fill = document.getElementById('clickProgressFill');
+  const text = document.getElementById('clickProgressText');
+  if (fill) fill.style.width = (count * 10) + '%';
+  if (text) text.textContent = count + ' / 10';
+}
+
+// === View switching (auth <-> dashboard) ===
+const authView = document.getElementById('authView');
+const dashboard = document.getElementById('dashboard');
+const dashboardUsername = document.getElementById('dashboardUsername');
+
+function showDashboard(username) {
+  authView.style.display = 'none';
+  dashboard.style.display = 'flex';
+  if (username) dashboardUsername.textContent = username;
+  // Update topbar user state
+  renderUserState();
+  updatePointsUI();
+  updateCheckinUI();
+  updateClickUI();
+  updateGameUI();
+  hideMathVerify();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Logout
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    doLogout();
+  });
+}
+
+// === User state on topbar ===
+function renderUserState() {
+  const username = localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user');
+  if (username) {
+    document.getElementById('loginNavBtn').style.display = 'none';
+    document.getElementById('accountControl').style.display = 'block';
+  }
+  updatePointsUI();
+}
+
+renderUserState();
+
+
+
+// Menu logout button
+const menuLogoutBtn = document.getElementById('menuLogoutBtn');
+if (menuLogoutBtn) {
+  menuLogoutBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    doLogout();
+  });
+}
+
+// Shared logout function
+function doLogout() {
+  localStorage.removeItem('stream_user');
+  sessionStorage.removeItem('stream_user');
+  showToast('已退出登录', '账号');
+  setTimeout(() => location.reload(), 600);
+}
+
+// === Points Event Listeners ===
+const checkinBtn = document.getElementById('checkinBtn');
+const clickEarnBtn = document.getElementById('clickEarnBtn');
+if (checkinBtn) checkinBtn.addEventListener('click', doCheckin);
+if (clickEarnBtn) clickEarnBtn.addEventListener('click', doClickEarn);
+
+// === Game Play ===
+const OWNED_GAMES_KEY = 'stream_owned_games';
+
+function getOwnedGames() {
+  const data = localStorage.getItem(OWNED_GAMES_KEY);
+  return data ? JSON.parse(data) : [];
+}
+
+function isGameOwned(gameId) {
+  return getOwnedGames().includes(gameId);
+}
+
+function addOwnedGame(gameId) {
+  const games = getOwnedGames();
+  if (!games.includes(gameId)) {
+    games.push(gameId);
+    localStorage.setItem(OWNED_GAMES_KEY, JSON.stringify(games));
+  }
+}
+
+function updateGameUI() {
+  const playMinecraftBtn = document.getElementById('playMinecraft');
+  if (playMinecraftBtn) {
+    if (isGameOwned('minecraft')) {
+      playMinecraftBtn.textContent = '开始游戏';
+      playMinecraftBtn.style.background = '#10B981';
+      playMinecraftBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playMinecraftHighBtn = document.getElementById('playMinecraftHigh');
+  if (playMinecraftHighBtn) {
+    if (isGameOwned('minecraft_high')) {
+      playMinecraftHighBtn.textContent = '开始游戏';
+      playMinecraftHighBtn.style.background = '#10B981';
+      playMinecraftHighBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playMinecraftLowBtn = document.getElementById('playMinecraftLow');
+  if (playMinecraftLowBtn) {
+    if (isGameOwned('minecraft_low')) {
+      playMinecraftLowBtn.textContent = '开始游戏';
+      playMinecraftLowBtn.style.background = '#10B981';
+      playMinecraftLowBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playPcl2Btn = document.getElementById('playPcl2');
+  if (playPcl2Btn) {
+    if (isGameOwned('pcl2')) {
+      playPcl2Btn.textContent = '立即下载';
+      playPcl2Btn.style.background = '#10B981';
+      playPcl2Btn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playHmclBtn = document.getElementById('playHmcl');
+  if (playHmclBtn) {
+    if (isGameOwned('hmcl')) {
+      playHmclBtn.textContent = '立即下载';
+      playHmclBtn.style.background = '#10B981';
+      playHmclBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playRedAlertBtn = document.getElementById('playRedAlert');
+  if (playRedAlertBtn) {
+    if (isGameOwned('red_alert')) {
+      playRedAlertBtn.textContent = '开始游戏';
+      playRedAlertBtn.style.background = '#10B981';
+      playRedAlertBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playSlowRoadsBtn = document.getElementById('playSlowRoads');
+  if (playSlowRoadsBtn) {
+    if (isGameOwned('slow_roads')) {
+      playSlowRoadsBtn.textContent = '开始游戏';
+      playSlowRoadsBtn.style.background = '#10B981';
+      playSlowRoadsBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+  const playLifeRestartBtn = document.getElementById('playLifeRestart');
+  if (playLifeRestartBtn) {
+    if (isGameOwned('life_restart')) {
+      playLifeRestartBtn.textContent = '开始游戏';
+      playLifeRestartBtn.style.background = '#10B981';
+      playLifeRestartBtn.style.boxShadow = '0 2px 6px rgba(16, 185, 129, 0.25)';
+    }
+  }
+}
+
+const playMinecraftBtn = document.getElementById('playMinecraft');
+if (playMinecraftBtn) {
+  playMinecraftBtn.addEventListener('click', () => {
+    if (isGameOwned('minecraft')) {
+      window.open('https://playmcjscc.pages.dev/1.8.8/', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 10) {
+        showToast('点券不足，需要 10 点券购买游戏');
+        return;
+      }
+      setPoints(points - 10);
+      addOwnedGame('minecraft');
+      showToast('购买成功！游戏已永久解锁');
+      playMinecraftBtn.textContent = '开始游戏';
+      playMinecraftBtn.style.background = '#10B981';
+      window.open('https://playmcjscc.pages.dev/1.8.8/', '_blank');
+    }
+  });
+}
+
+const playMinecraftHighBtn = document.getElementById('playMinecraftHigh');
+if (playMinecraftHighBtn) {
+  playMinecraftHighBtn.addEventListener('click', () => {
+    if (isGameOwned('minecraft_high')) {
+      window.open('https://playmcjscc.pages.dev/1.12.2/', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 15) {
+        showToast('点券不足，需要 15 点券购买游戏');
+        return;
+      }
+      setPoints(points - 15);
+      addOwnedGame('minecraft_high');
+      showToast('购买成功！游戏已永久解锁');
+      playMinecraftHighBtn.textContent = '开始游戏';
+      playMinecraftHighBtn.style.background = '#10B981';
+      window.open('https://playmcjscc.pages.dev/1.12.2/', '_blank');
+    }
+  });
+}
+
+const playMinecraftLowBtn = document.getElementById('playMinecraftLow');
+if (playMinecraftLowBtn) {
+  playMinecraftLowBtn.addEventListener('click', () => {
+    if (isGameOwned('minecraft_low')) {
+      window.open('https://eaglercraft.ir/zh/play/1.5.2?touch=false&userscript=', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 5) {
+        showToast('点券不足，需要 5 点券购买游戏');
+        return;
+      }
+      setPoints(points - 5);
+      addOwnedGame('minecraft_low');
+      showToast('购买成功！游戏已永久解锁');
+      playMinecraftLowBtn.textContent = '开始游戏';
+      playMinecraftLowBtn.style.background = '#10B981';
+      window.open('https://eaglercraft.ir/zh/play/1.5.2?touch=false&userscript=', '_blank');
+    }
+  });
+}
+
+// PCL2 启动器
+const playPcl2Btn = document.getElementById('playPcl2');
+if (playPcl2Btn) {
+  playPcl2Btn.addEventListener('click', () => {
+    if (isGameOwned('pcl2')) {
+      playPcl2Btn.textContent = '立即下载';
+      playPcl2Btn.style.background = '#10B981';
+      window.open('https://zip1.webgetstore.com/2026/05/24/656631ffb11dfb4be9268504daf055b0.zip?sg=e031b3bd5e961b2f4be662310e94467b&e=6a300c8f&fileName=PCL%20正式版%202.12.8.2.zip&fi=287702843', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 5) {
+        showToast('点券不足，需要 5 点券购买');
+        return;
+      }
+      setPoints(points - 5);
+      addOwnedGame('pcl2');
+      showToast('购买成功！PCL2启动器已永久解锁');
+      playPcl2Btn.textContent = '立即下载';
+      playPcl2Btn.style.background = '#10B981';
+      window.open('https://zip1.webgetstore.com/2026/05/24/656631ffb11dfb4be9268504daf055b0.zip?sg=e031b3bd5e961b2f4be662310e94467b&e=6a300c8f&fileName=PCL%20正式版%202.12.8.2.zip&fi=287702843', '_blank');
+    }
+  });
+}
+
+// HMCL 启动器
+const hmclOverlay = document.getElementById('hmclOverlay');
+const closeHmclOverlay = document.getElementById('closeHmclOverlay');
+const hmclNormalOption = document.getElementById('hmclNormal');
+const hmclFastOption = document.getElementById('hmclFast');
+
+function openHmclModal() {
+  hmclOverlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeHmclModal() {
+  hmclOverlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+if (closeHmclOverlay) {
+  closeHmclOverlay.addEventListener('click', closeHmclModal);
+}
+hmclOverlay.addEventListener('click', (e) => {
+  if (e.target === hmclOverlay) closeHmclModal();
+});
+
+const playHmclBtn = document.getElementById('playHmcl');
+if (playHmclBtn) {
+  playHmclBtn.addEventListener('click', () => {
+    openHmclModal();
+  });
+}
+
+const HMCL_NORMAL_URL = 'https://url94.ctfile.com/d/33326794-44675752-fc62fc?p=5267&d=44675752&fk=8b4182#/f/tempdir-UTMCNlxtDmRXYwRkUmpRN1J9DDVRZltjWzYDZVQ0VWEEbFRlBT5bLlppUzNUbVAzBjFTYVZhDTkPZlcw';
+const HMCL_FAST_URL = 'https://wwbgd.lanzouw.com/iYFYL3s26u0f';
+
+if (hmclNormalOption) {
+  hmclNormalOption.addEventListener('click', () => {
+    const points = getPoints();
+    if (points < 15) {
+      showToast('点券不足，需要 15 点券');
+      return;
+    }
+    setPoints(points - 15);
+    showToast('购买成功！正常下载 -15 点券');
+    closeHmclModal();
+    window.open(HMCL_NORMAL_URL, '_blank');
+  });
+}
+
+if (hmclFastOption) {
+  hmclFastOption.addEventListener('click', () => {
+    const points = getPoints();
+    if (points < 20) {
+      showToast('点券不足，需要 20 点券');
+      return;
+    }
+    setPoints(points - 20);
+    showToast('购买成功！高速下载 -20 点券');
+    closeHmclModal();
+    window.open(HMCL_FAST_URL, '_blank');
+  });
+}
+
+// 红警
+const playRedAlertBtn = document.getElementById('playRedAlert');
+if (playRedAlertBtn) {
+  playRedAlertBtn.addEventListener('click', () => {
+    if (isGameOwned('red_alert')) {
+      window.open('https://game.ra2web.com', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 10) {
+        showToast('点券不足，需要 10 点券购买游戏');
+        return;
+      }
+      setPoints(points - 10);
+      addOwnedGame('red_alert');
+      showToast('购买成功！红警已永久解锁');
+      playRedAlertBtn.textContent = '开始游戏';
+      playRedAlertBtn.style.background = '#10B981';
+      window.open('https://game.ra2web.com', '_blank');
+    }
+  });
+}
+
+// 超级马里奥（免费）
+const playMarioBtn = document.getElementById('playMario');
+if (playMarioBtn) {
+  playMarioBtn.addEventListener('click', () => {
+    window.open('https://zaixianwan.app/games/1666', '_blank');
+  });
+}
+
+// 慢路
+const playSlowRoadsBtn = document.getElementById('playSlowRoads');
+if (playSlowRoadsBtn) {
+  playSlowRoadsBtn.addEventListener('click', () => {
+    if (isGameOwned('slow_roads')) {
+      window.open('https://slowroads.io/#A2-d0cef992@1', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 5) {
+        showToast('点券不足，需要 5 点券购买游戏');
+        return;
+      }
+      setPoints(points - 5);
+      addOwnedGame('slow_roads');
+      showToast('购买成功！慢路已永久解锁');
+      playSlowRoadsBtn.textContent = '开始游戏';
+      playSlowRoadsBtn.style.background = '#10B981';
+      window.open('https://slowroads.io/#A2-d0cef992@1', '_blank');
+    }
+  });
+}
+
+// 垃圾人生
+const playLifeRestartBtn = document.getElementById('playLifeRestart');
+if (playLifeRestartBtn) {
+  playLifeRestartBtn.addEventListener('click', () => {
+    if (isGameOwned('life_restart')) {
+      window.open('https://liferestart.syaro.io/public/index.html', '_blank');
+    } else {
+      const points = getPoints();
+      if (points < 20) {
+        showToast('点券不足，需要 20 点券购买游戏');
+        return;
+      }
+      setPoints(points - 20);
+      addOwnedGame('life_restart');
+      showToast('购买成功！垃圾人生已永久解锁');
+      playLifeRestartBtn.textContent = '开始游戏';
+      playLifeRestartBtn.style.background = '#10B981';
+      window.open('https://liferestart.syaro.io/public/index.html', '_blank');
+    }
+  });
+}
+
+// 一键购买全套
+const buyAllMinecraftBtn = document.getElementById('buyAllMinecraft');
+if (buyAllMinecraftBtn) {
+  buyAllMinecraftBtn.addEventListener('click', () => {
+    const allOwned = isGameOwned('minecraft') && isGameOwned('minecraft_high') && isGameOwned('minecraft_low');
+    if (allOwned) {
+      showToast('您已拥有全部游戏，直接打开！');
+      window.open('https://playmcjscc.pages.dev/1.8.8/', '_blank');
+      return;
+    }
+    const points = getPoints();
+    if (points < 25) {
+      showToast('点券不足，需要 25 点券购买全套');
+      return;
+    }
+    setPoints(points - 25);
+    addOwnedGame('minecraft');
+    addOwnedGame('minecraft_high');
+    addOwnedGame('minecraft_low');
+    showToast('购买成功！我的世界整合包已永久解锁');
+    updateGameUI();
+  });
+}
+
+// === Click Slider (Dashboard) ===
+const clickSliderWrap = document.getElementById('clickSliderTrack') ? document.getElementById('clickSliderTrack').parentElement : null;
+const clickSliderHandle = document.getElementById('clickSliderHandle');
+const clickSliderFill = document.getElementById('clickSliderFill');
+const clickSliderText = document.getElementById('clickSliderText');
+const clickSliderTrack = document.getElementById('clickSliderTrack');
+
+let clickSliderDragging = false;
+let clickSliderStartX = 0;
+let clickSliderHandleLeft = 0;
+let mathVerified = false;
+let mathAnswer = 0;
+
+function getClickSliderMaxX() {
+  if (!clickSliderTrack || !clickSliderHandle) return 0;
+  return clickSliderTrack.offsetWidth - clickSliderHandle.offsetWidth;
+}
+
+function getSlideKey() { return 'stream_slide_count_' + getCurrentUserKey(); }
+function getSlideCount() {
+  return parseInt(localStorage.getItem(getSlideKey()) || '0', 10);
+}
+function setSlideCount(val) {
+  localStorage.setItem(getSlideKey(), String(val));
+}
+
+// === Math Verify ===
+const mathWrap = document.getElementById('mathVerifyWrap');
+const mathQuestion = document.getElementById('mathQuestion');
+const mathInput = document.getElementById('mathInput');
+const mathSubmitBtn = document.getElementById('mathSubmitBtn');
+
+function generateMath() {
+  const ops = ['+', '-', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a, b;
+  if (op === '+') {
+    a = Math.floor(Math.random() * 20) + 1;
+    b = Math.floor(Math.random() * 20) + 1;
+    mathAnswer = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 20) + 10;
+    b = Math.floor(Math.random() * a);
+    mathAnswer = a - b;
+  } else {
+    a = Math.floor(Math.random() * 9) + 1;
+    b = Math.floor(Math.random() * 9) + 1;
+    mathAnswer = a * b;
+  }
+  mathQuestion.textContent = `${a} ${op} ${b} = ?`;
+  mathInput.value = '';
+}
+
+function showMathVerify() {
+  mathWrap.style.display = 'block';
+  generateMath();
+  mathInput.focus();
+}
+
+function hideMathVerify() {
+  mathWrap.style.display = 'none';
+  mathVerified = false;
+}
+
+if (mathSubmitBtn) {
+  mathSubmitBtn.addEventListener('click', () => {
+    const val = parseInt(mathInput.value, 10);
+    if (val === mathAnswer) {
+      mathVerified = true;
+      hideMathVerify();
+      showToast('数学验证通过！+5 点券');
+      addPoints(5);
+      setSlideCount(0);
+      resetClickSlider();
+    } else {
+      showToast('答案错误，再试一次！');
+      mathInput.value = '';
+      mathInput.focus();
+    }
+  });
+}
+
+if (mathInput) {
+  mathInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') mathSubmitBtn.click();
+  });
+}
+
+// === Brain Training Math ===
+const brainQuestion = document.getElementById('brainQuestion');
+const brainInput = document.getElementById('brainInput');
+const brainSubmitBtn = document.getElementById('brainSubmitBtn');
+let brainAnswer = 0;
+
+function generateBrainMath() {
+  const ops = ['+', '-', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a, b;
+  if (op === '+') {
+    a = Math.floor(Math.random() * 50) + 1;
+    b = Math.floor(Math.random() * 50) + 1;
+    brainAnswer = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 50) + 20;
+    b = Math.floor(Math.random() * a);
+    brainAnswer = a - b;
+  } else {
+    a = Math.floor(Math.random() * 12) + 1;
+    b = Math.floor(Math.random() * 12) + 1;
+    brainAnswer = a * b;
+  }
+  brainQuestion.textContent = `${a} ${op} ${b} = ?`;
+  brainInput.value = '';
+}
+
+if (brainSubmitBtn) {
+  brainSubmitBtn.addEventListener('click', () => {
+    const val = parseInt(brainInput.value, 10);
+    if (val === brainAnswer) {
+      addPoints(3);
+      showToast('正确！+3 点券');
+      generateBrainMath();
+      brainInput.focus();
+    } else {
+      showToast('答错了，再试一次！');
+      brainInput.value = '';
+      brainInput.focus();
+    }
+  });
+}
+
+if (brainInput) {
+  brainInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') brainSubmitBtn.click();
+  });
+}
+
+// Init brain math on load
+generateBrainMath();
+
+function resetClickSlider() {
+  clickSliderHandleLeft = 0;
+  if (clickSliderHandle) clickSliderHandle.style.left = '0px';
+  if (clickSliderFill) clickSliderFill.style.width = '0px';
+  if (clickSliderWrap) clickSliderWrap.classList.remove('success', 'fail');
+  if (clickSliderText) {
+    const count = getSlideCount();
+    clickSliderText.textContent = count > 0 ? `已滑动 ${count}/5 次，连续 5 次 +5 点券` : '按住滑块向右滑动验证';
+  }
+  hideMathVerify();
+}
+
+function onClickSliderDown(e) {
+  if (clickSliderWrap && clickSliderWrap.classList.contains('success')) return;
+  clickSliderDragging = true;
+  if (clickSliderWrap) clickSliderWrap.classList.add('dragging');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  clickSliderStartX = clientX;
+  clickSliderHandleLeft = parseFloat(clickSliderHandle.style.left) || 0;
+  if (e.cancelable) e.preventDefault();
+}
+
+function onClickSliderMove(e) {
+  if (!clickSliderDragging) return;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const delta = clientX - clickSliderStartX;
+  const maxX = getClickSliderMaxX();
+  let newLeft = clickSliderHandleLeft + delta;
+  newLeft = Math.max(0, Math.min(newLeft, maxX));
+  if (clickSliderHandle) clickSliderHandle.style.left = newLeft + 'px';
+  if (clickSliderFill) clickSliderFill.style.width = (newLeft + clickSliderHandle.offsetWidth) + 'px';
+  if (e.cancelable) e.preventDefault();
+}
+
+function onClickSliderUp() {
+  if (!clickSliderDragging) return;
+  clickSliderDragging = false;
+  if (clickSliderWrap) clickSliderWrap.classList.remove('dragging');
+  const maxX = getClickSliderMaxX();
+  const currentLeft = parseFloat(clickSliderHandle.style.left) || 0;
+  if (currentLeft >= maxX - 5) {
+    // Success — 每次 +2 点券
+    if (clickSliderHandle) clickSliderHandle.style.left = maxX + 'px';
+    if (clickSliderFill) clickSliderFill.style.width = '100%';
+    if (clickSliderWrap) clickSliderWrap.classList.add('success');
+    addPoints(2);
+    showToast('验证成功！+2 点券');
+
+    let count = getSlideCount() + 1;
+    setSlideCount(count);
+
+    if (count >= 5) {
+      // 连续 5 次，弹出数学验证
+      if (clickSliderText) clickSliderText.textContent = '✓ 完成！请回答数学题';
+      showMathVerify();
+      setTimeout(resetClickSlider, 800);
+    } else {
+      // 未达 5 次
+      if (clickSliderText) clickSliderText.textContent = `已滑动 ${count}/5 次，再来 ${5 - count} 次 +5 额外点券`;
+      setTimeout(resetClickSlider, 800);
+    }
+  } else {
+    if (clickSliderWrap) clickSliderWrap.classList.add('fail');
+    // 失败重置计数
+    setSlideCount(0);
+    setTimeout(resetClickSlider, 500);
+  }
+}
+
+if (clickSliderHandle) {
+  clickSliderHandle.addEventListener('mousedown', onClickSliderDown);
+  clickSliderHandle.addEventListener('touchstart', onClickSliderDown, { passive: false });
+}
+if (clickSliderTrack) {
+  clickSliderTrack.addEventListener('mousemove', onClickSliderMove);
+  clickSliderTrack.addEventListener('touchmove', onClickSliderMove, { passive: false });
+  clickSliderTrack.addEventListener('mouseleave', onClickSliderUp);
+  clickSliderTrack.addEventListener('mouseup', onClickSliderUp);
+  clickSliderTrack.addEventListener('touchend', onClickSliderUp);
+}
+document.addEventListener('mouseup', onClickSliderUp);
+document.addEventListener('touchend', onClickSliderUp);
+
+// === RRTF File Drag & Drop / Preview ===
+const dropOverlay = document.getElementById('dropOverlay');
+const dropZone = document.getElementById('dropZone');
+const previewOverlay = document.getElementById('previewOverlay');
+const previewFrame = document.getElementById('previewFrame');
+const previewFilename = document.getElementById('previewFilename');
+const previewFilesize = document.getElementById('previewFilesize');
+const previewLoading = document.getElementById('previewLoading');
+const rrtfFileInput = document.getElementById('rrtfFileInput');
+const closePreviewBtn = document.getElementById('closePreview');
+const openRrtfBtn = document.getElementById('openRrtfBtn');
+const reloadPreviewBtn = document.getElementById('reloadPreview');
+const openInNewWindowBtn = document.getElementById('openInNewWindow');
+const downloadRrtfBtn = document.getElementById('downloadRrtf');
+const loadSampleRrtfBtn = document.getElementById('loadSampleRrtf');
+
+let dragCounter = 0;
+let currentRrtfContent = '';
+let currentRrtfName = '';
+
+function isFileDrag(e) {
+  return e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files');
+}
+
+function isValidRrtfFile(filename) {
+  const lower = filename.toLowerCase();
+  return lower.endsWith('.rrtf') || lower.endsWith('.html');
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+}
+
+function loadRrtfFile(file) {
+  if (!isValidRrtfFile(file.name)) {
+    showToast('请选择 .rrtf 或 .html 格式的文件', '格式错误');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onloadstart = () => {
+    previewLoading.style.display = 'flex';
+    previewOverlay.classList.add('show');
+    previewFilename.textContent = file.name;
+    previewFilesize.textContent = '· ' + formatSize(file.size);
+    currentRrtfName = file.name;
+  };
+  reader.onload = (e) => {
+    currentRrtfContent = e.target.result;
+    previewFrame.srcdoc = currentRrtfContent;
+    setTimeout(() => {
+      previewLoading.style.display = 'none';
+    }, 300);
+  };
+  reader.onerror = () => {
+    showToast('文件读取失败', '错误');
+    previewOverlay.classList.remove('show');
+  };
+  reader.readAsText(file);
+}
+
+// Drag enter: show overlay
+document.addEventListener('dragenter', (e) => {
+  if (isFileDrag(e)) {
+    e.preventDefault();
+    dragCounter++;
+    dropOverlay.classList.add('show');
+  }
+});
+
+// Drag leave: use relatedTarget to avoid child-element flicker
+document.addEventListener('dragleave', (e) => {
+  if (isFileDrag(e)) {
+    e.preventDefault();
+    // Only decrement if we're actually leaving the document, not entering a child
+    const related = e.relatedTarget;
+    if (!related || !document.contains(related)) {
+      dragCounter = 0;
+      dropOverlay.classList.remove('show');
+      dropOverlay.classList.remove('drag-active');
+    } else {
+      dragCounter--;
+      if (dragCounter <= 0) {
+        dragCounter = 0;
+        dropOverlay.classList.remove('show');
+        dropOverlay.classList.remove('drag-active');
+      }
+    }
+  }
+});
+
+// Drag over: prevent default and highlight drop zone when over it
+document.addEventListener('dragover', (e) => {
+  if (isFileDrag(e)) {
+    e.preventDefault();
+    // Check if dragging over the drop zone
+    const rect = dropZone.getBoundingClientRect();
+    const overZone = e.clientX >= rect.left && e.clientX <= rect.right &&
+                     e.clientY >= rect.top && e.clientY <= rect.bottom;
+    dropOverlay.classList.toggle('drag-active', overZone);
+  }
+});
+
+// Drop: handle file drop
+document.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dragCounter = 0;
+  dropOverlay.classList.remove('show');
+  dropOverlay.classList.remove('drag-active');
+  if (!e.dataTransfer.files.length) return;
+  loadRrtfFile(e.dataTransfer.files[0]);
+});
+
+// Close preview
+function closePreview() {
+  previewOverlay.classList.remove('show');
+  setTimeout(() => {
+    previewFrame.srcdoc = '';
+    currentRrtfContent = '';
+    currentRrtfName = '';
+  }, 300);
+}
+
+closePreviewBtn.addEventListener('click', closePreview);
+
+// ESC to close preview
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && previewOverlay.classList.contains('show')) {
+    closePreview();
+  }
+});
+
+// File input fallback (button in empty state)
+if (openRrtfBtn) {
+  openRrtfBtn.addEventListener('click', () => rrtfFileInput.click());
+}
+rrtfFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) loadRrtfFile(file);
+  rrtfFileInput.value = '';
+});
+
+// Reload preview
+if (reloadPreviewBtn) {
+  reloadPreviewBtn.addEventListener('click', () => {
+    if (currentRrtfContent) {
+      previewLoading.style.display = 'flex';
+      previewFrame.srcdoc = '';
+      setTimeout(() => {
+        previewFrame.srcdoc = currentRrtfContent;
+        setTimeout(() => { previewLoading.style.display = 'none'; }, 200);
+      }, 100);
+    }
+  });
+}
+
+// Open in new window
+if (openInNewWindowBtn) {
+  openInNewWindowBtn.addEventListener('click', () => {
+    if (!currentRrtfContent) return;
+    const blob = new Blob([currentRrtfContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  });
+}
+
+// Download source
+if (downloadRrtfBtn) {
+  downloadRrtfBtn.addEventListener('click', () => {
+    if (!currentRrtfContent) return;
+    const blob = new Blob([currentRrtfContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = currentRrtfName || 'preview.rrtf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('下载已开始', 'RRTF');
+  });
+}
+
+// Sample RRTF
+if (loadSampleRrtfBtn) {
+  loadSampleRrtfBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const SAMPLE = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample.rrtf</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    height: 100vh;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    font-family: 'Outfit', -apple-system, "PingFang SC", sans-serif;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(255, 87, 34, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 138, 80, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    padding: 56px 64px;
+    border-radius: 28px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    animation: cardIn 0.6s ease-out;
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .emoji {
+    font-size: 72px;
+    margin-bottom: 20px;
+    display: block;
+    animation: bob 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(255, 87, 34, 0.3));
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-12px) rotate(5deg); }
+  }
+  h1 {
+    font-size: 40px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 14px;
+    background: linear-gradient(135deg, #fff 0%, #FF8A50 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  p {
+    opacity: 0.7;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .meta {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .tag {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(255, 87, 34, 0.2);
+    border: 1px solid rgba(255, 87, 34, 0.3);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #FF8A50;
+  }
+  .brand {
+    font-size: 12px;
+    opacity: 0.4;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+  }
+  .particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .particle {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: rgba(255, 87, 34, 0.4);
+    border-radius: 50%;
+    animation: float 8s ease-in-out infinite;
+  }
+  .particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0s; }
+  .particle:nth-child(2) { left: 80%; top: 30%; animation-delay: 1s; width: 6px; height: 6px; }
+  .particle:nth-child(3) { left: 30%; top: 70%; animation-delay: 2s; background: rgba(255, 138, 80, 0.3); }
+  .particle:nth-child(4) { left: 70%; top: 60%; animation-delay: 3s; width: 3px; height: 3px; }
+  .particle:nth-child(5) { left: 50%; top: 15%; animation-delay: 4s; background: rgba(255, 183, 77, 0.3); }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+    50% { transform: translateY(-40px) scale(1.2); opacity: 0.8; }
+  }
+</style>
+</head>
+<body>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="card">
+    <span class="emoji">📦</span>
+    <h1>Hello, RRTF!</h1>
+    <p>这是一个 YziStudio 自主开发的<br>游戏资源文件示例</p>
+    <p style="font-size: 13px; opacity: 0.5;">只需将 HTML 文件后缀改为 .rrtf 即可</p>
+    <div class="meta">
+      <span class="tag">SAMPLE.RRTF</span>
+      <span class="brand">YZI STUDIO</span>
+    </div>
+  </div>
+</body>
+</html>`;
+    currentRrtfContent = SAMPLE;
+    currentRrtfName = 'sample.rrtf';
+    dropOverlay.classList.remove('show');
+    previewLoading.style.display = 'flex';
+    previewOverlay.classList.add('show');
+    previewFilename.textContent = 'sample.rrtf';
+    previewFilesize.textContent = '· ' + formatSize(SAMPLE.length);
+    previewFrame.srcdoc = SAMPLE;
+    setTimeout(() => { previewLoading.style.display = 'none'; }, 300);
+  });
+}
+
+// === Human verification (slider captcha) ===
+const captcha = document.getElementById('captcha');
+const captchaHandle = document.getElementById('captchaHandle');
+const captchaFill = document.getElementById('captchaFill');
+const captchaText = document.getElementById('captchaText');
+const captchaTrack = document.getElementById('captchaTrack');
+let captchaVerified = false;
+
+let isDragging = false;
+let dragStartX = 0;
+let handleStartLeft = 0;
+
+function getCaptchaMaxX() {
+  if (!captchaTrack || !captchaHandle) return 0;
+  return captchaTrack.offsetWidth - captchaHandle.offsetWidth;
+}
+
+function resetCaptcha() {
+  handleStartLeft = 0;
+  captchaHandle.style.left = '0px';
+  captchaFill.style.width = '0px';
+  captcha.classList.remove('success');
+  captcha.classList.remove('fail');
+  captchaText.textContent = '按住滑块向右拖动完成验证';
+  captchaVerified = false;
+}
+
+function onCaptchaDown(e) {
+  if (captcha.classList.contains('success')) return;
+  isDragging = true;
+  captcha.classList.add('dragging');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  dragStartX = clientX;
+  // Parse current left
+  const currentLeft = parseFloat(captchaHandle.style.left) || 0;
+  handleStartLeft = currentLeft;
+  if (e.cancelable) e.preventDefault();
+}
+
+function onCaptchaMove(e) {
+  if (!isDragging) return;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const delta = clientX - dragStartX;
+  const maxX = getCaptchaMaxX();
+  let newLeft = handleStartLeft + delta;
+  newLeft = Math.max(0, Math.min(newLeft, maxX));
+  captchaHandle.style.left = newLeft + 'px';
+  captchaFill.style.width = (newLeft + captchaHandle.offsetWidth) + 'px';
+  if (e.cancelable) e.preventDefault();
+}
+
+function onCaptchaUp() {
+  if (!isDragging) return;
+  isDragging = false;
+  captcha.classList.remove('dragging');
+  const maxX = getCaptchaMaxX();
+  const currentLeft = parseFloat(captchaHandle.style.left) || 0;
+  if (currentLeft >= maxX - 5) {
+    // Success — 验证成功 +2 点券
+    captchaHandle.style.left = maxX + 'px';
+    captchaFill.style.width = '100%';
+    captcha.classList.add('success');
+    captchaText.textContent = '✓ 验证成功 +2 点券';
+    captchaVerified = true;
+    addPoints(2);
+    showToast('验证成功！+2 点券');
+    // 验证后重置以便下次使用
+    setTimeout(resetCaptcha, 1500);
+  } else {
+    // Fail - bounce back
+    captcha.classList.add('fail');
+    setTimeout(() => {
+      captcha.classList.remove('fail');
+      resetCaptcha();
+    }, 500);
+  }
+}
+
+// Bind events on the handle
+captchaHandle.addEventListener('mousedown', onCaptchaDown);
+captchaHandle.addEventListener('touchstart', onCaptchaDown, { passive: false });
+
+// Bind move/up on the track (not document, to avoid conflicts)
+captchaTrack.addEventListener('mousemove', onCaptchaMove);
+captchaTrack.addEventListener('touchmove', onCaptchaMove, { passive: false });
+captchaTrack.addEventListener('mouseleave', onCaptchaUp);
+captchaTrack.addEventListener('mouseup', onCaptchaUp);
+captchaTrack.addEventListener('touchend', onCaptchaUp);
+
+// Also bind on document as fallback for mouseup
+document.addEventListener('mouseup', (e) => {
+  if (isDragging) onCaptchaUp();
+});
+document.addEventListener('touchend', (e) => {
+  if (isDragging) onCaptchaUp();
+});
+
+// Form validation
+const form = document.getElementById('regForm');
+const closeSuccess = document.getElementById('closeSuccess');
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const u = document.getElementById('username').value.trim();
+  const em = document.getElementById('email').value.trim();
+  const p = document.getElementById('password').value;
+  const c = document.getElementById('confirm').value;
+  const ag = document.getElementById('agreement').checked;
+
+  if (u.length < 3) return showToast('用户名至少 3 个字符');
+  if (!/^[a-zA-Z0-9_]+$/.test(u)) return showToast('用户名只能包含字母、数字、下划线');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return showToast('邮箱格式不正确');
+  if (p.length < 8) return showToast('密码至少 8 位');
+  if (p !== c) return showToast('两次密码输入不一致');
+  if (!ag) return showToast('请勾选并同意用户协议');
+  if (!captchaVerified) return showToast('请先完成人机验证');
+
+  // Auto-login on successful registration
+  sessionStorage.setItem('stream_user', u);
+  successOverlay.classList.add('show');
+});
+
+// Render on load
+
+function dismissSuccessAndEnter() {
+  successOverlay.classList.remove('show');
+  const u = localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user');
+  showDashboard(u);
+}
+
+closeSuccess.addEventListener('click', dismissSuccessAndEnter);
+successOverlay.addEventListener('click', (e) => {
+  if (e.target === successOverlay) dismissSuccessAndEnter();
+});
+
+// === Auto-show dashboard if already logged in ===
+const existingUser = localStorage.getItem('stream_user') || sessionStorage.getItem('stream_user');
+if (existingUser) {
+  showDashboard(existingUser);
+}
+</script>
+</body>
+</html>
