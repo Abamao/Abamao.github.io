@@ -1338,6 +1338,39 @@
             width: 100%;
         }
 
+        /* 错误代码红色警示框 */
+        .error-alert {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: rgba(200, 70, 70, 0.08);
+            border: 1px solid rgba(180, 60, 60, 0.2);
+            border-radius: 16px;
+            color: #a04040;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-alert svg {
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            stroke: #a04040;
+        }
+
+        body.dark-mode .error-alert {
+            background: rgba(220, 90, 90, 0.12);
+            border-color: rgba(200, 80, 80, 0.3);
+            color: #d07070;
+        }
+
+        body.dark-mode .error-alert svg {
+            stroke: #d07070;
+        }
+
         /* 大屏幕字体优化 */
         @media (min-width: 1920px) {
             .message-content {
@@ -5639,7 +5672,7 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function addMessageToUI(content, isUser, animate = true, messageId = null) {
+        function addMessageToUI(content, isUser, animate = true, messageId = null, extraHtml = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ' + (isUser ? 'user' : 'ai');
             if (animate) msgDiv.style.animation = 'fadeIn 0.2s ease';
@@ -5651,15 +5684,22 @@
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            
+
             // 创建文本节点
             const textNode = document.createTextNode(content);
             contentDiv.appendChild(textNode);
 
+            // 插入额外HTML（如红色警示框）
+            if (extraHtml) {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = extraHtml;
+                contentDiv.appendChild(wrapper);
+            }
+
             // 添加操作按钮
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'message-actions';
-            
+
             // 复制按钮
             const copyBtn = document.createElement('button');
             copyBtn.className = 'message-action-btn';
@@ -5670,8 +5710,8 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
             `;
-            copyBtn.onclick = () => copyMessage(content, copyBtn);
-            
+            copyBtn.onclick = () => copyMessage(content + (extraHtml ? '\n错误代码:0xE2' : ''), copyBtn);
+
             // 删除按钮
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'message-action-btn delete';
@@ -5683,7 +5723,7 @@
                 </svg>
             `;
             deleteBtn.onclick = () => deleteMessage(messageId || generateId());
-            
+
             actionsDiv.appendChild(copyBtn);
             actionsDiv.appendChild(deleteBtn);
             contentDiv.appendChild(actionsDiv);
@@ -5781,7 +5821,7 @@
         }
 
         // 打字机效果 - 每秒50个字符
-        async function typewriterEffect(text, messageId = null) {
+        async function typewriterEffect(text, messageId = null, extraHtml = null) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message ai';
             if (messageId) msgDiv.dataset.messageId = messageId;
@@ -5792,7 +5832,7 @@
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
-            
+
             // 创建文本节点用于打字效果
             const textNode = document.createTextNode('');
             contentDiv.appendChild(textNode);
@@ -5800,7 +5840,7 @@
             // 添加操作按钮
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'message-actions';
-            
+
             const copyBtn = document.createElement('button');
             copyBtn.className = 'message-action-btn';
             copyBtn.title = '复制';
@@ -5810,8 +5850,8 @@
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
             `;
-            copyBtn.onclick = () => copyMessage(text, copyBtn);
-            
+            copyBtn.onclick = () => copyMessage(text + (extraHtml ? '\n错误代码:0xE2' : ''), copyBtn);
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'message-action-btn delete';
             deleteBtn.title = '删除';
@@ -5822,7 +5862,7 @@
                 </svg>
             `;
             deleteBtn.onclick = () => deleteMessage(messageId || generateId());
-            
+
             actionsDiv.appendChild(copyBtn);
             actionsDiv.appendChild(deleteBtn);
             contentDiv.appendChild(actionsDiv);
@@ -5839,6 +5879,14 @@
                 textNode.textContent += text[i];
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 await new Promise(r => setTimeout(r, delayPerChar));
+            }
+
+            // 打字完成后插入额外HTML（如红色警示框）
+            if (extraHtml) {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = extraHtml;
+                contentDiv.insertBefore(wrapper, actionsDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
             }
         }
 
@@ -8921,153 +8969,31 @@
             removeTyping();
 
             // 根据用户输入生成回复
-            let responseText;
+            const responseText = '服务器现在状况不太好 TvT';
+            const errorAlertHtml = '<div class="error-alert"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>错误代码:0xE2</div>';
+            const fullResponseText = '服务器现在状况不太好 TvT\n错误代码:0xE2';
             const lowerText = text.toLowerCase();
-            
+
             // 联网搜索模式
             if (searchEnabled) {
-                const sourceInfo = searchSources[currentSearchSource];
-                const searchUrl = sourceInfo.url + encodeURIComponent(text);
-                const containerId = 'search-result-' + generateId();
-                
-                // 检查缓存
-                const cacheKey = searchCache.generateKey(text, currentSearchSource);
-                const cachedResult = searchCache.get(cacheKey);
-                
-                let responseText;
-                if (cachedResult) {
-                    responseText = `我从缓存中为你找到 **${sourceInfo.name}** 的相关信息。`;
-                } else {
-                    responseText = `我已经为你在 **${sourceInfo.name}** 找到这些信息。`;
-                    // 缓存搜索结果
-                    searchCache.set(cacheKey, { url: searchUrl, query: text, timestamp: Date.now() });
-                }
-                
-                // 添加搜索链接消息（直接在页面展开显示）
-                const searchMessageHtml = `<div class="search-preview-card" onclick="toggleSearchResult('${containerId}', '${searchUrl}')" data-search-url="${searchUrl}">
-                    <div class="search-preview-header">
-                        <div class="search-preview-info">
-                            <span style="font-size: 18px;">${sourceInfo.icon}</span>
-                            <div class="search-preview-text">
-                                <div class="search-preview-query">${escapeHtml(text)}</div>
-                                <div class="search-preview-hint">${cachedResult ? '📋 来自缓存' : '🔍 点击展开搜索结果'}</div>
-                            </div>
-                        </div>
-                        <svg class="search-preview-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4b70e2" stroke-width="2">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                    </div>
-                </div>
-                <div class="search-result-container" id="${containerId}" data-cache-key="${cacheKey}">
-                    <div class="search-result-header">
-                        <div class="search-result-title">
-                            <span>${sourceInfo.icon}</span>
-                            <span>${sourceInfo.name} 搜索结果</span>
-                        </div>
-                        <div class="search-result-actions">
-                            <button class="search-result-btn" onclick="event.stopPropagation(); refreshSearchResult('${containerId}', '${searchUrl}')" title="刷新">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="23 4 23 10 17 10"></polyline>
-                                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-                                </svg>
-                                刷新
-                            </button>
-                            <button class="search-result-btn" onclick="event.stopPropagation(); openSearchInNewTab('${searchUrl}')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                    <polyline points="15 3 21 3 21 9"></polyline>
-                                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                                </svg>
-                                新窗口打开
-                            </button>
-                            <button class="search-result-btn" onclick="event.stopPropagation(); toggleSearchResult('${containerId}', '${searchUrl}')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                                收起
-                            </button>
-                        </div>
-                    </div>
-                    <div class="search-result-loading" style="display: none; padding: 20px; text-align: center; color: #666;">
-                        <div class="typing-indicator">
-                            <span></span><span></span><span></span>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 12px;">正在加载搜索结果...</div>
-                    </div>
-                    <iframe class="search-result-iframe" sandbox="allow-scripts allow-same-origin allow-forms" loading="lazy"></iframe>
-                </div>`;
-                
                 const aiMsgId = generateId();
-                chat.messages.push({ 
-                    content: responseText + '\n\n[搜索结果]', 
-                    isUser: false, 
-                    id: aiMsgId, 
-                    searchHtml: searchMessageHtml,
-                    searchData: { url: searchUrl, source: currentSearchSource, query: text }
-                });
-                
-                // 添加AI消息到UI
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message ai';
-                msgDiv.id = 'msg-' + aiMsgId;
-                
-                const avatar = document.createElement('div');
-                avatar.className = 'avatar';
-                avatar.textContent = 'AI';
-                
-                const contentDiv = document.createElement('div');
-                contentDiv.className = 'message-content';
-                contentDiv.innerHTML = responseText + searchMessageHtml;
-                
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'message-actions';
-                actionsDiv.innerHTML = `
-                    <button class="message-action-btn" onclick="copyMessage('${aiMsgId}')" title="复制">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                    <button class="message-action-btn" onclick="deleteMessage('${aiMsgId}')" title="删除">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                    </button>
-                `;
-                contentDiv.appendChild(actionsDiv);
-                
-                msgDiv.appendChild(avatar);
-                msgDiv.appendChild(contentDiv);
-                chatContainer.appendChild(msgDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
+                await typewriterEffect(responseText, aiMsgId, errorAlertHtml);
+                chat.messages.push({ content: fullResponseText, isUser: false, id: aiMsgId });
             } else if (lowerText.includes('你是谁') || lowerText.includes('你叫什么') || lowerText.includes('介绍一下自己')) {
-                responseText = '我是 Jet Spus 1.0，由 YziStudio 全程自主研发、自主训练的初代基础版 AI，应答风格沉稳正式，可进行日常交流与基础专业内容输出，严格恪守各项行为与伦理准则。';
                 const aiMsgId = generateId();
-                await typewriterEffect(responseText, aiMsgId);
-                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+                await typewriterEffect(responseText, aiMsgId, errorAlertHtml);
+                chat.messages.push({ content: fullResponseText, isUser: false, id: aiMsgId });
             } else if (lowerText.includes('倒计时')) {
-                // 检测是否包含时间单位
-                const hasTimeUnit = /(\d+\s*(分钟|分|秒|小时|时|毫秒|ms|min|hour|sec)|\d+[:：]\d+(:\d+)?)/i.test(text);
-                
-                if (hasTimeUnit) {
-                    responseText = '请再说一遍您需要倒计时几分钟？';
-                } else {
-                    responseText = '请您说一下你需要倒计时几分钟，这样我才能为您倒计时。';
-                }
                 const aiMsgId = generateId();
-                await typewriterEffect(responseText, aiMsgId);
-                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
-                
+                await typewriterEffect(responseText, aiMsgId, errorAlertHtml);
+                chat.messages.push({ content: fullResponseText, isUser: false, id: aiMsgId });
+
                 // 显示倒计时选择对话框
                 setTimeout(() => showCountdownModal(), 500);
             } else {
-                responseText = '感谢您的提问。作为 Jet Spus 1.0，我已收到您的消息，正在处理中。目前系统处于演示模式，完整功能即将上线。';
                 const aiMsgId = generateId();
-                await typewriterEffect(responseText, aiMsgId);
-                chat.messages.push({ content: responseText, isUser: false, id: aiMsgId });
+                await typewriterEffect(responseText, aiMsgId, errorAlertHtml);
+                chat.messages.push({ content: fullResponseText, isUser: false, id: aiMsgId });
             }
 
             saveChatsToStorage();
