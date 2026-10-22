@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>完整教程 · PCL2 v2.14.0.0 关闭自动更新版 | PCL2-Reload</title>
+<meta name="description" content="PCL2 v2.14.0.0 关闭自动更新版完整使用教程：压缩包内容、解压与启动步骤、老用户迁移注意事项、exe SHA256 校验。">
+<meta name="theme-color" content="#070a09">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 4 60 19 32 34 4 19Z' fill='%233ee08a'/%3E%3Cpath d='M4 19 32 34v26L4 45Z' fill='%232a7a52'/%3E%3Cpath d='M60 19 32 34v26l28-15Z' fill='%231b5539'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">
+      <svg class="cube" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 4 60 19 32 34 4 19Z" fill="#3ee08a"/>
+        <path d="M4 19 32 34v26L4 45Z" fill="#2a7a52"/>
+        <path d="M60 19 32 34v26l28-15Z" fill="#1b5539"/>
+      </svg>
+      <span>PCL2-Reload<small>非官方存档站</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#story">事件</a>
+      <a href="index.html#download">下载</a>
+      <a href="index.html#alternatives">备选</a>
+      <a href="tutorial.html" style="color:var(--text)">教程</a>
+      <a href="index.html#patch">补丁</a>
+      <a href="index.html#faq">常见问题</a>
+      <a class="nav-cta" href="index.html#download">立即获取</a>
+    </nav>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="wrap">
+    <a class="back-link" href="index.html">← 返回首页</a>
+    <h1>PCL2 v2.14.0.0 关闭自动更新版 · 完整教程</h1>
+    <p>从下载到启动的全部步骤，含压缩包结构、老用户迁移注意事项与 SHA256 校验方法。</p>
+  </div>
+</div>
+
+<div class="wrap doc-wrap">
+  <aside class="toc">
+    <b>目录</b>
+    <a href="#tldr">一句话版本</a>
+    <a href="#about">关于 2.14.0.0</a>
+    <a href="#inside">压缩包内容</a>
+    <a href="#usage">用法</a>
+    <a href="#verify">校验 SHA256</a>
+    <a href="#license">许可与致谢</a>
+  </aside>
+
+  <article class="article">
+
+    <h2 id="tldr">一句话版本</h2>
+    <p>
+      <strong>解压后直接双击 exe 就能用，默认不会自动更新。</strong>适合不熟悉电脑的朋友。
+    </p>
+    <p style="color:var(--muted);font-size:14px">
+      方法来源：尘漠中尘。
+    </p>
+
+    <h2 id="about">关于 2.14.0.0</h2>
+    <p>
+      2.14.0.0 是官方 <strong>2.99（关闭 MC 下载）之前的最后一个正式版</strong>，比 2.13.1.1 多了很多修复，比如：
+    </p>
+    <ul>
+      <li>可以在版本设置里修改、添加、更新已装版本的组件；</li>
+      <li>启动时可以按 <code>Esc</code> 取消。</li>
+    </ul>
+    <p>
+      已实测：<strong>正版登录、版本列表加载正常，没有下载限制。</strong>
+    </p>
+
+    <h2 id="inside">压缩包内容</h2>
+    <pre class="code">Plain Craft Launcher 2.exe   <span class="cmt">← 官方原版，未修改</span>
+PCL/Setup.ini                <span class="cmt">← 只有一行 SystemSystemUpdate:3（关闭自动更新）</span></pre>
+    <p>
+      除上述两个文件外没有别的东西。exe 是官方原版，未做任何修改；Setup.ini 的唯一作用是关掉自动更新，避免启动器把自己升级成没有下载功能的版本。
+    </p>
+
+    <h2 id="usage">用法</h2>
+
+    <div class="step">
+      <div class="n">1</div>
+      <div class="t">
+        <b>解压到一个普通文件夹</b>
+        不要直接在压缩包里双击，也不要放在临时文件夹里。建议放在 D 盘之类路径简单、不会被清理的位置，路径里尽量别有特殊符号。
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">2</div>
+      <div class="t">
+        <b>双击 Plain Craft Launcher 2.exe</b>
+        首次启动会生成配置文件，属正常现象。之后即可正版登录或离线登录，进入「下载」页面安装原版 Minecraft。
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">3</div>
+      <div class="t">
+        <b>弹出「悲报」公告时不要点「更新 PCL」</b>
+        直接关闭公告即可。点了更新就会升到 2.99，原版 Minecraft 下载功能随之消失，需要重新下载旧版 exe。
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n">4</div>
+      <div class="t">
+        <b>已经在用 PCL 的人：只替换 exe</b>
+        只把 exe 替换到原来的文件夹里，<strong>不要</strong>用压缩包里的 <code>PCL</code> 文件夹覆盖自己的，否则设置会被冲掉。然后检查自己的 <code>PCL/Setup.ini</code> 里有没有 <code>SystemSystemUpdate:3</code>，没有就手动补上这一行。
+      </div>
+    </div>
+
+    <div class="alert" style="margin:26px 0 0">
+      <span class="ic">!</span>
+      <span>替换 exe 前建议先把原来的 exe 备份一份（重命名为 <code style="font-family:var(--mono)">Plain Craft Launcher 2.exe.bak</code>），万一有问题可以直接换回来。</span>
+    </div>
+
+    <h2 id="verify">校验 SHA256</h2>
+    <p>exe SHA256（官方原版，可自行核对）：</p>
+    <div class="copy-box" style="margin-bottom:14px">
+      <code>5582952DED3B443503F66C23B810802BD20F1A3E847B54D9E09653A825859A36</code>
+      <button class="copy-btn" data-copy="5582952DED3B443503F66C23B810802BD20F1A3E847B54D9E09653A825859A36">复制</button>
+    </div>
+    <p>Windows 上核对方法：在该 exe 所在文件夹按住 <code>Shift</code> + 右键，选择「在此处打开 PowerShell 窗口」，执行：</p>
+    <pre class="code">certutil -hashfile "Plain Craft Launcher 2.exe" SHA256</pre>
+    <p>输出的字符串与上面一致，说明文件未被篡改。macOS / Linux 可用：</p>
+    <pre class="code">shasum -a 256 "Plain Craft Launcher 2.exe"</pre>
+
+    <h2 id="license">许可与致谢</h2>
+    <p>
+      PCL 受《PCL 分发有限许可》约束。<strong>如作者要求，本站将立即删除相关内容。</strong>
+    </p>
+    <p>
+      请支持原作者龙腾猫跃：<a href="https://afdian.com/a/LTCat" target="_blank" rel="noopener noreferrer">https://afdian.com/a/LTCat</a>
+    </p>
+    <p style="color:var(--muted);font-size:14px">
+      本站为非官方存档站，与 PCL2 作者及官方团队无关，不提供破解、不修改程序本体。
+    </p>
+
+    <div class="btn-row" style="margin-top:34px">
+      <a class="btn btn-primary" href="index.html#download">返回下载页</a>
+      <a class="btn btn-ghost" href="index.html#faq">查看常见问题</a>
+      <a class="btn btn-ghost" href="index.html#alternatives">看看其他启动器</a>
+    </div>
+  </article>
+</div>
+
+<footer>
+  <div class="wrap foot-inner">
+    <p>
+      PCL2-Reload · 非官方存档站<br>
+      与 PCL2 作者及官方团队无关 · 内容仅供学习与存档参考
+    </p>
+    <div class="foot-links">
+      <a href="index.html#download">下载</a>
+      <a href="index.html#patch">补丁</a>
+      <a href="index.html#faq">常见问题</a>
+      <a href="https://afdian.com/a/LTCat" target="_blank" rel="noopener noreferrer">支持原作者</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= 首次进入 · 广告弹窗 ================= -->
+<div class="ad-overlay" id="adOverlay" hidden>
+  <div class="ad-modal" role="dialog" aria-modal="true" aria-labelledby="adTitle" tabindex="-1">
+    <div class="ad-top">
+      <span class="ad-tag">广告</span>
+      <button class="ad-close" type="button" data-ad-close aria-label="关闭广告">✕</button>
+    </div>
+
+    <p class="ad-hello">嘿！在吗？</p>
+    <h3 id="adTitle">BlockHelm 启动器</h3>
+    <p class="ad-sub">由 Yzi Studio 辅助开发 · 开源免费</p>
+    <p class="ad-body">这个启动器开源免费，因此<strong>永久不会被封</strong>。</p>
+
+    <div class="copy-box">
+      <code>https://wwbgd.lanzouw.com/iFcM44cy6k7e</code>
+      <button class="copy-btn" data-copy="https://wwbgd.lanzouw.com/iFcM44cy6k7e">复制</button>
+    </div>
+    <div class="pw-row">
+      <span>提取码</span>
+      <code class="plain">bsum</code>
+      <button class="copy-btn" data-copy="bsum">复制</button>
+    </div>
+
+    <div class="ad-actions">
+      <a class="btn btn-primary" href="https://wwbgd.lanzouw.com/iFcM44cy6k7e" target="_blank" rel="noopener noreferrer">前往下载</a>
+      <button class="btn btn-ghost" type="button" data-ad-close>稍后再说</button>
+    </div>
+    <p class="ad-foot">本站广告位 · 关闭后不再自动弹出</p>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
