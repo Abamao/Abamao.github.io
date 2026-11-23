@@ -79,6 +79,25 @@ function loadState() {
 let state = loadState();
 let currentId = state.activeId;
 let busy = false;
+let cliOpen = false;
+let cliBooted = false;
+let cliHistory = [];
+let cliHistoryIndex = 0;
+let cliPending = null;
+let lastRenderedModelId = null;
+let perfState = {
+  step: 1,
+  ram: null,
+  vram: null,
+  gpu: "",
+  preference: "balanced",
+  language: "zh",
+  platform: "",
+  cores: 0,
+  cpuName: "",
+  cpuCores: 0,
+  detectedGpu: "",
+};
 let localEngine = null;
 let localReady = false;
 let webgpuSupported = false;
@@ -272,6 +291,14 @@ function selectIntensityPane(pane) {
   document.querySelectorAll(".intensity-pane").forEach((el) => el.classList.toggle("active", el.dataset.pane === pane));
 }
 
+function animateModelText(node) {
+  if (!node) return;
+  node.classList.remove("model-swap");
+  void node.offsetWidth;
+  node.classList.add("model-swap");
+  node.addEventListener("animationend", () => node.classList.remove("model-swap"), { once: true });
+}
+
 function syncModeUI() {
   const intensityKey = state.settings.local.intensity || "medium";
   const intensity = INTENSITY_PRESETS[intensityKey] || INTENSITY_PRESETS.medium;
@@ -281,8 +308,10 @@ function syncModeUI() {
   const currentModel = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
   const currentModelName = currentModel?.name || "本地模型";
   const supportsThinking = !!currentModel?.thinkingSupported;
+  const modelChanged = lastRenderedModelId !== null && lastRenderedModelId !== state.settings.local.modelId;
 
   $("currentModelLabel").textContent = currentModelName;
+  $("emptyTitle").textContent = `与「${currentModelName}」对话`;
   $("intensityPopover").hidden = false;
   $("intensityPopover").dataset.level = intensityKey;
   $("intensityPopover").classList.toggle("ultra-active", isUltra);
@@ -297,6 +326,12 @@ function syncModeUI() {
   $("cachePill").hidden = !cachedModels.has(state.settings.local.modelId);
   $("codexIntensityLabel").textContent = intensity.label;
   $("codexModelLine").textContent = currentModelName + " ›";
+  if (modelChanged) {
+    animateModelText($("currentModelLabel"));
+    animateModelText($("emptyTitle"));
+    animateModelText($("codexModelLine"));
+  }
+  lastRenderedModelId = state.settings.local.modelId;
   $("intensityTrigger").title = `${intensity.label} - ${intensity.desc} · 当前模型：${currentModelName}`;
   $("thinkingToggle").checked = !!state.settings.local.thinkingEnabled && supportsThinking;
   $("thinkingToggle").disabled = !supportsThinking;
@@ -768,6 +803,859 @@ function autoResizeInput() {
 function openSidebar() { sidebarOpen = true; $("app").classList.add("sidebar-open"); }
 function closeSidebar() { sidebarOpen = false; $("app").classList.remove("sidebar-open"); }
 
+/* ---------- Performance check ---------- */
+const PERF_BUILDS = [
+  { id: "14900k-5090", label: "i9-14900K + RTX 5090", cpu: "i9-14900K", gpu: "RTX 5090", ram: 32, vram: 32 },
+  { id: "14900k-4090", label: "i9-14900K + RTX 4090", cpu: "i9-14900K", gpu: "RTX 4090", ram: 32, vram: 24 },
+  { id: "14700k-4080s", label: "i7-14700K + RTX 4080 Super", cpu: "i7-14700K", gpu: "RTX 4080 Super", ram: 32, vram: 16 },
+  { id: "13700k-4070tis", label: "i7-13700K + RTX 4070 Ti Super", cpu: "i7-13700K", gpu: "RTX 4070 Ti Super", ram: 32, vram: 16 },
+  { id: "13600k-4070", label: "i5-13600K + RTX 4070", cpu: "i5-13600K", gpu: "RTX 4070", ram: 32, vram: 12 },
+  { id: "12400-3060", label: "i5-12400 + RTX 3060 12GB", cpu: "i5-12400", gpu: "RTX 3060 12GB", ram: 16, vram: 12 },
+  { id: "11400-3060ti", label: "i5-11400 + RTX 3060 Ti", cpu: "i5-11400", gpu: "RTX 3060 Ti", ram: 16, vram: 8 },
+  { id: "10400-1660s", label: "i5-10400 + GTX 1660 Super", cpu: "i5-10400", gpu: "GTX 1660 Super", ram: 16, vram: 6 },
+  { id: "9900k-2080ti", label: "i9-9900K + RTX 2080 Ti", cpu: "i9-9900K", gpu: "RTX 2080 Ti", ram: 32, vram: 11 },
+  { id: "8700k-1080ti", label: "i7-8700K + GTX 1080 Ti", cpu: "i7-8700K", gpu: "GTX 1080 Ti", ram: 16, vram: 11 },
+  { id: "12100-1060", label: "i3-12100 + GTX 1060 6GB", cpu: "i3-12100", gpu: "GTX 1060 6GB", ram: 16, vram: 6 },
+  { id: "8100-1060", label: "i3-8100 + GTX 1060 3GB", cpu: "i3-8100", gpu: "GTX 1060 3GB", ram: 8, vram: 3 },
+];
+
+const PERF_CPUS = [
+  { group: "8 代", name: "i3-8100", ram: 8, cores: 4 },
+  { group: "8 代", name: "i5-8400", ram: 16, cores: 6 },
+  { group: "8 代", name: "i7-8700K", ram: 16, cores: 6 },
+  { group: "9 代", name: "i3-9100F", ram: 8, cores: 4 },
+  { group: "9 代", name: "i5-9400F", ram: 16, cores: 6 },
+  { group: "9 代", name: "i7-9700K", ram: 16, cores: 8 },
+  { group: "9 代", name: "i9-9900K", ram: 32, cores: 8 },
+  { group: "10 代", name: "i3-10100", ram: 16, cores: 4 },
+  { group: "10 代", name: "i5-10400", ram: 16, cores: 6 },
+  { group: "10 代", name: "i7-10700K", ram: 32, cores: 8 },
+  { group: "10 代", name: "i9-10900K", ram: 32, cores: 10 },
+  { group: "11 代", name: "i3-11100", ram: 16, cores: 4 },
+  { group: "11 代", name: "i5-11400", ram: 16, cores: 6 },
+  { group: "11 代", name: "i7-11700K", ram: 32, cores: 8 },
+  { group: "11 代", name: "i9-11900K", ram: 32, cores: 8 },
+  { group: "12 代", name: "i3-12100", ram: 16, cores: 4 },
+  { group: "12 代", name: "i5-12400", ram: 16, cores: 6 },
+  { group: "12 代", name: "i5-12600K", ram: 16, cores: 10 },
+  { group: "12 代", name: "i7-12700K", ram: 32, cores: 12 },
+  { group: "12 代", name: "i9-12900K", ram: 32, cores: 16 },
+  { group: "13 代", name: "i3-13100", ram: 16, cores: 4 },
+  { group: "13 代", name: "i5-13400", ram: 16, cores: 10 },
+  { group: "13 代", name: "i5-13600K", ram: 32, cores: 14 },
+  { group: "13 代", name: "i7-13700K", ram: 32, cores: 16 },
+  { group: "13 代", name: "i9-13900K", ram: 32, cores: 24 },
+  { group: "14 代", name: "i3-14100", ram: 16, cores: 4 },
+  { group: "14 代", name: "i5-14400", ram: 16, cores: 10 },
+  { group: "14 代", name: "i5-14600K", ram: 32, cores: 14 },
+  { group: "14 代", name: "i7-14700K", ram: 32, cores: 20 },
+  { group: "14 代", name: "i9-14900K", ram: 32, cores: 24 },
+];
+
+const PERF_GPUS = [
+  { group: "GTX 10", name: "GTX 1060 3GB", vram: 3 },
+  { group: "GTX 10", name: "GTX 1060 5GB", vram: 5 },
+  { group: "GTX 10", name: "GTX 1060 6GB", vram: 6 },
+  { group: "GTX 10", name: "GTX 1070", vram: 8 },
+  { group: "GTX 10", name: "GTX 1070 Ti", vram: 8 },
+  { group: "GTX 10", name: "GTX 1080", vram: 8 },
+  { group: "GTX 10", name: "GTX 1080 Ti", vram: 11 },
+  { group: "GTX 16", name: "GTX 1650", vram: 4 },
+  { group: "GTX 16", name: "GTX 1650 Super", vram: 4 },
+  { group: "GTX 16", name: "GTX 1660", vram: 6 },
+  { group: "GTX 16", name: "GTX 1660 Super", vram: 6 },
+  { group: "GTX 16", name: "GTX 1660 Ti", vram: 6 },
+  { group: "RTX 20", name: "RTX 2060", vram: 6 },
+  { group: "RTX 20", name: "RTX 2060 12GB", vram: 12 },
+  { group: "RTX 20", name: "RTX 2060 Super", vram: 8 },
+  { group: "RTX 20", name: "RTX 2070", vram: 8 },
+  { group: "RTX 20", name: "RTX 2070 Super", vram: 8 },
+  { group: "RTX 20", name: "RTX 2080", vram: 8 },
+  { group: "RTX 20", name: "RTX 2080 Super", vram: 8 },
+  { group: "RTX 20", name: "RTX 2080 Ti", vram: 11 },
+  { group: "RTX 30", name: "RTX 3050 6GB", vram: 6 },
+  { group: "RTX 30", name: "RTX 3050 8GB", vram: 8 },
+  { group: "RTX 30", name: "RTX 3060 8GB", vram: 8 },
+  { group: "RTX 30", name: "RTX 3060 12GB", vram: 12 },
+  { group: "RTX 30", name: "RTX 3060 Ti", vram: 8 },
+  { group: "RTX 30", name: "RTX 3070", vram: 8 },
+  { group: "RTX 30", name: "RTX 3070 Ti", vram: 8 },
+  { group: "RTX 30", name: "RTX 3080 10GB", vram: 10 },
+  { group: "RTX 30", name: "RTX 3080 12GB", vram: 12 },
+  { group: "RTX 30", name: "RTX 3080 Ti", vram: 12 },
+  { group: "RTX 30", name: "RTX 3090", vram: 24 },
+  { group: "RTX 30", name: "RTX 3090 Ti", vram: 24 },
+  { group: "RTX 40", name: "RTX 4060", vram: 8 },
+  { group: "RTX 40", name: "RTX 4060 Ti 8GB", vram: 8 },
+  { group: "RTX 40", name: "RTX 4060 Ti 16GB", vram: 16 },
+  { group: "RTX 40", name: "RTX 4070", vram: 12 },
+  { group: "RTX 40", name: "RTX 4070 Super", vram: 12 },
+  { group: "RTX 40", name: "RTX 4070 Ti", vram: 12 },
+  { group: "RTX 40", name: "RTX 4070 Ti Super", vram: 16 },
+  { group: "RTX 40", name: "RTX 4080", vram: 16 },
+  { group: "RTX 40", name: "RTX 4080 Super", vram: 16 },
+  { group: "RTX 40", name: "RTX 4090", vram: 24 },
+  { group: "RTX 40", name: "RTX 4090 D", vram: 24 },
+  { group: "RTX 50", name: "RTX 5060", vram: 8 },
+  { group: "RTX 50", name: "RTX 5060 Ti 8GB", vram: 8 },
+  { group: "RTX 50", name: "RTX 5060 Ti 16GB", vram: 16 },
+  { group: "RTX 50", name: "RTX 5070", vram: 12 },
+  { group: "RTX 50", name: "RTX 5070 Ti", vram: 16 },
+  { group: "RTX 50", name: "RTX 5080", vram: 16 },
+  { group: "RTX 50", name: "RTX 5090", vram: 32 },
+  { group: "RTX 50", name: "RTX 5090 D", vram: 32 },
+];
+
+function perfParseVram(value) {
+  const match = String(value).match(/([\d.]+)/);
+  return match ? Number(match[1]) : 0;
+}
+
+function perfFillSelect(select, items, placeholder, labelFn) {
+  select.innerHTML = `<option value="">${placeholder}</option>`;
+  const groups = new Map();
+  items.forEach((item) => {
+    if (!groups.has(item.group)) {
+      const group = document.createElement("optgroup");
+      group.label = item.group;
+      groups.set(item.group, group);
+      select.appendChild(group);
+    }
+    const option = document.createElement("option");
+    option.value = item.name;
+    option.textContent = labelFn(item);
+    groups.get(item.group).appendChild(option);
+  });
+}
+
+function populatePerfPresets() {
+  $("perfBuildPreset").innerHTML = '<option value="">自定义 / 手动填写</option>'
+    + PERF_BUILDS.map((build) => `<option value="${build.id}">${build.label}</option>`).join("");
+  perfFillSelect($("perfCpuPreset"), PERF_CPUS, "自定义 / 自动检测", (cpu) => `${cpu.name} · 建议 ${cpu.ram}GB`);
+  perfFillSelect($("perfGpuPreset"), PERF_GPUS, "自定义 / 自动检测", (gpu) => `${gpu.name} · ${gpu.vram}GB`);
+}
+
+function perfSetRam(ram) {
+  let matched = false;
+  document.querySelectorAll("#perfRamOptions .perf-option").forEach((node) => {
+    const on = Number(node.dataset.value) === ram;
+    node.classList.toggle("selected", on);
+    if (on) matched = true;
+  });
+  $("perfRamCustom").value = matched ? "" : String(ram);
+  perfState.ram = ram;
+}
+
+function perfSetVram(vram) {
+  let matched = false;
+  document.querySelectorAll("#perfVramOptions .perf-option").forEach((node) => {
+    const on = node.dataset.value !== "unknown" && Number(node.dataset.value) === vram;
+    node.classList.toggle("selected", on);
+    if (on) matched = true;
+  });
+  if (!matched) {
+    document.querySelector('#perfVramOptions .perf-option[data-value="unknown"]').classList.add("selected");
+  }
+  perfState.vram = matched ? vram : null;
+}
+
+function applyPerfBuild(id) {
+  const build = PERF_BUILDS.find((item) => item.id === id);
+  if (!build) return;
+  const cpu = PERF_CPUS.find((item) => item.name === build.cpu);
+  perfState.cpuName = build.cpu;
+  perfState.cpuCores = cpu?.cores || 0;
+  perfState.gpu = build.gpu;
+  $("perfGpuInput").value = build.gpu;
+  $("perfCpuPreset").value = build.cpu;
+  $("perfGpuPreset").value = build.gpu;
+  perfSetRam(build.ram);
+  perfSetVram(build.vram);
+  $("perfDeviceNote").textContent = `预设：${build.label} · 内存 ${build.ram} GB`;
+  $("perfGpuNote").textContent = `预设显卡：${build.gpu} · ${build.vram} GB 显存`;
+}
+
+function applyPerfCpu(name) {
+  const cpu = PERF_CPUS.find((item) => item.name === name);
+  if (!cpu) return;
+  perfState.cpuName = cpu.name;
+  perfState.cpuCores = cpu.cores;
+  perfSetRam(cpu.ram);
+  $("perfBuildPreset").value = "";
+  $("perfDeviceNote").textContent = `CPU 预设：${cpu.name} · 建议内存 ${cpu.ram} GB`;
+}
+
+function applyPerfGpu(name) {
+  const gpu = PERF_GPUS.find((item) => item.name === name);
+  if (!gpu) return;
+  perfState.gpu = gpu.name;
+  $("perfGpuInput").value = gpu.name;
+  perfSetVram(gpu.vram);
+  $("perfBuildPreset").value = "";
+  $("perfGpuNote").textContent = `预设显卡：${gpu.name} · ${gpu.vram} GB 显存`;
+}
+
+function perfShowStep(step) {
+  perfState.step = step;
+  document.querySelectorAll(".perf-step").forEach((node) => {
+    node.classList.toggle("active", Number(node.dataset.step) === step);
+  });
+  document.querySelectorAll("#perfProgress span").forEach((node, index) => {
+    node.classList.toggle("active", index < Math.min(step, 3));
+  });
+}
+
+function openPerf() {
+  closeSettings();
+  closeCli();
+  closeIntensityPanel();
+  perfState = {
+    step: 1,
+    ram: null,
+    vram: null,
+    gpu: "",
+    preference: "balanced",
+    language: "zh",
+    platform: "",
+    cores: 0,
+    cpuName: "",
+    cpuCores: 0,
+    detectedGpu: "",
+  };
+  $("perfModal").hidden = false;
+  $("perfRamCustom").value = "";
+  $("perfGpuInput").value = "";
+  $("perfBuildPreset").value = "";
+  $("perfCpuPreset").value = "";
+  $("perfGpuPreset").value = "";
+  $("perfDeviceNote").textContent = "正在读取设备信息…";
+  $("perfGpuNote").textContent = "正在读取显卡信息…";
+  $("perfRoast").hidden = true;
+  document.querySelectorAll("#perfRamOptions .perf-option, #perfVramOptions .perf-option").forEach((node) => node.classList.remove("selected"));
+  document.querySelectorAll("#perfVramOptions .perf-option").forEach((node) => {
+    node.classList.toggle("selected", node.dataset.value === "unknown");
+  });
+  document.querySelectorAll("#perfPreferenceOptions .perf-option").forEach((node) => {
+    node.classList.toggle("selected", node.dataset.value === "balanced");
+  });
+  document.querySelectorAll("#perfLanguageOptions .perf-option").forEach((node) => {
+    node.classList.toggle("selected", node.dataset.value === "zh");
+  });
+  perfShowStep(1);
+  perfDetect();
+}
+
+function closePerf() {
+  $("perfModal").hidden = true;
+}
+
+async function perfDetect() {
+  const platform = navigator.userAgentData?.platform || navigator.platform || "未知系统";
+  const cores = navigator.hardwareConcurrency || 0;
+  const memory = navigator.deviceMemory || null;
+  let gpu = "";
+  if (navigator.gpu) {
+    try {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (adapter?.info) {
+        const info = adapter.info;
+        gpu = info.description || [info.vendor, info.architecture, info.device].filter(Boolean).join(" ");
+      }
+    } catch (_) {
+      // 读不到就算了，让用户手填。
+    }
+  }
+  perfState.platform = platform;
+  perfState.cores = cores;
+  perfState.detectedGpu = gpu;
+  if (!perfState.cpuName) {
+    $("perfDeviceNote").textContent = `检测到 ${platform}${cores ? ` · ${cores} 核 CPU` : ""}${memory ? ` · 约 ${memory} GB 内存` : ""}${memory === 8 ? "（浏览器可能只报告到 8 GB）" : ""}`;
+  }
+  if (!perfState.gpu) {
+    $("perfGpuNote").textContent = gpu ? `浏览器识别到：${gpu}` : "浏览器没识别到显卡型号，手动填一下或留空。";
+    if (gpu) $("perfGpuInput").value = gpu;
+  }
+  if (!perfState.ram && memory) {
+    const match = [...document.querySelectorAll("#perfRamOptions .perf-option")]
+      .find((node) => Number(node.dataset.value) === memory);
+    if (match) {
+      match.click();
+    } else {
+      $("perfRamCustom").value = String(memory);
+      perfState.ram = memory;
+    }
+  }
+}
+
+function perfGetRam() {
+  const custom = Number($("perfRamCustom").value);
+  if (custom > 0) return custom;
+  const selected = document.querySelector("#perfRamOptions .perf-option.selected");
+  return selected ? Number(selected.dataset.value) : null;
+}
+
+function perfGetVram() {
+  const selected = document.querySelector("#perfVramOptions .perf-option.selected");
+  if (!selected || selected.dataset.value === "unknown") return null;
+  return Number(selected.dataset.value);
+}
+
+function perfEstimateVram(ram, gpu) {
+  const platform = String(perfState.platform).toLowerCase();
+  const name = String(gpu).toLowerCase();
+  if (platform.includes("mac")) return Math.max(4, ram * 0.7);
+  if (name.includes("intel") || name.includes("iris") || name.includes("radeon graphics") || name.includes("apple")) {
+    return Math.max(2, Math.min(8, ram * 0.25));
+  }
+  return Math.max(4, Math.min(12, ram * 0.4));
+}
+
+async function perfRunEstimate() {
+  const ram = perfGetRam();
+  if (!ram) {
+    toast("先选一个内存大小，再继续。", "err");
+    return;
+  }
+  if (!webgpuSupported) await probeLocal();
+  const manualVram = perfGetVram();
+  const gpu = $("perfGpuInput").value.trim();
+  const effectiveVram = manualVram || perfEstimateVram(ram, gpu);
+  const noWebgpu = !webgpuSupported;
+  const veryLow = noWebgpu || effectiveVram <= 3 || ram <= 8;
+  const rank = { recommended: 3, try: 2, struggle: 1, no: 0 };
+
+  const results = LOCAL_MODELS.map((model) => {
+    const need = perfParseVram(model.vram);
+    let level = "no";
+    let label = "不建议";
+    let reason = "显存不足";
+    if (!webgpuSupported) {
+      level = "no";
+      label = "不适合";
+      reason = "浏览器没有可用的 WebGPU";
+    } else if (effectiveVram >= need * 1.35 && ram >= need + 6) {
+      level = "recommended";
+      label = "推荐";
+      reason = "显存和内存都够";
+    } else if (effectiveVram >= need * 1.1 && ram >= need + 3) {
+      level = "try";
+      label = "可尝试";
+      reason = "能加载，长上下文可能吃紧";
+    } else if (effectiveVram >= need * 0.95) {
+      level = "struggle";
+      label = "吃力";
+      reason = "接近上限，可能卡顿或加载失败";
+    }
+    return { model, need, level, label, reason };
+  });
+
+  if (veryLow) {
+    results.forEach((item) => {
+      item.level = "no";
+      item.label = "不建议";
+      item.reason = noWebgpu ? "浏览器没有可用的 WebGPU" : "配置过低，建议先升级硬件";
+    });
+  }
+
+  results.sort((a, b) => {
+    if (rank[b.level] !== rank[a.level]) return rank[b.level] - rank[a.level];
+    if (perfState.preference === "speed") return a.need - b.need;
+    return b.need - a.need;
+  });
+
+  const recommended = results.filter((item) => item.level === "recommended");
+  const playable = results.filter((item) => item.level === "recommended" || item.level === "try");
+  let verdict = "适合轻量模型";
+  let summary = "小模型没问题，大模型会比较吃力。";
+  if (noWebgpu) {
+    verdict = "不适合本地跑";
+    summary = "当前浏览器没有可用的 WebGPU。换 Chrome / Edge 或更新系统后再试。";
+  } else if (veryLow) {
+    verdict = "非常低配，建议先别跑本地 AI";
+    summary = "这配置跑本地模型不是挑战，是许愿。先升级内存或显卡，再回来。";
+  } else if (!recommended.length) {
+    verdict = "能跑，但选择有限";
+    summary = "没有模型达到推荐线，先试“可尝试”里体积最小的那个。";
+  } else if (recommended.some((item) => item.need >= 20)) {
+    verdict = "可以跑大模型";
+    summary = "这台机器能碰 20B 以上的大模型，注意散热、电源和浏览器内存占用。";
+  } else if (effectiveVram >= 24) {
+    verdict = "可以跑大模型（70B 需谨慎）";
+    summary = "24GB+ 显存能覆盖 13B~30B 级模型；70B 量化版接近上限，可能吃力。";
+  } else if (recommended.some((item) => item.need >= 5)) {
+    verdict = "可以跑主流模型";
+    summary = "主流 7B~9B 模型基本能跑，长上下文和高质量档位会更吃资源。";
+  }
+
+  $("perfVerdict").textContent = verdict;
+  $("perfSummary").textContent = summary;
+  $("perfRoast").hidden = !veryLow;
+  $("perfSpecs").innerHTML = "";
+  const specs = [
+    `内存 ${ram} GB`,
+    `显存 ${manualVram ? `${manualVram} GB（手动）` : `${effectiveVram.toFixed(1)} GB（估算）`}`,
+    `系统 ${perfState.platform || "未知"}`,
+    `CPU ${perfState.cpuName ? `${perfState.cpuName}（${perfState.cpuCores} 核）` : perfState.cores ? `${perfState.cores} 核（自动检测）` : "未知"}`,
+    `WebGPU ${webgpuSupported ? "可用" : "不可用"}`,
+  ];
+  specs.forEach((text) => {
+    const span = document.createElement("span");
+    span.className = "perf-spec";
+    span.textContent = text;
+    $("perfSpecs").appendChild(span);
+  });
+
+  $("perfModelList").innerHTML = "";
+  results.forEach(({ model, level, label, reason }) => {
+    const item = document.createElement("div");
+    item.className = "perf-model-item";
+    item.title = reason;
+    const name = document.createElement("span");
+    name.className = "perf-model-name";
+    name.textContent = model.name;
+    const vram = document.createElement("span");
+    vram.className = "perf-model-vram";
+    vram.textContent = model.vram;
+    const fit = document.createElement("span");
+    fit.className = `perf-fit ${level}`;
+    fit.textContent = label;
+    item.append(name, vram, fit);
+    $("perfModelList").appendChild(item);
+  });
+  perfShowStep(4);
+}
+
+/* ---------- Command line ---------- */
+const CLI_COMMANDS = [
+  "/help",
+  "/model choose",
+  "/models",
+  "/desktop",
+  "/create chat new",
+  "/create chat backup",
+  "/chat list",
+  "/chat open",
+  "/chat clear",
+  "/intensity",
+  "/thinking",
+  "/perf",
+  "/status",
+  "/stop",
+  "/clear",
+];
+
+function cliPrint(text = "", kind = "") {
+  const out = $("cliOutput");
+  const line = document.createElement("div");
+  line.className = `cli-line ${kind}`.trim();
+  line.textContent = text;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+}
+
+function cliWelcome() {
+  cliPrint("SodiJat Shell v1.0 · local runtime", "head");
+  cliPrint("输入 /help 查看命令，/desktop 回到图形模式。", "muted");
+  cliPrint("");
+}
+
+function openCli() {
+  closeSettings();
+  closeIntensityPanel();
+  closeSidebar();
+  $("cli").hidden = false;
+  cliOpen = true;
+  if (!cliBooted) {
+    cliWelcome();
+    cliBooted = true;
+  }
+  requestAnimationFrame(() => $("cliInput").focus());
+}
+
+function closeCli() {
+  $("cli").hidden = true;
+  cliOpen = false;
+  $("promptInput").focus();
+}
+
+function cliListModels() {
+  cliPrint("可用模型：", "head");
+  LOCAL_MODELS.forEach((model, index) => {
+    const active = model.id === state.settings.local.modelId ? "  ← 当前" : "";
+    const cached = cachedModels.has(model.id) ? " [已缓存]" : "";
+    cliPrint(`  ${String(index + 1).padStart(2)}. ${model.name}${cached}${active}`);
+  });
+}
+
+function cliResolveModel(input) {
+  const index = Number(input);
+  if (Number.isInteger(index) && index >= 1 && index <= LOCAL_MODELS.length) return LOCAL_MODELS[index - 1];
+  const query = input.toLowerCase();
+  return LOCAL_MODELS.find((m) => m.id.toLowerCase() === query)
+    || LOCAL_MODELS.find((m) => m.name.toLowerCase() === query)
+    || LOCAL_MODELS.find((m) => m.name.toLowerCase().includes(query));
+}
+
+function cliSelectModel(model) {
+  state.settings.local.modelId = model.id;
+  saveState();
+  syncModeUI();
+  renderModelGrid();
+  cliPrint(`已切换到 ${model.name}（${model.vram}）。`, "ok");
+  if (!cachedModels.has(model.id)) cliPrint("这个模型还没缓存，下次发送时会先下载。", "muted");
+}
+
+function cliNewChat() {
+  if (busy) {
+    cliPrint("正在生成，先停止再新建。", "err");
+    return;
+  }
+  const conv = { id: uid(), title: "新的对话", messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  state.conversations.unshift(conv);
+  currentId = conv.id;
+  saveState();
+  renderAll();
+  closeSidebar();
+  cliPrint("已新建对话。", "ok");
+}
+
+function cliAppendStream(kind = "", prefix = "") {
+  const out = $("cliOutput");
+  const line = document.createElement("div");
+  line.className = `cli-line ${kind}`.trim();
+  line.textContent = prefix;
+  out.appendChild(line);
+  out.scrollTop = out.scrollHeight;
+  return line;
+}
+
+async function cliChat(text) {
+  if (busy) {
+    cliPrint("正在生成，输入 /stop 可以停止。", "err");
+    return;
+  }
+  if (!localReady) {
+    cliPrint("正在检测 WebGPU…", "muted");
+    await probeLocal();
+  }
+  if (!localReady) {
+    cliPrint("WebGPU 不可用，没法在命令行里跑本地模型。", "err");
+    return;
+  }
+
+  const conv = ensureConversation();
+  conv.messages.push({ id: uid(), role: "user", content: text, ts: Date.now() });
+  const replyId = uid();
+  conv.messages.push({ id: replyId, role: "assistant", content: "", streaming: true, ts: Date.now() });
+  conv.title = convTitle(conv);
+  conv.updatedAt = Date.now();
+  renderMessages();
+  renderConvList();
+  setBusy(true);
+
+  const activeModel = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
+  const thinkingOn = !!state.settings.local.thinkingEnabled && !!activeModel?.thinkingSupported;
+  const intensity = INTENSITY_PRESETS[state.settings.local.intensity] || INTENSITY_PRESETS.medium;
+  const options = {
+    temperature: intensity.temperature,
+    top_p: intensity.top_p,
+    maxTokens: intensity.maxTokens,
+    repetition_penalty: intensity.repetition_penalty,
+    frequency_penalty: intensity.frequency_penalty,
+    presence_penalty: intensity.presence_penalty,
+    enableThinking: thinkingOn,
+  };
+  if (thinkingOn) options.maxTokens = Math.max(options.maxTokens, 4096);
+
+  const history = tidyHistory(conv.messages
+    .filter((m) => m.id !== replyId && (m.role === "user" || m.role === "assistant"))
+    .map((m) => ({ role: m.role, content: m.content })));
+  const messages = [{ role: "system", content: activeModel?.systemPrompt || LOCAL_SYSTEM_PROMPT }, ...history];
+
+  let full = "";
+  let thinkingText = "";
+  let thinkLine = null;
+  let answerLine = null;
+
+  try {
+    cliPrint(`正在使用 ${activeModel?.name || "本地模型"} 生成…`, "muted");
+    if (activeModel && !cachedModels.has(activeModel.id)) {
+      cliPrint("这个模型还没缓存，首次使用会先下载，可能需要几分钟。", "muted");
+    }
+    await ensureLocalModel();
+    await localEngine.generate(messages, options, (delta) => {
+      full += delta;
+      if (!answerLine) answerLine = cliAppendStream("", "");
+      answerLine.textContent = full;
+      $("cliOutput").scrollTop = $("cliOutput").scrollHeight;
+    }, (thought) => {
+      thinkingText += thought;
+      if (!thinkLine) thinkLine = cliAppendStream("muted", "🤔 思考中…");
+      thinkLine.textContent = `🤔 思考中… ${thinkingText.length} 字`;
+    });
+
+    if (thinkingOn && thinkingText.trim() && !full.trim()) {
+      cliPrint("思考阶段用完了 token，正在补最终答案…", "muted");
+      const fallbackMessages = messages.map((m, i) => i === 0
+        ? { ...m, content: m.content + " 请立即给出最终答案，不要再展开思考。" }
+        : m);
+      await localEngine.generate(fallbackMessages, { ...options, enableThinking: false, maxTokens: 2048 }, (delta) => {
+        full += delta;
+        if (!answerLine) answerLine = cliAppendStream("", "");
+        answerLine.textContent = full;
+        $("cliOutput").scrollTop = $("cliOutput").scrollHeight;
+      }, () => {});
+    }
+
+    if (thinkLine) thinkLine.textContent = `🤔 思考完成（${thinkingText.length} 字）`;
+    if (!full.trim()) {
+      if (!answerLine) answerLine = cliAppendStream("err", "");
+      answerLine.textContent = "（模型没有返回内容）";
+    }
+    const target = conv.messages.find((m) => m.id === replyId);
+    if (target) {
+      target.content = full || "（模型没有返回内容）";
+      target.thinking = thinkingText.trim();
+      target.streaming = false;
+    }
+  } catch (error) {
+    if (answerLine) {
+      answerLine.className = "cli-line err";
+      answerLine.textContent = `出错了：${error.message || error}`;
+    } else {
+      cliPrint(`出错了：${error.message || error}`, "err");
+    }
+    const target = conv.messages.find((m) => m.id === replyId);
+    if (target) {
+      target.content = full || "（生成失败）";
+      target.thinking = thinkingText.trim();
+      target.streaming = false;
+    }
+  } finally {
+    setBusy(false);
+    conv.updatedAt = Date.now();
+    saveState();
+    renderMessages();
+    renderConvList();
+    cliPrint("");
+    $("cliInput").focus();
+  }
+}
+
+function cliBackup() {
+  const conv = currentConv();
+  if (!conv || !conv.messages.length) {
+    cliPrint("当前对话为空，没有可备份的内容。", "err");
+    return;
+  }
+  exportCurrent();
+  cliPrint(`已导出「${convTitle(conv)}」为 Markdown。`, "ok");
+}
+
+function cliListChats() {
+  if (!state.conversations.length) {
+    cliPrint("还没有会话。输入 /create chat new 新建一个。", "muted");
+    return;
+  }
+  cliPrint("会话列表：", "head");
+  state.conversations.forEach((conv, index) => {
+    const active = conv.id === currentId ? "  ← 当前" : "";
+    cliPrint(`  ${String(index + 1).padStart(2)}. ${convTitle(conv)}${active}`);
+  });
+  cliPrint("输入 /chat open <序号> 打开会话。", "muted");
+}
+
+function cliHelp() {
+  cliPrint("可用命令：", "head");
+  const rows = [
+    ["/help", "显示帮助"],
+    ["/model choose", "列出并选择本地模型"],
+    ["/models", "列出所有模型"],
+    ["/desktop", "回到图形模式"],
+    ["/create chat new", "新建对话"],
+    ["/create chat backup", "备份当前对话为 Markdown"],
+    ["/chat list", "列出会话"],
+    ["/chat open <序号>", "打开会话"],
+    ["/chat clear", "清空当前会话"],
+    ["/intensity <档位>", "设置思考强度"],
+    ["/thinking on|off", "开关思考链"],
+    ["/perf", "打开电脑性能预估问卷"],
+    ["/status", "查看当前状态"],
+    ["/stop", "停止当前生成"],
+    ["/clear", "清空终端输出"],
+    ["<文字>", "直接输入文字，和本地模型对话"],
+  ];
+  rows.forEach(([command, desc]) => cliPrint(`  ${command.padEnd(28)}${desc}`));
+  cliPrint("提示：↑/↓ 历史命令，Tab 补全。", "muted");
+}
+
+function cliRun(raw) {
+  const input = raw.trim();
+  if (!input) return;
+  cliPrint(`sodijat@local:~$ ${input}`, "cmd");
+  cliHistory.push(input);
+  cliHistoryIndex = cliHistory.length;
+
+  if (cliPending === "model" && !input.startsWith("/")) {
+    const model = cliResolveModel(input);
+    if (model) {
+      cliPending = null;
+      cliSelectModel(model);
+    } else {
+      cliPrint("没找到这个模型。输入序号或模型名，输入 / 取消。", "err");
+    }
+    return;
+  }
+  cliPending = null;
+
+  if (!input.startsWith("/")) {
+    cliChat(input);
+    return;
+  }
+
+  const tokens = input.split(/\s+/);
+  const cmd = tokens[0].toLowerCase();
+  const args = tokens.slice(1);
+  const rest = args.join(" ");
+
+  if (cmd === "/help" || cmd === "/?") {
+    cliHelp();
+  } else if (cmd === "/desktop" || cmd === "/exit" || cmd === "/gui") {
+    cliPrint("正在返回图形模式…", "ok");
+    setTimeout(closeCli, 180);
+  } else if (cmd === "/model") {
+    if (!args.length || args[0].toLowerCase() === "choose" || args[0].toLowerCase() === "list") {
+      cliListModels();
+      cliPrint("输入序号或模型名选择，输入 / 取消。", "muted");
+      cliPending = "model";
+    } else {
+      const model = cliResolveModel(rest);
+      if (model) cliSelectModel(model);
+      else cliPrint("没找到这个模型。输入 /models 查看列表。", "err");
+    }
+  } else if (cmd === "/models") {
+    cliListModels();
+  } else if (cmd === "/create") {
+    if (rest === "chat new" || rest === "new") {
+      cliNewChat();
+    } else if (rest === "chat backup" || rest === "backup") {
+      cliBackup();
+    } else {
+      cliPrint("用法：/create chat new | /create chat backup", "err");
+    }
+  } else if (cmd === "/chat") {
+    const sub = (args[0] || "list").toLowerCase();
+    if (sub === "list") {
+      cliListChats();
+    } else if (sub === "new") {
+      cliNewChat();
+    } else if (sub === "open") {
+      const index = Number(args[1]) - 1;
+      const conv = state.conversations[index];
+      if (!conv) {
+        cliPrint("序号无效。输入 /chat list 查看会话。", "err");
+      } else {
+        currentId = conv.id;
+        saveState();
+        renderAll();
+        cliPrint(`已打开「${convTitle(conv)}」。`, "ok");
+      }
+    } else if (sub === "clear") {
+      const conv = currentConv();
+      if (!conv || !conv.messages.length) {
+        cliPrint("当前对话已经是空的。", "muted");
+      } else if (confirm("清空当前会话的所有消息？这个操作没法撤销。")) {
+        conv.messages = [];
+        conv.title = "新的对话";
+        saveState();
+        renderMessages();
+        renderConvList();
+        cliPrint("当前对话已清空。", "ok");
+      }
+    } else if (sub === "backup") {
+      cliBackup();
+    } else {
+      cliPrint("用法：/chat list | /chat open <序号> | /chat clear | /chat backup", "err");
+    }
+  } else if (cmd === "/intensity") {
+    const aliases = {
+      slow: "slow", "1": "slow", "轻度": "slow",
+      medium: "medium", "2": "medium", "中": "medium", "中速": "medium",
+      speed: "speed", "3": "speed", "快速": "speed",
+      speedlimits: "speedlimits", "4": "speedlimits", "极速": "speedlimits",
+      ultra: "ultra", "5": "ultra", "极限": "ultra",
+    };
+    const key = aliases[rest.toLowerCase()];
+    if (!key) {
+      cliPrint("用法：/intensity <slow|medium|speed|speedlimits|ultra>", "err");
+      return;
+    }
+    state.settings.local.intensity = key;
+    saveState();
+    syncModeUI();
+    cliPrint(`思考强度已设为 ${INTENSITY_PRESETS[key].label}。`, "ok");
+  } else if (cmd === "/thinking") {
+    const model = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
+    if (!model?.thinkingSupported) {
+      cliPrint("当前模型不支持思考链。", "err");
+      return;
+    }
+    const value = rest.toLowerCase();
+    if (value === "on" || value === "1" || value === "开") {
+      state.settings.local.thinkingEnabled = true;
+    } else if (value === "off" || value === "0" || value === "关") {
+      state.settings.local.thinkingEnabled = false;
+    } else {
+      cliPrint(`思考链当前：${state.settings.local.thinkingEnabled ? "开" : "关"}。用法：/thinking on|off`, "muted");
+      return;
+    }
+    saveState();
+    syncModeUI();
+    cliPrint(`思考链已${state.settings.local.thinkingEnabled ? "开启" : "关闭"}。`, "ok");
+  } else if (cmd === "/perf") {
+    cliPrint("正在打开性能预估…", "ok");
+    closeCli();
+    openPerf();
+  } else if (cmd === "/status") {
+    const model = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
+    const intensity = INTENSITY_PRESETS[state.settings.local.intensity] || INTENSITY_PRESETS.medium;
+    const conv = currentConv();
+    cliPrint("运行状态：", "head");
+    cliPrint(`  模型：${model?.name || "未选择"}（${model?.vram || "-"}）`);
+    cliPrint(`  强度：${intensity.label} · 思考链：${state.settings.local.thinkingEnabled ? "开" : "关"}`);
+    cliPrint(`  缓存：${model && cachedModels.has(model.id) ? "已缓存" : "未缓存"}`);
+    cliPrint(`  WebGPU：${webgpuSupported ? "可用" : "不可用"}`);
+    cliPrint(`  对话：${conv ? convTitle(conv) : "无"} · ${conv?.messages.length || 0} 条消息`);
+  } else if (cmd === "/stop") {
+    if (!busy) {
+      cliPrint("现在没有正在生成的内容。", "muted");
+    } else {
+      stopGeneration();
+      cliPrint("已请求停止生成。", "ok");
+    }
+  } else if (cmd === "/clear") {
+    $("cliOutput").innerHTML = "";
+    cliPrint("终端已清空。输入 /help 查看命令。", "muted");
+  } else if (cmd === "/export") {
+    cliBackup();
+  } else {
+    cliPrint(`未知命令：${cmd}。输入 /help 查看可用命令。`, "err");
+  }
+}
+
+function cliComplete() {
+  const input = $("cliInput");
+  const value = input.value;
+  if (!value.startsWith("/")) return;
+  const matches = CLI_COMMANDS.filter((command) => command.startsWith(value));
+  if (matches.length === 1) {
+    input.value = matches[0] + " ";
+  } else if (matches.length > 1) {
+    cliPrint(`sodijat@local:~$ ${value}`, "cmd");
+    matches.forEach((command) => cliPrint("  " + command, "muted"));
+  }
+}
+
 /* ---------- Events ---------- */
 function bindEvents() {
   $("newChatBtn").onclick = newChat;
@@ -781,9 +1669,98 @@ function bindEvents() {
   $("scrim").onclick = () => { closeSettings(); closeSidebar(); };
   $("menuBtn").onclick = openSidebar;
   $("sidebarClose").onclick = closeSidebar;
+  $("openCli").onclick = openCli;
+  $("closeCli").onclick = closeCli;
+  $("cli").addEventListener("click", (event) => {
+    if (event.target === $("cli")) closeCli();
+  });
+
+  $("cliInput").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const value = $("cliInput").value;
+      $("cliInput").value = "";
+      cliRun(value);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!cliHistory.length) return;
+      cliHistoryIndex = Math.max(0, cliHistoryIndex - 1);
+      $("cliInput").value = cliHistory[cliHistoryIndex] || "";
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      cliHistoryIndex = Math.min(cliHistory.length, cliHistoryIndex + 1);
+      $("cliInput").value = cliHistory[cliHistoryIndex] || "";
+    } else if (event.key === "Tab") {
+      event.preventDefault();
+      cliComplete();
+    } else if (event.key === "Escape") {
+      closeCli();
+    }
+  });
 
   document.querySelectorAll(".settings-tab").forEach((btn) => btn.onclick = () => selectSettingsTab(btn.dataset.tab));
   $("refreshCacheBtn").onclick = async () => { await refreshCacheStatus(); toast("缓存状态已刷新", "ok"); };
+
+  $("perfBtn").onclick = openPerf;
+  $("closePerf").onclick = closePerf;
+  $("perfBuildPreset").onchange = (event) => {
+    if (event.target.value) applyPerfBuild(event.target.value);
+  };
+  $("perfCpuPreset").onchange = (event) => {
+    if (event.target.value) applyPerfCpu(event.target.value);
+  };
+  $("perfGpuPreset").onchange = (event) => {
+    if (event.target.value) applyPerfGpu(event.target.value);
+  };
+  $("perfModal").addEventListener("click", (event) => {
+    if (event.target === $("perfModal")) {
+      closePerf();
+      return;
+    }
+    const option = event.target.closest(".perf-option");
+    if (!option) return;
+    const group = option.parentElement;
+    group.querySelectorAll(".perf-option").forEach((node) => node.classList.toggle("selected", node === option));
+    if (group.id === "perfRamOptions") {
+      perfState.ram = Number(option.dataset.value);
+      $("perfRamCustom").value = "";
+      $("perfBuildPreset").value = "";
+    } else if (group.id === "perfVramOptions") {
+      perfState.vram = option.dataset.value === "unknown" ? null : Number(option.dataset.value);
+      $("perfBuildPreset").value = "";
+      $("perfGpuPreset").value = "";
+    } else if (group.id === "perfPreferenceOptions") {
+      perfState.preference = option.dataset.value;
+    } else if (group.id === "perfLanguageOptions") {
+      perfState.language = option.dataset.value;
+    }
+  });
+  $("perfRamCustom").addEventListener("input", () => {
+    document.querySelectorAll("#perfRamOptions .perf-option").forEach((node) => node.classList.remove("selected"));
+    perfState.ram = Number($("perfRamCustom").value) || null;
+    $("perfBuildPreset").value = "";
+  });
+  $("perfGpuInput").addEventListener("input", () => {
+    perfState.gpu = $("perfGpuInput").value;
+    $("perfBuildPreset").value = "";
+    $("perfGpuPreset").value = "";
+  });
+  $("perfNext1").onclick = () => {
+    if (!perfGetRam()) {
+      toast("先选一个内存大小。", "err");
+      return;
+    }
+    perfShowStep(2);
+  };
+  $("perfBack2").onclick = () => perfShowStep(1);
+  $("perfNext2").onclick = () => {
+    perfState.gpu = $("perfGpuInput").value.trim();
+    perfShowStep(3);
+  };
+  $("perfBack3").onclick = () => perfShowStep(2);
+  $("perfRun").onclick = perfRunEstimate;
+  $("perfAgain").onclick = openPerf;
+  $("perfDone").onclick = closePerf;
 
   const applyIntensityIndex = (index) => {
     const clamped = Math.max(0, Math.min(INTENSITY_LEVELS.length - 1, index));
@@ -856,6 +1833,14 @@ function bindEvents() {
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
+    if (!$("perfModal").hidden) {
+      closePerf();
+      return;
+    }
+    if (cliOpen) {
+      closeCli();
+      return;
+    }
     closeIntensityPanel();
     if (!$("settings").hidden) closeSettings();
     else if (sidebarOpen) closeSidebar();
@@ -863,6 +1848,7 @@ function bindEvents() {
 }
 
 async function init() {
+  populatePerfPresets();
   bindEvents();
   if (!currentConv() && state.conversations.length) currentId = state.conversations[0].id;
   if (!currentConv()) ensureConversation();

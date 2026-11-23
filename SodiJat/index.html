@@ -29,6 +29,8 @@
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z"/></symbol>
     <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 11a8 8 0 1 1 2.3 5.7M4 6v5h5"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="m7 9 3 3-3 3M12.5 15H17"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.5 18a9 9 0 1 1 15 0"/><path d="m12 13 4.2-4.2"/><circle cx="12" cy="13" r="1.5"/></symbol>
   </svg>
 
   <div class="app" id="app">
@@ -51,6 +53,7 @@
 
       <div class="sidebar-foot">
         <div class="runtime-status" id="runtimeStatus"><span class="status-dot"></span><span id="runtimeStatusText">正在检查运行环境…</span></div>
+        <button class="foot-btn" id="openCli"><svg><use href="#i-terminal"/></svg>命令行</button>
         <button class="foot-btn" id="openSettings"><svg><use href="#i-settings"/></svg>设置</button>
       </div>
     </aside>
@@ -76,7 +79,7 @@
         <div class="messages" id="messages"></div>
         <div class="empty-state" id="emptyState">
           <div class="empty-logo"><svg><use href="#i-spark"/></svg></div>
-          <h1>今天想聊点什么？</h1>
+          <h1 id="emptyTitle">与「Qwen3 1.7B」对话</h1>
           <p id="emptyHint">选个模型下载到浏览器缓存，之后断网也能聊。第一次下载会慢一点，毕竟是在把模型搬回家。</p>
           <div class="suggestions" id="suggestions">
             <button data-prompt="帮我写一段简洁的产品介绍">帮我写一段简洁的产品介绍</button>
@@ -164,6 +167,7 @@
           </div>
           <div class="model-section-head">
             <div><h3>可用模型</h3><p>下载后存进浏览器缓存，之后断网也能聊。</p></div>
+            <button class="mini-btn" id="perfBtn"><svg><use href="#i-gauge"/></svg>性能预估</button>
             <button class="mini-btn" id="refreshCacheBtn"><svg><use href="#i-refresh"/></svg>刷新状态</button>
           </div>
           <div class="model-grid" id="modelGrid"></div>
@@ -185,6 +189,113 @@
           </ul>
           <p class="safe-note">清空浏览器站点数据会同时删掉会话记录和已下载模型。重要对话记得先导出。</p>
         </section>
+      </div>
+    </div>
+
+    <div class="perf" id="perfModal" hidden role="dialog" aria-modal="true" aria-label="电脑性能预估">
+      <div class="perf-card">
+        <div class="perf-head">
+          <div>
+            <span class="perf-kicker">PERFORMANCE CHECK</span>
+            <h2>你的电脑能跑哪些模型？</h2>
+            <p>回答 3 个问题，给你一个粗略但诚实的估计。</p>
+          </div>
+          <button class="icon-btn" id="closePerf" title="关闭" aria-label="关闭"><svg><use href="#i-close"/></svg></button>
+        </div>
+        <div class="perf-progress" id="perfProgress"><span class="active"></span><span></span><span></span></div>
+
+        <div class="perf-step active" data-step="1">
+          <div class="perf-step-head"><span>01 / 03</span><h3>这台电脑有多少内存？</h3><p>系统内存，不是硬盘容量。</p></div>
+          <p class="perf-detect" id="perfDeviceNote">正在读取设备信息…</p>
+          <details class="perf-presets" open>
+            <summary>快速预设 <span>整机 / CPU / 显卡</span></summary>
+            <div class="perf-preset-grid">
+              <label>整机<select id="perfBuildPreset"><option value="">自定义 / 手动填写</option></select></label>
+              <label>CPU<select id="perfCpuPreset"><option value="">自定义 / 自动检测</option></select></label>
+              <label>显卡<select id="perfGpuPreset"><option value="">自定义 / 自动检测</option></select></label>
+            </div>
+          </details>
+          <div class="perf-options" id="perfRamOptions">
+            <button type="button" class="perf-option" data-value="8">8 GB</button>
+            <button type="button" class="perf-option" data-value="16">16 GB</button>
+            <button type="button" class="perf-option" data-value="24">24 GB</button>
+            <button type="button" class="perf-option" data-value="32">32 GB</button>
+            <button type="button" class="perf-option" data-value="64">64 GB</button>
+            <button type="button" class="perf-option" data-value="128">128 GB+</button>
+          </div>
+          <label class="perf-custom">其他 <input id="perfRamCustom" type="number" min="4" max="512" placeholder="例如 24" /> GB</label>
+          <div class="perf-actions"><span></span><button class="perf-primary" id="perfNext1" type="button">下一步</button></div>
+        </div>
+
+        <div class="perf-step" data-step="2">
+          <div class="perf-step-head"><span>02 / 03</span><h3>显卡和显存</h3><p>不知道型号也没关系，显存选“不确定”就行。</p></div>
+          <p class="perf-detect" id="perfGpuNote">正在读取显卡信息…</p>
+          <label class="perf-field">显卡名称<input id="perfGpuInput" type="text" placeholder="例如 RTX 4060 / Apple M2 / Intel Iris Xe" /></label>
+          <div class="perf-options" id="perfVramOptions">
+            <button type="button" class="perf-option" data-value="3">3 GB</button>
+            <button type="button" class="perf-option" data-value="4">4 GB</button>
+            <button type="button" class="perf-option" data-value="5">5 GB</button>
+            <button type="button" class="perf-option" data-value="6">6 GB</button>
+            <button type="button" class="perf-option" data-value="8">8 GB</button>
+            <button type="button" class="perf-option" data-value="10">10 GB</button>
+            <button type="button" class="perf-option" data-value="11">11 GB</button>
+            <button type="button" class="perf-option" data-value="12">12 GB</button>
+            <button type="button" class="perf-option" data-value="16">16 GB</button>
+            <button type="button" class="perf-option" data-value="24">24 GB</button>
+            <button type="button" class="perf-option" data-value="32">32 GB+</button>
+            <button type="button" class="perf-option selected" data-value="unknown">不确定</button>
+          </div>
+          <div class="perf-actions"><button class="perf-back" id="perfBack2" type="button">上一步</button><button class="perf-primary" id="perfNext2" type="button">下一步</button></div>
+        </div>
+
+        <div class="perf-step" data-step="3">
+          <div class="perf-step-head"><span>03 / 03</span><h3>你更在意什么？</h3><p>用来调整推荐顺序，不影响能不能跑。</p></div>
+          <div class="perf-question"><strong>回答风格</strong><div class="perf-options" id="perfPreferenceOptions">
+            <button type="button" class="perf-option" data-value="speed">速度优先</button>
+            <button type="button" class="perf-option selected" data-value="balanced">均衡</button>
+            <button type="button" class="perf-option" data-value="quality">质量优先</button>
+          </div></div>
+          <div class="perf-question"><strong>主要语言</strong><div class="perf-options" id="perfLanguageOptions">
+            <button type="button" class="perf-option selected" data-value="zh">中文</button>
+            <button type="button" class="perf-option" data-value="en">英文</button>
+            <button type="button" class="perf-option" data-value="both">都要</button>
+          </div></div>
+          <div class="perf-actions"><button class="perf-back" id="perfBack3" type="button">上一步</button><button class="perf-primary" id="perfRun" type="button">开始评估</button></div>
+        </div>
+
+        <div class="perf-step" data-step="4">
+          <div class="perf-result-head">
+            <span class="perf-verdict" id="perfVerdict">评估结果</span>
+            <p id="perfSummary"></p>
+          </div>
+          <div class="perf-roast" id="perfRoast" hidden>
+            <strong>非常低配警告</strong>
+            <p>“你应该先去看看你的脑子，再到这里。”</p>
+            <p>“这你玩个AI毛啊”</p>
+            <p>“和意为？这种显卡怎么能跑的动这个网页的？”</p>
+          </div>
+          <div class="perf-specs" id="perfSpecs"></div>
+          <div class="perf-model-list" id="perfModelList"></div>
+          <p class="perf-note">估算基于模型权重和显存开销，实际表现受浏览器、驱动、后台程序影响。别拿估算当保修承诺。</p>
+          <div class="perf-actions"><button class="perf-back" id="perfAgain" type="button">重新测一次</button><button class="perf-primary" id="perfDone" type="button">关闭</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cli" id="cli" hidden>
+      <div class="cli-window">
+        <div class="cli-head">
+          <div class="cli-dots"><span></span><span></span><span></span></div>
+          <div class="cli-title">SodiJat Shell <em>local</em></div>
+          <button class="cli-desktop" id="closeCli"><svg><use href="#i-cpu"/></svg>图形模式</button>
+        </div>
+        <div class="cli-body" id="cliBody">
+          <div class="cli-output" id="cliOutput"></div>
+          <div class="cli-input-line">
+            <span class="cli-prompt">sodijat@local:~$</span>
+            <input id="cliInput" type="text" autocomplete="off" spellcheck="false" placeholder="输入 /help 查看命令" />
+          </div>
+        </div>
       </div>
     </div>
 
