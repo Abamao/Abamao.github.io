@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236d5cff'/%3E%3Cpath d='M32 12l5 15 15 5-15 5-5 15-5-15-15-5 15-5z' fill='white'/%3E%3C/svg%3E" />
+  <title>SodiJat · 本地优先的 AI 客户端</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <svg class="icon-defs" aria-hidden="true">
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5 14.1 8.3 20 10.4l-5.9 2.1L12 18.3l-2.1-5.8L4 10.4l5.9-2.1L12 2.5Z"/><path d="M19 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2Z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H8l-4 3v-5.6A7.5 7.5 0 0 1 4 11.5 7.5 7.5 0 0 1 11.5 4 7.5 7.5 0 0 1 20 11.5Z"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.5 18.5h9.2a4.3 4.3 0 0 0 .4-8.6A6 6 0 0 0 5.6 9.1a4.7 4.7 0 0 0 1.9 9.4Z"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 3v3.5M15 3v3.5M9 17.5V21M15 17.5V21M3 9h3.5M3 15h3.5M17.5 9H21M17.5 15H21"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m4 12 16-8-6 16-2.8-6.2L4 12Z"/><path d="m11.2 13.8 4-4"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.2 2.2-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-3.1v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.3 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-3.1h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.3 7 6.5 4.8l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h3.1v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L17.7 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v3.1h-.2a1.7 1.7 0 0 0-1.5.9Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l.8 13h9.4l.8-13M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 15V3m0 0 4 4M12 3 8 7M4 15v3.5A2.5 2.5 0 0 0 6.5 21h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-.6 4M20 5v6h-6"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5 14h6l-1 8 8-12h-6l1-8Z"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 11a8 8 0 1 1 2.3 5.7M4 6v5h5"/></symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><svg><use href="#i-spark"/></svg></div>
+        <div class="brand-copy">
+          <strong>SodiJat</strong>
+          <span>本地优先的 AI 客户端</span>
+        </div>
+        <button class="icon-btn sidebar-close" id="sidebarClose" title="收起侧栏" aria-label="收起侧栏"><svg><use href="#i-close"/></svg></button>
+      </div>
+
+      <button class="new-chat-btn" id="newChatBtn"><svg><use href="#i-plus"/></svg>新建对话</button>
+
+      <div class="conv-section">
+        <div class="section-label">会话列表</div>
+        <div class="conv-list" id="convList"></div>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="runtime-status" id="runtimeStatus"><span class="status-dot"></span><span id="runtimeStatusText">正在检查运行环境…</span></div>
+        <button class="foot-btn" id="openSettings"><svg><use href="#i-settings"/></svg>设置</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" title="打开侧栏" aria-label="打开侧栏"><svg><use href="#i-menu"/></svg></button>
+        <div class="topbar-title">
+          <span class="mode-badge local"><svg><use href="#i-cpu"/></svg>本地</span>
+          <strong id="currentModelLabel">Qwen3 1.7B</strong>
+          <span class="topbar-sep">·</span>
+          <span class="topbar-sub" id="convTitle">新的对话</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="pill" id="cachePill" hidden>本地已缓存</span>
+          <button class="icon-btn" id="exportBtn" title="导出当前对话" aria-label="导出当前对话"><svg><use href="#i-export"/></svg></button>
+          <button class="icon-btn" id="clearBtn" title="清空当前对话" aria-label="清空当前对话"><svg><use href="#i-trash"/></svg></button>
+          <button class="icon-btn" id="topSettingsBtn" title="设置" aria-label="设置"><svg><use href="#i-settings"/></svg></button>
+        </div>
+      </header>
+
+      <div class="chat-scroll" id="chatScroll">
+        <div class="messages" id="messages"></div>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-logo"><svg><use href="#i-spark"/></svg></div>
+          <h1>今天想聊点什么？</h1>
+          <p id="emptyHint">选个模型下载到浏览器缓存，之后断网也能聊。第一次下载会慢一点，毕竟是在把模型搬回家。</p>
+          <div class="suggestions" id="suggestions">
+            <button data-prompt="帮我写一段简洁的产品介绍">帮我写一段简洁的产品介绍</button>
+            <button data-prompt="用通俗的话解释一下 WebGPU">用通俗的话解释一下 WebGPU</button>
+            <button data-prompt="用中文写一首关于秋天的短诗">用中文写一首关于秋天的短诗</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="composer-wrap">
+        <div class="composer" id="composer">
+          <textarea id="promptInput" rows="1" placeholder="输入消息，Enter 发送，Shift+Enter 换行"></textarea>
+          <div class="composer-bar">
+            <span class="composer-hint" id="composerHint">本地模型 · 数据不离开这台设备</span>
+            <div class="intensity-popover" id="intensityPopover" hidden>
+              <button class="intensity-trigger" id="intensityTrigger" type="button" aria-expanded="false" title="选择本地模型的思考强度">
+                <span class="intensity-dot" id="intensityDot"></span>
+                <span class="intensity-trigger-label" id="intensityTriggerLabel">Medium · 正常</span>
+                <svg class="intensity-chevron"><use href="#i-chevron"/></svg>
+              </button>
+              <div class="intensity-panel" id="intensityPanel" hidden>
+                <div class="codex-head">
+                  <button type="button" class="codex-icon" id="codexFullMode" title="开启完整模式" aria-label="开启完整模式"><svg><use href="#i-bolt"/></svg></button>
+                  <div class="codex-center">
+                    <strong id="codexIntensityLabel">Medium</strong>
+                    <button type="button" id="codexModelLine">Qwen3 1.7B ›</button>
+                  </div>
+                  <button type="button" class="codex-reset" id="codexReset" title="恢复默认档位" aria-label="恢复默认档位"><svg><use href="#i-reset"/></svg></button>
+                </div>
+                <div class="intensity-tabs" role="tablist">
+                  <button class="intensity-tab active" data-pane="intensity" type="button" role="tab">思考强度</button>
+                  <button class="intensity-tab" data-pane="model" type="button" role="tab">模型</button>
+                </div>
+                <div class="intensity-pane active" data-pane="intensity">
+                  <div class="intensity-panel-head"><span>思考强度</span><span class="intensity-panel-hint">拖动调节</span></div>
+                  <div class="intensity-slider" id="intensitySlider">
+                    <div class="slider-wrap">
+                      <div class="range-inner">
+                        <div class="range-track"></div>
+                        <div class="range-fill" id="rangeFill"></div>
+                        <div class="slider-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+                      </div>
+                      <div class="slider-beam" id="intensityBeam"></div>
+                      <input class="intensity-range" id="intensityRange" type="range" min="0" max="4" step="1" value="1" aria-label="思考强度" />
+                    </div>
+                  </div>
+                  <label class="thinking-toggle" id="thinkingToggleRow">
+                    <span class="thinking-toggle-icon">🤔</span>
+                    <span class="thinking-toggle-copy"><strong>思考链</strong><small id="thinkingToggleDesc">显示模型的思考过程</small></span>
+                    <input type="checkbox" id="thinkingToggle" />
+                    <span class="switch-ui"></span>
+                  </label>
+                </div>
+                <div class="intensity-pane" data-pane="model">
+                  <div class="intensity-panel-head"><span>本地模型</span><span class="intensity-panel-hint">点选切换</span></div>
+                  <div class="quick-model-list" id="quickModelList"></div>
+                </div>
+              </div>
+            </div>
+            <button class="send-btn" id="sendBtn" title="发送"><svg><use href="#i-send"/></svg></button>
+            <button class="stop-btn" id="stopBtn" hidden title="停止生成"><svg><use href="#i-stop"/></svg></button>
+          </div>
+        </div>
+        <p class="disclaimer">SodiJat 可能会出错，重要内容请自行核对。本地模型下载后存储在浏览器缓存中。</p>
+      </div>
+    </main>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <div class="settings" id="settings" hidden role="dialog" aria-modal="true" aria-label="设置">
+      <div class="settings-head">
+        <div><h2>设置</h2><p>管理本地模型与运行环境</p></div>
+        <button class="icon-btn" id="closeSettings" title="关闭" aria-label="关闭"><svg><use href="#i-close"/></svg></button>
+      </div>
+      <div class="settings-tabs" role="tablist">
+        <button class="settings-tab active" data-tab="local" role="tab">本地模型</button>
+        <button class="settings-tab" data-tab="about" role="tab">关于</button>
+      </div>
+
+      <div class="settings-body">
+        <section class="settings-pane active" data-pane="local">
+          <div class="webgpu-banner" id="webgpuBanner">
+            <span class="status-dot"></span>
+            <div><strong id="webgpuTitle">正在检测 WebGPU…</strong><p id="webgpuDesc">本地推理需要浏览器支持 WebGPU。</p></div>
+          </div>
+          <div class="model-section-head">
+            <div><h3>可用模型</h3><p>下载后存进浏览器缓存，之后断网也能聊。</p></div>
+            <button class="mini-btn" id="refreshCacheBtn"><svg><use href="#i-refresh"/></svg>刷新状态</button>
+          </div>
+          <div class="model-grid" id="modelGrid"></div>
+          <div class="load-progress" id="loadProgress" hidden>
+            <div class="load-progress-head"><span id="loadProgressLabel">正在下载模型…</span><span id="loadProgressPercent">0%</span></div>
+            <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+            <p id="loadProgressText">正在准备资源</p>
+          </div>
+          <p class="safe-note">首次下载可能几百 MB 到几 GB，取决于模型大小。建议接电源、用 Chrome 或 Edge，别让浏览器把标签页睡过去。</p>
+        </section>
+
+        <section class="settings-pane" data-pane="about">
+          <div class="about-hero"><div class="brand-mark large"><svg><use href="#i-spark"/></svg></div><h3>SodiJat</h3><p>一个不啰嗦的纯本地 AI 客户端</p></div>
+          <ul class="about-list">
+            <li><strong>本地模型</strong><span>基于 WebLLM，在浏览器里用 WebGPU 跑模型，支持流式输出。</span></li>
+            <li><strong>思考链</strong><span>支持思考链的模型可以显示推理过程，也可以随时关闭。</span></li>
+            <li><strong>隐私</strong><span>会话和设置保存在本机 localStorage，模型保存在浏览器缓存。</span></li>
+            <li><strong>版本</strong><span>1.0.0 · WebLLM 0.2.89</span></li>
+          </ul>
+          <p class="safe-note">清空浏览器站点数据会同时删掉会话记录和已下载模型。重要对话记得先导出。</p>
+        </section>
+      </div>
+    </div>
+
+    <div class="toast-host" id="toastHost"></div>
+  </div>
+
+  <script id="sodijat-worker" type="text/plain">
+// SodiJat 本地模型 Worker：WebLLM 的加载、缓存管理与流式推理都在这里，
+// 避免模型推理把主线程卡成 PPT。
+
+let webllm = null;
+let engine = null;
+let loadedModelId = null;
+let loading = false;
+let interrupted = false;
+
+const send = (message) => self.postMessage(message);
+
+function isLooping(text) {
+  if (text.length < 120) return false;
+  const tail = text.slice(-24);
+  if (tail.length < 12) return false;
+  return text.split(tail).length - 1 >= 4;
+}
+
+async function ensureWebLLM() {
+  if (!webllm) {
+    webllm = await import("https://esm.run/@mlc-ai/web-llm@0.2.89");
+  }
+  return webllm;
+}
+
+function appConfigFor(lib) {
+  const base = lib.prebuiltAppConfig;
+  return {
+    ...base,
+    model_list: base.model_list.map((record) =>
+      record.model_id.startsWith("Qwen3.5")
+        ? { ...record, overrides: { ...(record.overrides || {}), max_history_size: 16 } }
+        : record
+    ),
+  };
+}
+
+async function checkGPU() {
+  try {
+    if (!navigator.gpu) return { supported: false, reason: "当前浏览器没有暴露 WebGPU 接口" };
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) return { supported: false, reason: "没有找到可用的 GPU 适配器" };
+    return { supported: true, reason: "" };
+  } catch (error) {
+    return { supported: false, reason: String(error?.message || error) };
+  }
+}
+
+async function loadModel(modelId, id) {
+  if (loading) throw new Error("已有模型正在加载，请稍候");
+  loading = true;
+  try {
+    const lib = await ensureWebLLM();
+    if (engine && loadedModelId !== modelId) {
+      await engine.unload();
+      engine = null;
+      loadedModelId = null;
+    }
+    if (!engine) {
+      engine = await lib.CreateMLCEngine(modelId, {
+        appConfig: appConfigFor(lib),
+        initProgressCallback: (report) => {
+          send({
+            type: "progress",
+            id,
+            progress: Number(report.progress) || 0,
+            text: String(report.text || ""),
+          });
+        },
+      });
+      loadedModelId = modelId;
+    }
+    send({ type: "done", id, ok: true, modelId, reused: false });
+  } finally {
+    loading = false;
+  }
+}
+
+async function generate(messages, options, id) {
+  if (!engine) throw new Error("本地模型尚未加载");
+  interrupted = false;
+  await engine.resetChat();
+  let fullText = "";
+  let fullThinking = "";
+  let usage = null;
+  try {
+    const chunks = await engine.chat.completions.create({
+      messages,
+      temperature: options.temperature ?? 0.7,
+      top_p: options.top_p ?? 0.9,
+      max_tokens: options.maxTokens ?? 1024,
+      repetition_penalty: options.repetition_penalty ?? 1.1,
+      frequency_penalty: options.frequency_penalty ?? 0,
+      presence_penalty: options.presence_penalty ?? 0,
+      stream: true,
+      stream_options: { include_usage: true },
+      ...(typeof options.enableThinking === "boolean" ? { extra_body: { enable_thinking: options.enableThinking } } : {}),
+    });
+
+    // 无论思考模式开没开，都把 <think>...</think> 藏起来，只把答案显示给用户。
+    let thinkBuffer = "";
+    let thinkHandled = false;
+    const emit = (text) => {
+      if (!text) return;
+      fullText += text;
+      send({ type: "delta", id, text });
+    };
+    const emitThinking = (text) => {
+      if (!text || !text.trim()) return;
+      fullThinking += text;
+      send({ type: "thinking", id, text });
+    };
+    const feed = (delta) => {
+      if (!delta) return;
+      if (thinkHandled) { emit(delta); return; }
+      thinkBuffer += delta;
+      if (thinkBuffer.startsWith("<think>")) {
+        const close = thinkBuffer.indexOf("</think>");
+        if (close !== -1) {
+          thinkHandled = true;
+          emitThinking(thinkBuffer.slice("<think>".length, close));
+          emit(thinkBuffer.slice(close + "</think>".length).replace(/^\n+/, ""));
+          thinkBuffer = "";
+        } else {
+          const partial = thinkBuffer.slice("<think>".length);
+          if (partial) {
+            emitThinking(partial);
+            thinkBuffer = "<think>";
+          }
+        }
+        return;
+      }
+      if ("<think>".startsWith(thinkBuffer)) return;
+      thinkHandled = true;
+      emit(thinkBuffer);
+      thinkBuffer = "";
+    };
+
+    for await (const chunk of chunks) {
+      feed(chunk?.choices?.[0]?.delta?.content || "");
+      if (chunk?.usage) usage = chunk.usage;
+      if (isLooping(fullText)) {
+        emit("\n\n（检测到模型开始复读，已自动停止。换个问法或切换到 1.7B / 3B 模型会更稳。）");
+        break;
+      }
+    }
+    if (!thinkHandled && thinkBuffer) {
+      if (thinkBuffer.startsWith("<think>")) emitThinking(thinkBuffer.slice("<think>".length));
+      else emit(thinkBuffer);
+    }
+  } catch (error) {
+    if (!interrupted) throw error;
+  }
+  send({ type: "done", id, text: fullText, thinking: fullThinking, usage, interrupted });
+}
+
+self.onmessage = async (event) => {
+  const { id, type, payload = {} } = event.data || {};
+  try {
+    switch (type) {
+      case "probe": {
+        const gpu = await checkGPU();
+        let version = null;
+        try {
+          const lib = await ensureWebLLM();
+          version = lib.modelVersion;
+        } catch (error) {
+          send({ type: "result", id, ok: false, error: "加载 WebLLM 失败：" + String(error?.message || error) });
+          return;
+        }
+        send({ type: "result", id, ok: true, gpu, version });
+        break;
+      }
+      case "checkCache": {
+        const lib = await ensureWebLLM();
+        const cached = await lib.hasModelInCache(payload.modelId, appConfigFor(lib));
+        send({ type: "result", id, ok: true, cached });
+        break;
+      }
+      case "load": {
+        await loadModel(payload.modelId, id);
+        break;
+      }
+      case "generate": {
+        await generate(payload.messages, payload.options || {}, id);
+        break;
+      }
+      case "unload": {
+        if (engine) await engine.unload();
+        engine = null;
+        loadedModelId = null;
+        send({ type: "result", id, ok: true });
+        break;
+      }
+      case "deleteModel": {
+        if (engine && loadedModelId === payload.modelId) {
+          await engine.unload();
+          engine = null;
+          loadedModelId = null;
+        }
+        const lib = await ensureWebLLM();
+        await lib.deleteModelAllInfoInCache(payload.modelId, appConfigFor(lib));
+        send({ type: "result", id, ok: true });
+        break;
+      }
+      case "interrupt": {
+        interrupted = true;
+        if (engine) await engine.interruptGenerate();
+        send({ type: "result", id, ok: true });
+        break;
+      }
+      default:
+        send({ type: "result", id, ok: false, error: "未知指令：" + type });
+    }
+  } catch (error) {
+    send({
+      type: "error",
+      id,
+      error: String(error?.message || error),
+      stack: error?.stack || null,
+    });
+  }
+};
+  </script>
+  <script src="./app.js"></script>
+</body>
+</html>
