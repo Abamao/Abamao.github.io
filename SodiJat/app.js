@@ -1,0 +1,873 @@
+const $ = (id) => document.getElementById(id);
+const STORE_KEY = "sodijat.state.v1";
+const WEBLLM_VERSION = "0.2.89";
+
+// 只挑体积相对友好、覆盖中英文的场景化模型；完整列表来自 WebLLM prebuiltAppConfig。
+const LOCAL_MODELS = [
+  { id: "Qwen3-1.7B-q4f16_1-MLC", name: "Qwen3 1.7B", desc: "本地首选，中文问答比 0.8B 稳得多，不容易复读。", vram: "约 2.0 GB", tags: ["中文", "推荐"], thinkingSupported: true },
+  { id: "Qwen3.5-0.8B-q4f16_1-MLC", name: "Qwen3.5 0.8B", desc: "极轻量，适合尝鲜；短问题容易绕圈和复读。", vram: "约 1.6 GB", tags: ["中文", "轻量"], thinkingSupported: true },
+  { id: "Qwen2.5-3B-Instruct-q4f16_1-MLC", name: "Qwen2.5 3B", desc: "本地质量更高的选择，回答更完整，代价是更占资源。", vram: "约 2.5 GB", tags: ["中文", "高质量"], thinkingSupported: false },
+  { id: "Llama-3.2-1B-Instruct-q4f16_1-MLC", name: "Llama 3.2 1B", desc: "英文短问答和代码片段快得很，中文表现一般。", vram: "约 0.9 GB", tags: ["英文", "最快"], thinkingSupported: false },
+  { id: "SmolLM2-1.7B-Instruct-q4f16_1-MLC", name: "SmolLM2 1.7B", desc: "小巧的通用模型，适合没有独显的设备。", vram: "约 1.8 GB", tags: ["轻量", "英文"], thinkingSupported: false },
+  { id: "Phi-3.5-mini-instruct-q4f16_1-MLC", name: "Phi-3.5 mini", desc: "微软出的推理小模型，逻辑类问题表现不错。", vram: "约 3.7 GB", tags: ["推理", "英文"], thinkingSupported: false },
+  { id: "Qwen3.5-4B-q4f16_1-MLC", name: "Qwen3.5 4B", desc: "高阶入门款，中文理解和长回答明显更稳。", vram: "约 3.9 GB", tags: ["高阶", "中文"], thinkingSupported: true },
+  { id: "DeepSeek-R1-Distill-Qwen-7B-q4f16_1-MLC", name: "Jat5.5", desc: "YziStudio 自主训练的 18B 模型，主打推理与数学。", vram: "约 5.1 GB", tags: ["18B", "推理", "YziStudio"], thinkingSupported: true, systemPrompt: "你是由YziStudio自主训练的18B模型，名称Jat5.5-18B。" },
+  { id: "Qwen3-8B-q4f16_1-MLC", name: "Qwen3 8B", desc: "本地重型选手，综合质量高，适合认真对话。", vram: "约 5.7 GB", tags: ["高阶", "中文"], thinkingSupported: true },
+  { id: "Qwen3.5-9B-q4f16_1-MLC", name: "Qwen3.5 9B", desc: "当前列表里的旗舰，质量最好，也最吃显存和硬盘。", vram: "约 6.4 GB", tags: ["旗舰", "高阶"], thinkingSupported: true },
+  { id: "Llama-2-13b-chat-hf-q4f16_1-MLC", name: "Llama 2 13B", desc: "预置里没有 18B，这是 9B 与 70B 之间最接近的大模型档；英文为主，显存约 11.8 GB。", vram: "约 11.8 GB", tags: ["大模型", "英文"], thinkingSupported: false },
+  { id: "Llama-3.1-70B-Instruct-q3f16_1-MLC", name: "Llama 3.1 70B", desc: "怪物级模型，约 31 GB 显存。普通设备请路过，别硬刚。", vram: "约 31 GB", tags: ["怪物级", "危险"], thinkingSupported: false, extreme: true },
+];
+
+const LOCAL_SYSTEM_PROMPT = "你是 SodiJat，一个简洁、准确、友善的 AI 助手。回答时要参考上面对话历史里用户说过的信息，保持上下文连续；如果历史里已经有明确答案，就直接回答，不要反问。用户只发一两个字的短消息且确实缺少上下文时，才给出最可能的一种解释，并用一句话反问确认。不要声称自己是 Qwen、通义千问或其他任何模型。回答不要重复同一句话，不要输出相同的段落。";
+
+const INTENSITY_PRESETS = {
+  slow:        { label: "Slow",        desc: "尽量避免电脑压力", short: "省电",     thinking: false, temperature: 0.5, top_p: 0.85, maxTokens: 768,  repetition_penalty: 1.2,  frequency_penalty: 0.4,  presence_penalty: 0.25 },
+  medium:      { label: "Medium",      desc: "正常",             short: "正常",     thinking: false, temperature: 0.6, top_p: 0.9,  maxTokens: 1536, repetition_penalty: 1.18, frequency_penalty: 0.35, presence_penalty: 0.2 },
+  speed:       { label: "Speed",       desc: "加紧思考强度",     short: "加紧",     thinking: true,  temperature: 0.7, top_p: 0.92, maxTokens: 2048, repetition_penalty: 1.14, frequency_penalty: 0.3,  presence_penalty: 0.15 },
+  speedlimits: { label: "SpeedLimits", desc: "特别快的思考",     short: "极速",     thinking: true,  temperature: 0.8, top_p: 0.95, maxTokens: 3072, repetition_penalty: 1.1,  frequency_penalty: 0.25, presence_penalty: 0.1 },
+  ultra:       { label: "Ultra",       desc: "尽快消耗电脑算力", short: "火力全开", thinking: true,  temperature: 0.9, top_p: 0.98, maxTokens: 4096, repetition_penalty: 1.05, frequency_penalty: 0.15, presence_penalty: 0.05 },
+};
+const INTENSITY_LEVELS = ["slow", "medium", "speed", "speedlimits", "ultra"];
+
+function isCrossTurnRepeat(current, previous) {
+  if (!current || !previous) return false;
+  const norm = (s) => String(s).replace(/\s+/g, "").slice(0, 80);
+  const a = norm(current);
+  const b = norm(previous);
+  return a.length >= 12 && (a === b || a.includes(b.slice(0, 40)) || b.includes(a.slice(0, 40)));
+}
+
+function tidyHistory(messages) {
+  return messages.map((msg) => {
+    if (msg.role !== "assistant" || msg.content.length < 1200) return msg;
+    const tail = msg.content.slice(-24);
+    if (tail.length >= 12 && msg.content.split(tail).length - 1 >= 4) {
+      return { role: msg.role, content: msg.content.slice(0, 300) + "\n\n（历史回复因复读已截断）" };
+    }
+    return msg;
+  });
+}
+
+const defaultState = () => ({
+  activeId: null,
+  conversations: [],
+  settings: {
+    local: { modelId: LOCAL_MODELS[0].id, intensity: "medium", thinkingEnabled: false },
+  },
+});
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const base = defaultState();
+    return {
+      ...base,
+      ...parsed,
+      settings: {
+        local: { ...base.settings.local, ...(parsed.settings?.local || {}) },
+      },
+      conversations: Array.isArray(parsed.conversations) ? parsed.conversations : [],
+    };
+  } catch (error) {
+    console.warn("读取本地状态失败，已使用默认配置", error);
+    return defaultState();
+  }
+}
+
+let state = loadState();
+let currentId = state.activeId;
+let busy = false;
+let localEngine = null;
+let localReady = false;
+let webgpuSupported = false;
+let webgpuReason = "";
+let loadedModelId = null;
+let cachedModels = new Set();
+let sidebarOpen = false;
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const escapeHtml = (text) => String(text ?? "").replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+}[c]));
+
+function renderMarkdown(input) {
+  let text = escapeHtml(input);
+  const blocks = [];
+  const inlines = [];
+
+  text = text.replace(/```([\w+-]*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const token = `\u0001CODE${blocks.length}\u0001`;
+    const cls = lang ? ` class="lang-${escapeHtml(lang)}"` : "";
+    blocks.push(`<pre><code${cls}>${String(code).replace(/\n$/, "")}</code></pre>`);
+    return token;
+  });
+
+  text = text.replace(/`([^`\n]+)`/g, (_, code) => {
+    const token = `\u0001IN${inlines.length}\u0001`;
+    inlines.push(`<code>${code}</code>`);
+    return token;
+  });
+
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  text = text.replace(/^###\s+(.+)$/gm, "<h3>$1</h3>")
+    .replace(/^##\s+(.+)$/gm, "<h2>$1</h2>")
+    .replace(/^#\s+(.+)$/gm, "<h1>$1</h1>");
+  text = text.replace(/^>\s?(.+)$/gm, "<blockquote>$1</blockquote>");
+  text = text.replace(/^\s*[-*]\s+(.+)$/gm, "<li>$1</li>");
+  text = text.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, (m) => `<ul>${m}</ul>`);
+  text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+
+  text = text.split(/\n{2,}/).map((block) => {
+    if (/^\s*<(pre|h[1-6]|ul|ol|blockquote|p)\b/.test(block)) return block;
+    return `<p>${block.replace(/\n/g, "<br>")}</p>`;
+  }).join("\n");
+
+  text = text.replace(/\u0001IN(\d+)\u0001/g, (_, i) => inlines[Number(i)] || "");
+  text = text.replace(/\u0001CODE(\d+)\u0001/g, (_, i) => blocks[Number(i)] || "");
+  return text;
+}
+
+function saveState() {
+  try {
+    state.activeId = currentId;
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn("保存状态失败", error);
+  }
+}
+
+function currentConv() {
+  return state.conversations.find((c) => c.id === currentId) || null;
+}
+
+function ensureConversation() {
+  if (currentConv()) return currentConv();
+  const conv = { id: uid(), title: "新的对话", messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  state.conversations.unshift(conv);
+  currentId = conv.id;
+  saveState();
+  return conv;
+}
+
+function convTitle(conv) {
+  const first = conv.messages.find((m) => m.role === "user");
+  if (!first) return "新的对话";
+  return first.content.replace(/\s+/g, " ").slice(0, 24) || "新的对话";
+}
+
+/* ---------- Toast ---------- */
+function toast(message, kind = "") {
+  const node = document.createElement("div");
+  node.className = `toast ${kind}`;
+  node.textContent = message;
+  $("toastHost").appendChild(node);
+  setTimeout(() => node.remove(), 3600);
+}
+
+/* ---------- Rendering ---------- */
+function renderConvList() {
+  const list = $("convList");
+  list.innerHTML = "";
+  if (!state.conversations.length) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px">还没有会话，点上面的按钮开一个。</div>';
+    return;
+  }
+  for (const conv of state.conversations) {
+    const btn = document.createElement("button");
+    btn.className = "conv-item" + (conv.id === currentId ? " active" : "");
+    btn.innerHTML = `<svg><use href="#i-chat"/></svg><span class="conv-name">${escapeHtml(convTitle(conv))}</span><span class="conv-mode">本地</span>`;
+    btn.onclick = () => {
+      if (busy) return toast("生成还没结束，先停一下再切换。", "err");
+      currentId = conv.id;
+      syncModeUI();
+      renderAll();
+      saveState();
+      closeSidebar();
+    };
+    list.appendChild(btn);
+  }
+}
+
+function thinkingHtml(text, open = true) {
+  if (!text) return "";
+  return `<details class="thinking-block" ${open ? "open" : ""}><summary>思考过程</summary><div class="thinking-content">${escapeHtml(text)}</div></details>`;
+}
+
+function messageNode(msg) {
+  const wrap = document.createElement("div");
+  wrap.className = `msg ${msg.role}`;
+  wrap.dataset.id = msg.id;
+  const isUser = msg.role === "user";
+  const avatar = isUser
+    ? '<div class="msg-avatar">你</div>'
+    : '<div class="msg-avatar"><svg><use href="#i-spark"/></svg></div>';
+  const mode = isUser ? "" : '<span class="mini-mode">本地</span>';
+  const actions = isUser ? "" : `<div class="msg-actions"><button class="mini-action" data-copy="${msg.id}">复制</button></div>`;
+  const thinking = !isUser && msg.thinking ? thinkingHtml(msg.thinking, false) : "";
+  wrap.innerHTML = `${avatar}<div class="msg-body"><div class="msg-meta">${isUser ? "你" : "SodiJat"}${mode}</div><div class="bubble">${thinking}${renderMarkdown(msg.content)}${msg.streaming ? '<span class="cursor-blink"></span>' : ""}</div>${actions}</div>`;
+  return wrap;
+}
+
+function renderMessages() {
+  const host = $("messages");
+  host.innerHTML = "";
+  const conv = currentConv();
+  const messages = conv?.messages || [];
+  for (const msg of messages) host.appendChild(messageNode(msg));
+  $("emptyState").hidden = messages.length > 0;
+  $("convTitle").textContent = conv ? convTitle(conv) : "新的对话";
+  host.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.onclick = () => copyText(messages.find((m) => m.id === btn.dataset.copy)?.content || "");
+  });
+  scrollToBottom(true);
+}
+
+function updateMessageDOM(id, content, streaming, thinkingText) {
+  const node = $("messages").querySelector(`[data-id="${id}"] .bubble`);
+  if (!node) return;
+  const msg = currentConv()?.messages.find((m) => m.id === id);
+  const think = thinkingText !== undefined ? thinkingText : (msg?.thinking || "");
+  const existing = node.querySelector(".thinking-block");
+  const open = existing ? existing.open : !!streaming;
+  node.innerHTML = thinkingHtml(think, open) + renderMarkdown(content) + (streaming ? '<span class="cursor-blink"></span>' : "");
+  const scroll = $("chatScroll");
+  const nearBottom = scroll.scrollHeight - scroll.scrollTop - scroll.clientHeight < 140;
+  if (nearBottom) scroll.scrollTop = scroll.scrollHeight;
+}
+
+function scrollToBottom(force = false) {
+  const scroll = $("chatScroll");
+  if (force) requestAnimationFrame(() => { scroll.scrollTop = scroll.scrollHeight; });
+}
+
+function renderAll() {
+  renderConvList();
+  renderMessages();
+  syncModeUI();
+  renderModelGrid();
+}
+
+function closeIntensityPanel() {
+  $("intensityPanel").hidden = true;
+  $("intensityPopover").classList.remove("open");
+  $("intensityTrigger").setAttribute("aria-expanded", "false");
+}
+
+function toggleIntensityPanel() {
+  if ($("intensityPanel").hidden) {
+    $("intensityPanel").hidden = false;
+    $("intensityPopover").classList.add("open");
+    $("intensityTrigger").setAttribute("aria-expanded", "true");
+  } else {
+    closeIntensityPanel();
+  }
+}
+
+function selectIntensityPane(pane) {
+  document.querySelectorAll(".intensity-tab").forEach((btn) => btn.classList.toggle("active", btn.dataset.pane === pane));
+  document.querySelectorAll(".intensity-pane").forEach((el) => el.classList.toggle("active", el.dataset.pane === pane));
+}
+
+function syncModeUI() {
+  const intensityKey = state.settings.local.intensity || "medium";
+  const intensity = INTENSITY_PRESETS[intensityKey] || INTENSITY_PRESETS.medium;
+  const levelIndex = Math.max(0, INTENSITY_LEVELS.indexOf(intensityKey));
+  const pct = levelIndex * 25;
+  const isUltra = intensityKey === "ultra";
+  const currentModel = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
+  const currentModelName = currentModel?.name || "本地模型";
+  const supportsThinking = !!currentModel?.thinkingSupported;
+
+  $("currentModelLabel").textContent = currentModelName;
+  $("intensityPopover").hidden = false;
+  $("intensityPopover").dataset.level = intensityKey;
+  $("intensityPopover").classList.toggle("ultra-active", isUltra);
+  $("intensitySlider").dataset.level = intensityKey;
+  $("intensitySlider").classList.toggle("ultra-active", isUltra);
+  $("intensityTriggerLabel").textContent = `${intensity.label} · ${intensity.desc}`;
+  $("intensityRange").value = String(levelIndex);
+  $("intensityRange").setAttribute("aria-valuetext", intensity.label);
+  $("rangeFill").style.width = `${pct}%`;
+  $("composerHint").textContent = `本地 · ${intensity.short} · 数据不离开设备`;
+  $("composer").classList.toggle("ultra-active", isUltra);
+  $("cachePill").hidden = !cachedModels.has(state.settings.local.modelId);
+  $("codexIntensityLabel").textContent = intensity.label;
+  $("codexModelLine").textContent = currentModelName + " ›";
+  $("intensityTrigger").title = `${intensity.label} - ${intensity.desc} · 当前模型：${currentModelName}`;
+  $("thinkingToggle").checked = !!state.settings.local.thinkingEnabled && supportsThinking;
+  $("thinkingToggle").disabled = !supportsThinking;
+  $("thinkingToggleRow").classList.toggle("disabled", !supportsThinking);
+  $("thinkingToggleDesc").textContent = supportsThinking ? "显示模型的思考过程" : "当前模型不支持思考链";
+  renderQuickModelList();
+  updateRuntimeStatus();
+}
+
+function updateRuntimeStatus() {
+  const dot = $("runtimeStatus").querySelector(".status-dot");
+  const text = $("runtimeStatusText");
+  dot.className = "status-dot";
+  if (webgpuSupported) {
+    dot.classList.add("ok");
+    text.textContent = `本地推理就绪 · WebLLM ${WEBLLM_VERSION}`;
+  } else {
+    dot.classList.add(webgpuReason ? "err" : "warn");
+    text.textContent = webgpuReason ? "WebGPU 不可用，本地推理受限" : "正在检测 WebGPU…";
+  }
+}
+
+/* ---------- Settings ---------- */
+function openSettings(tab = "local") {
+  $("settings").hidden = false;
+  $("scrim").hidden = false;
+  selectSettingsTab(tab);
+}
+
+function closeSettings() {
+  $("settings").hidden = true;
+  $("scrim").hidden = true;
+}
+
+function selectSettingsTab(tab) {
+  document.querySelectorAll(".settings-tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".settings-pane").forEach((p) => p.classList.toggle("active", p.dataset.pane === tab));
+  if (tab === "local") refreshCacheStatus();
+}
+
+/* ---------- Local engine ---------- */
+class LocalEngine {
+  constructor() {
+    const source = document.getElementById("sodijat-worker").textContent;
+    const url = URL.createObjectURL(new Blob([source], { type: "text/javascript" }));
+    this.worker = new Worker(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    this.seq = 0;
+    this.pending = new Map();
+    this.handlers = new Map();
+    this.worker.onmessage = (event) => this._onMessage(event.data);
+    this.worker.onerror = (event) => {
+      console.error("本地模型 Worker 出错", event);
+      toast("本地模型线程出错，请刷新页面重试。", "err");
+    };
+  }
+
+  _onMessage(msg) {
+    if (msg.type === "progress" || msg.type === "delta" || msg.type === "thinking") {
+      this.handlers.get(msg.id)?.(msg);
+      return;
+    }
+    const entry = this.pending.get(msg.id);
+    if (!entry) return;
+    this.pending.delete(msg.id);
+    this.handlers.delete(msg.id);
+    if (msg.type === "error") entry.reject(new Error(msg.error || "本地模型执行失败"));
+    else entry.resolve(msg);
+  }
+
+  call(type, payload = {}, handler = null) {
+    const id = ++this.seq;
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, { resolve, reject });
+      if (handler) this.handlers.set(id, handler);
+      this.worker.postMessage({ id, type, payload });
+      setTimeout(() => {
+        if (this.pending.has(id)) {
+          this.pending.delete(id);
+          this.handlers.delete(id);
+          reject(new Error("本地模型操作超时，请检查浏览器控制台"));
+        }
+      }, 30 * 60 * 1000);
+    });
+  }
+
+  async generate(messages, options, onDelta, onThinking) {
+    return this.call("generate", { messages, options }, (msg) => {
+      if (msg.type === "delta") onDelta(msg.text);
+      if (msg.type === "thinking") onThinking?.(msg.text);
+    });
+  }
+}
+
+async function ensureLocalEngine() {
+  if (localEngine) return localEngine;
+  localEngine = new LocalEngine();
+  return localEngine;
+}
+
+async function probeLocal() {
+  try {
+    const engine = await ensureLocalEngine();
+    const result = await engine.call("probe");
+    if (!result.ok) throw new Error(result.error || "探测失败");
+    webgpuSupported = result.gpu.supported;
+    webgpuReason = result.gpu.reason || "";
+    localReady = result.gpu.supported;
+    updateWebGPUBanner();
+    updateRuntimeStatus();
+    if (localReady) await refreshCacheStatus();
+  } catch (error) {
+    webgpuSupported = false;
+    localReady = false;
+    webgpuReason = String(error.message || error);
+    updateWebGPUBanner();
+    updateRuntimeStatus();
+    console.warn("本地模型探测失败", error);
+  }
+}
+
+function updateWebGPUBanner() {
+  const banner = $("webgpuBanner");
+  const dot = banner.querySelector(".status-dot");
+  dot.className = "status-dot";
+  if (localReady) {
+    dot.classList.add("ok");
+    $("webgpuTitle").textContent = "WebGPU 可用，本地推理已就绪";
+    $("webgpuDesc").textContent = `WebLLM ${WEBLLM_VERSION} · 模型会下载并保存在浏览器缓存中。`;
+  } else {
+    dot.classList.add("err");
+    $("webgpuTitle").textContent = "WebGPU 不可用";
+    $("webgpuDesc").textContent = webgpuReason
+      ? `${webgpuReason}。本地模式需要最新版 Chrome 或 Edge，并开启硬件加速。`
+      : "本地推理需要最新版 Chrome 或 Edge，并开启硬件加速。";
+  }
+  renderModelGrid();
+  renderQuickModelList();
+}
+
+async function refreshCacheStatus() {
+  if (!localEngine) return;
+  cachedModels = new Set();
+  for (const model of LOCAL_MODELS) {
+    try {
+      const result = await localEngine.call("checkCache", { modelId: model.id });
+      if (result.ok && result.cached) cachedModels.add(model.id);
+    } catch (error) {
+      console.warn("检查模型缓存失败", model.id, error);
+    }
+  }
+  updateWebGPUBanner();
+  syncModeUI();
+}
+
+function renderModelGrid() {
+  const grid = $("modelGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  for (const model of LOCAL_MODELS) {
+    const cached = cachedModels.has(model.id);
+    const active = state.settings.local.modelId === model.id;
+    const loaded = loadedModelId === model.id;
+    const card = document.createElement("div");
+    card.className = "model-card" + (active ? " active" : "") + (model.extreme ? " extreme" : "");
+    const tags = model.tags.map((t) => `<span class="model-tag${model.extreme ? " extreme" : ""}">${escapeHtml(t)}</span>`).join("")
+      + (model.extreme ? '<span class="model-tag extreme">下载前警告</span>' : "")
+      + (cached ? '<span class="model-tag cached">已下载</span>' : "");
+    card.innerHTML = `
+      <div class="model-card-head"><svg><use href="#i-cpu"/></svg><strong>${escapeHtml(model.name)}</strong></div>
+      <div class="model-desc">${escapeHtml(model.desc)}</div>
+      <div class="model-tags"><span class="model-tag">${escapeHtml(model.vram)}</span>${tags}</div>
+      <div class="model-actions">
+        <button class="mini-btn primary" data-action="load" ${!localReady || loaded ? "disabled" : ""}>${loaded ? "已加载" : cached ? "加载模型" : "下载并加载"}</button>
+        <button class="mini-btn danger" data-action="delete" ${!cached || !localReady ? "disabled" : ""} title="删除浏览器中的模型缓存"><svg><use href="#i-trash"/></svg></button>
+      </div>`;
+    card.onclick = (event) => {
+      if (event.target.closest("button")) return;
+      state.settings.local.modelId = model.id;
+      saveState();
+      syncModeUI();
+      renderModelGrid();
+    };
+    card.querySelector('[data-action="load"]').onclick = async () => {
+      state.settings.local.modelId = model.id;
+      saveState();
+      syncModeUI();
+      await downloadLocalModel(model);
+    };
+    card.querySelector('[data-action="delete"]').onclick = async () => {
+      if (!confirm(`删除「${model.name}」的本地缓存？下次使用需要重新下载。`)) return;
+      try {
+        const engine = await ensureLocalEngine();
+        await engine.call("deleteModel", { modelId: model.id });
+        cachedModels.delete(model.id);
+        if (loadedModelId === model.id) loadedModelId = null;
+        toast("模型缓存已删除", "ok");
+        renderModelGrid();
+        syncModeUI();
+      } catch (error) {
+        toast(`删除失败：${error.message}`, "err");
+      }
+    };
+    grid.appendChild(card);
+  }
+}
+
+function renderQuickModelList() {
+  const host = $("quickModelList");
+  if (!host) return;
+  host.innerHTML = "";
+  for (const model of LOCAL_MODELS) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    const active = state.settings.local.modelId === model.id;
+    const cached = cachedModels.has(model.id);
+    btn.className = "quick-model-item" + (active ? " active" : "") + (cached ? " cached" : "") + (model.extreme ? " extreme" : "");
+    btn.innerHTML = `<span class="quick-model-dot"></span><span class="quick-model-name">${escapeHtml(model.name)}</span><span class="quick-model-vram">${escapeHtml(model.vram)}</span>`;
+    btn.onclick = (event) => {
+      event.stopPropagation();
+      if (state.settings.local.modelId === model.id) return;
+      state.settings.local.modelId = model.id;
+      saveState();
+      syncModeUI();
+      renderModelGrid();
+    };
+    host.appendChild(btn);
+  }
+}
+
+async function downloadLocalModel(model) {
+  if (!localReady) {
+    toast("WebGPU 不可用，无法加载本地模型。", "err");
+    openSettings("local");
+    return;
+  }
+  if (model.extreme && !confirm(`运行这个模型可能会让你的设备发热或卡死。\n\n「${model.name}」需要约 ${model.vram.replace("约 ", "")} 显存，下载体积也很大。确定要继续吗？`)) {
+    return;
+  }
+  const progress = $("loadProgress");
+  progress.hidden = false;
+  $("loadProgressLabel").textContent = `正在准备 ${model.name}…`;
+  $("loadProgressPercent").textContent = "0%";
+  $("progressFill").style.width = "0%";
+  $("loadProgressText").textContent = "第一次下载可能需要几分钟，别关标签页。";
+  try {
+    const engine = await ensureLocalEngine();
+    const result = await engine.call("load", { modelId: model.id }, (msg) => {
+      if (msg.type !== "progress") return;
+      const pct = Math.max(0, Math.min(100, Math.round(msg.progress * 100)));
+      $("loadProgressPercent").textContent = `${pct}%`;
+      $("progressFill").style.width = `${pct}%`;
+      $("loadProgressText").textContent = msg.text || "";
+    });
+    if (!result.ok) throw new Error(result.error || "加载失败");
+    loadedModelId = model.id;
+    cachedModels.add(model.id);
+    toast(`${model.name} 已加载，可以开聊了。`, "ok");
+  } catch (error) {
+    toast(`模型加载失败：${error.message}`, "err");
+  } finally {
+    progress.hidden = true;
+    renderModelGrid();
+    syncModeUI();
+  }
+}
+
+async function ensureLocalModel() {
+  const modelId = state.settings.local.modelId;
+  if (loadedModelId === modelId && localEngine) return;
+  const model = LOCAL_MODELS.find((m) => m.id === modelId);
+  if (!model) throw new Error("请先选择一个本地模型");
+  toast("正在准备本地模型，下载进度可在设置 → 本地模型里查看。");
+  await downloadLocalModel(model);
+  if (loadedModelId !== modelId) throw new Error("本地模型未就绪");
+}
+
+/* ---------- Chat actions ---------- */
+function setBusy(value) {
+  busy = value;
+  $("sendBtn").disabled = value;
+  $("stopBtn").hidden = !value;
+  $("sendBtn").hidden = value;
+}
+
+async function sendMessage() {
+  if (busy) return;
+  const input = $("promptInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  if (!localReady) {
+    toast("WebGPU 不可用，先看看本地模型设置里的说明。", "err");
+    openSettings("local");
+    return;
+  }
+
+  const conv = ensureConversation();
+  input.value = "";
+  autoResizeInput();
+  conv.messages.push({ id: uid(), role: "user", content: text, ts: Date.now() });
+  const replyId = uid();
+  conv.messages.push({ id: replyId, role: "assistant", content: "", streaming: true, ts: Date.now() });
+  conv.title = convTitle(conv);
+  conv.updatedAt = Date.now();
+  renderMessages();
+  renderConvList();
+  setBusy(true);
+
+  const activeModel = LOCAL_MODELS.find((m) => m.id === state.settings.local.modelId);
+  const systemPrompt = activeModel?.systemPrompt || LOCAL_SYSTEM_PROMPT;
+  const history = tidyHistory(conv.messages
+    .filter((m) => m.id !== replyId && (m.role === "user" || m.role === "assistant"))
+    .map((m) => ({ role: m.role, content: m.content })));
+  const messages = [{ role: "system", content: systemPrompt }, ...history];
+  let full = "";
+  let thinkingText = "";
+
+  try {
+    await ensureLocalModel();
+      const thinkingOn = !!state.settings.local.thinkingEnabled && !!activeModel?.thinkingSupported;
+      const intensity = INTENSITY_PRESETS[state.settings.local.intensity] || INTENSITY_PRESETS.medium;
+      const options = {
+        temperature: intensity.temperature,
+        top_p: intensity.top_p,
+        maxTokens: intensity.maxTokens,
+        repetition_penalty: intensity.repetition_penalty,
+        frequency_penalty: intensity.frequency_penalty,
+        presence_penalty: intensity.presence_penalty,
+        enableThinking: thinkingOn,
+      };
+      if (thinkingOn) options.maxTokens = Math.max(options.maxTokens, 4096);
+      const previousAssistant = [...conv.messages].reverse()
+        .find((m) => m.role === "assistant" && m.id !== replyId && !m.streaming);
+
+      const runLocal = async (retry = false, keepThinking = false) => {
+        const attemptMessages = retry
+          ? messages.map((m, i) => i === 0
+            ? { ...m, content: m.content + " 注意：不要重复上一轮的原话，直接根据对话历史给出新的回答。" }
+            : m)
+          : messages;
+        const attemptOptions = retry
+          ? { ...options, temperature: Math.min(1.2, options.temperature + 0.2), repetition_penalty: 1.25 }
+          : options;
+        full = "";
+        if (!keepThinking) thinkingText = "";
+        updateMessageDOM(replyId, "", true, thinkingText);
+        await localEngine.generate(attemptMessages, attemptOptions, (delta) => {
+          full += delta;
+          updateMessageDOM(replyId, full, true, thinkingText);
+        }, (thought) => {
+          thinkingText += thought;
+          updateMessageDOM(replyId, full, true, thinkingText);
+        });
+      };
+
+      await runLocal(false);
+      if (previousAssistant && isCrossTurnRepeat(full, previousAssistant.content)) {
+        await runLocal(true);
+      }
+      if (thinkingOn && thinkingText.trim() && !full.trim()) {
+        const fallbackMessages = messages.map((m, i) => i === 0
+          ? { ...m, content: m.content + " 请立即给出最终答案，不要再展开思考。" }
+          : m);
+        full = "";
+        await localEngine.generate(fallbackMessages, { ...options, enableThinking: false, maxTokens: 2048 }, (delta) => {
+          full += delta;
+          updateMessageDOM(replyId, full, true, thinkingText);
+        }, () => {});
+    }
+    const target = conv.messages.find((m) => m.id === replyId);
+    if (target) {
+      target.content = full || "（模型没有返回内容）";
+      target.thinking = thinkingText.trim();
+      target.streaming = false;
+    }
+  } catch (error) {
+    const cancelled = error?.name === "AbortError";
+    const target = conv.messages.find((m) => m.id === replyId);
+    if (target) {
+      target.content = cancelled ? `${full}\n\n_已停止生成。_` : `${full}\n\n> 出错了：${escapeHtml(error.message || error)}`;
+      target.thinking = thinkingText.trim();
+      target.streaming = false;
+    }
+    if (!cancelled) toast(`生成失败：${error.message || error}`, "err");
+  } finally {
+    setBusy(false);
+    conv.updatedAt = Date.now();
+    saveState();
+    renderMessages();
+    renderConvList();
+    input.focus();
+  }
+}
+
+function stopGeneration() {
+  if (!busy) return;
+  if (localEngine) localEngine.call("interrupt").catch(() => {});
+  toast("已请求停止生成");
+}
+
+function newChat() {
+  if (busy) return toast("先停止当前生成，再开新对话。", "err");
+  const existing = currentConv();
+  if (existing && !existing.messages.length) {
+    toast("这已经是新的对话了。");
+    $("promptInput").focus();
+    return;
+  }
+  const conv = { id: uid(), title: "新的对话", messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  state.conversations.unshift(conv);
+  currentId = conv.id;
+  saveState();
+  renderAll();
+  closeSidebar();
+  $("promptInput").focus();
+}
+
+function clearCurrent() {
+  const conv = currentConv();
+  if (!conv || !conv.messages.length) return;
+  if (!confirm("清空当前会话的所有消息？这个操作没法撤销。")) return;
+  conv.messages = [];
+  conv.title = "新的对话";
+  saveState();
+  renderMessages();
+  renderConvList();
+  toast("会话已清空");
+}
+
+function exportCurrent() {
+  const conv = currentConv();
+  if (!conv || !conv.messages.length) return toast("当前会话还没有内容可以导出。");
+  const lines = [`# SodiJat 对话导出`, "", `时间：${new Date(conv.updatedAt).toLocaleString("zh-CN")}`, `模式：本地模型`, ""];
+  for (const msg of conv.messages) {
+    lines.push(`## ${msg.role === "user" ? "你" : "SodiJat"}`, "", msg.content, "");
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `SodiJat-${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("对话已导出为 Markdown", "ok");
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast("已复制", "ok");
+  } catch (_) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    document.execCommand("copy");
+    area.remove();
+    toast("已复制", "ok");
+  }
+}
+
+function autoResizeInput() {
+  const input = $("promptInput");
+  input.style.height = "auto";
+  input.style.height = Math.min(input.scrollHeight, 180) + "px";
+}
+
+function openSidebar() { sidebarOpen = true; $("app").classList.add("sidebar-open"); }
+function closeSidebar() { sidebarOpen = false; $("app").classList.remove("sidebar-open"); }
+
+/* ---------- Events ---------- */
+function bindEvents() {
+  $("newChatBtn").onclick = newChat;
+  $("sendBtn").onclick = sendMessage;
+  $("stopBtn").onclick = stopGeneration;
+  $("clearBtn").onclick = clearCurrent;
+  $("exportBtn").onclick = exportCurrent;
+  $("openSettings").onclick = () => openSettings("local");
+  $("topSettingsBtn").onclick = () => openSettings("local");
+  $("closeSettings").onclick = closeSettings;
+  $("scrim").onclick = () => { closeSettings(); closeSidebar(); };
+  $("menuBtn").onclick = openSidebar;
+  $("sidebarClose").onclick = closeSidebar;
+
+  document.querySelectorAll(".settings-tab").forEach((btn) => btn.onclick = () => selectSettingsTab(btn.dataset.tab));
+  $("refreshCacheBtn").onclick = async () => { await refreshCacheStatus(); toast("缓存状态已刷新", "ok"); };
+
+  const applyIntensityIndex = (index) => {
+    const clamped = Math.max(0, Math.min(INTENSITY_LEVELS.length - 1, index));
+    const key = INTENSITY_LEVELS[clamped];
+    if (key === state.settings.local.intensity) return;
+    state.settings.local.intensity = key;
+    saveState();
+    syncModeUI();
+  };
+
+  $("intensityTrigger").addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleIntensityPanel();
+  });
+  document.querySelectorAll(".intensity-tab").forEach((btn) => {
+    btn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      selectIntensityPane(btn.dataset.pane);
+    });
+  });
+  $("thinkingToggle").addEventListener("change", (event) => {
+    event.stopPropagation();
+    state.settings.local.thinkingEnabled = event.target.checked;
+    saveState();
+    syncModeUI();
+  });
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest("#intensityPopover")) closeIntensityPanel();
+  });
+
+  $("codexModelLine").addEventListener("click", (event) => {
+    event.stopPropagation();
+    selectIntensityPane("model");
+  });
+  $("codexReset").addEventListener("click", (event) => {
+    event.stopPropagation();
+    selectIntensityPane("intensity");
+    applyIntensityIndex(1);
+  });
+  $("codexFullMode").addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!confirm("是否开启完整模式？\n\n开启完整模式会自动切换到 Ultra，并打开思考链。")) return;
+    state.settings.local.intensity = "ultra";
+    state.settings.local.thinkingEnabled = true;
+    saveState();
+    syncModeUI();
+    selectIntensityPane("intensity");
+  });
+
+  $("intensityRange").addEventListener("input", (event) => {
+    applyIntensityIndex(Number(event.target.value));
+  });
+
+  const input = $("promptInput");
+  input.addEventListener("input", autoResizeInput);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
+      event.preventDefault();
+      sendMessage();
+    }
+  });
+
+  document.querySelectorAll("#suggestions button").forEach((btn) => {
+    btn.onclick = () => {
+      input.value = btn.dataset.prompt;
+      autoResizeInput();
+      input.focus();
+    };
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    closeIntensityPanel();
+    if (!$("settings").hidden) closeSettings();
+    else if (sidebarOpen) closeSidebar();
+  });
+}
+
+async function init() {
+  bindEvents();
+  if (!currentConv() && state.conversations.length) currentId = state.conversations[0].id;
+  if (!currentConv()) ensureConversation();
+  renderAll();
+  probeLocal();
+}
+
+init();
